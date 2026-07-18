@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [] }) {
   const [val, setVal] = useState(initialQuery);

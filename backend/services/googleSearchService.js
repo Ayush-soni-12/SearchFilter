@@ -20,38 +20,51 @@ export class GoogleSearchService extends SearchProvider {
     const page = await context.newPage();
     
     try {
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=50`;
-      await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+      let allRawResults = [];
 
-      // We wait up to 60 seconds for the search results (#search). 
-      // If a CAPTCHA appears, this gives the user 60 seconds to manually solve it.
-      await page.waitForSelector('#search', { timeout: 60000 });
+      // Fetch 4 pages (up to 40 results)
+      for (let pageNum = 0; pageNum < 4; pageNum++) {
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&start=${pageNum * 10}`;
+        await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
-      // Extract results by looking for <h3> tags, which are consistently used for search result titles
-      const results = await page.$$eval('h3', (elements) => {
-        return elements.map(h3 => {
-          // The <a> tag is usually the parent of the <h3>
-          const linkEl = h3.closest('a') || h3.parentElement;
-          if (!linkEl || !linkEl.href) return null;
+        // Wait up to 60 seconds (allows time for CAPTCHA solving if it appears on any page)
+        await page.waitForSelector('#search', { timeout: 60000 });
 
-          const title = h3.innerText;
-          const url = linkEl.href;
-          
-          if (!url.startsWith('http') || url.includes('google.com') || url.includes('google.co.in')) return null;
+        // Extract results from this page
+        const pageResults = await page.$$eval('h3', (elements) => {
+          return elements.map(h3 => {
+            const linkEl = h3.closest('a') || h3.parentElement;
+            if (!linkEl || !linkEl.href) return null;
 
-          // Find the container to get the snippet
-          const container = h3.closest('.g, .MjjYud, div[data-sokoban-container]') || h3.closest('div').parentElement;
-          
-          let snippet = '';
-          if (container) {
-            const snippetEl = container.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .yXK7lf, .MUxGbd');
-            if (snippetEl) {
-              snippet = snippetEl.innerText;
+            const title = h3.innerText;
+            const url = linkEl.href;
+            
+            if (!url.startsWith('http') || url.includes('google.com') || url.includes('google.co.in')) return null;
+
+            const container = h3.closest('.g, .MjjYud, div[data-sokoban-container]') || h3.closest('div').parentElement;
+            
+            let snippet = '';
+            if (container) {
+              const snippetEl = container.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .yXK7lf, .MUxGbd');
+              if (snippetEl) snippet = snippetEl.innerText;
             }
-          }
 
-          return { title, url, snippet };
-        }).filter(item => item !== null && item.title.trim() !== '');
+            return { title, url, snippet };
+          }).filter(item => item !== null && item.title.trim() !== '');
+        });
+
+        allRawResults = allRawResults.concat(pageResults);
+        
+        // Wait 500ms before fetching the next page to prevent aggressive rate limiting
+        if (pageNum < 3) await page.waitForTimeout(500);
+      }
+
+      // Deduplicate results just in case Google returned overlapping results
+      const uniqueUrls = new Set();
+      const results = allRawResults.filter(item => {
+        if (uniqueUrls.has(item.url)) return false;
+        uniqueUrls.add(item.url);
+        return true;
       });
 
       // Add domain property to each result

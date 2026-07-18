@@ -9,7 +9,12 @@ const HISTORY_FILE = path.join(__dirname, '../history.json');
 const readJsonFile = async (filePath, defaultData) => {
   try {
     const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (Array.isArray(defaultData) && !Array.isArray(parsed)) {
+      console.warn(`Warning: Expected array in ${filePath}, got object. Resetting.`);
+      return defaultData;
+    }
+    return parsed;
   } catch (err) {
     if (err.code === 'ENOENT') {
       await writeJsonFile(filePath, defaultData);
