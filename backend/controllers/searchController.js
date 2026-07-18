@@ -1,4 +1,6 @@
 import { GoogleSearchService } from '../services/googleSearchService.js';
+import { preferenceEngine } from '../services/preferenceEngine.js';
+import { storageService } from '../services/storageService.js';
 
 const googleService = new GoogleSearchService();
 
@@ -10,19 +12,11 @@ export const handleSearch = async (req, res) => {
   }
 
   try {
+    // Log history
+    await storageService.addHistory(query);
+
     const rawResults = await googleService.search(query);
-    
-    // TODO: Add Preference Engine ranking here later
-    // For now, we just assign the raw position score based on the Google ranking
-    const totalResults = rawResults.length;
-    const rankedResults = rawResults.map((result, index) => {
-      return {
-        ...result,
-        positionScore: totalResults - index,
-        preferenceScore: 0, // Default for now
-        finalScore: totalResults - index
-      };
-    });
+    const rankedResults = await preferenceEngine.rankResults(rawResults);
     
     res.json({
       query,
