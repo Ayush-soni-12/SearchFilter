@@ -75,12 +75,12 @@ function App() {
   return (
     <div className="app-container">
       <nav className="navbar">
-        <div className="nav-brand" onClick={() => setActivePage('home')}>
+        <div className="nav-brand" onClick={() => setActivePage(results.length > 0 ? 'results' : 'home')}>
           SearchFilter
         </div>
         <button 
           className="open-btn" 
-          onClick={() => setActivePage(activePage === 'settings' ? 'home' : 'settings')}
+          onClick={() => setActivePage(activePage === 'settings' ? (results.length > 0 ? 'results' : 'home') : 'settings')}
         >
           <Settings size={18} />
           {activePage === 'settings' ? 'Close Settings' : 'Settings'}

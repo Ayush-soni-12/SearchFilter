@@ -20,9 +20,9 @@ const readJsonFile = async (filePath, defaultData) => {
   }
 };
 
-const writeJsonFile = async (filePath, data) => {
+async function writeJsonFile(filePath, data) {
   await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-};
+}
 
 export const storageService = {
   getPreferences: async () => readJsonFile(PREFERENCES_FILE, {}),
@@ -30,7 +30,8 @@ export const storageService = {
   
   getHistory: async () => readJsonFile(HISTORY_FILE, []),
   addHistory: async (entry) => {
-    const history = await readJsonFile(HISTORY_FILE, []);
+    let history = await readJsonFile(HISTORY_FILE, []);
+    history = history.filter(item => item.query !== entry);
     history.unshift({ query: entry, time: new Date().toISOString() });
     if (history.length > 100) history.pop();
     await writeJsonFile(HISTORY_FILE, history);

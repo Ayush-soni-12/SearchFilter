@@ -20,36 +20,38 @@ export class GoogleSearchService extends SearchProvider {
     const page = await context.newPage();
     
     try {
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=50`;
       await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
       // We wait up to 60 seconds for the search results (#search). 
       // If a CAPTCHA appears, this gives the user 60 seconds to manually solve it.
       await page.waitForSelector('#search', { timeout: 60000 });
 
-      // Extract results
-      const results = await page.$$eval('#search .g', (elements) => {
-        return elements.map(el => {
-          const titleEl = el.querySelector('h3');
-          const linkEl = el.querySelector('a');
-          
-          if (!titleEl || !linkEl) return null;
+      // Extract results by looking for <h3> tags, which are consistently used for search result titles
+      const results = await page.$$eval('h3', (elements) => {
+        return elements.map(h3 => {
+          // The <a> tag is usually the parent of the <h3>
+          const linkEl = h3.closest('a') || h3.parentElement;
+          if (!linkEl || !linkEl.href) return null;
 
-          const title = titleEl.innerText;
+          const title = h3.innerText;
           const url = linkEl.href;
           
-          let snippet = '';
-          const snippetEl = el.querySelector('div[style*="-webkit-line-clamp"]');
-          const fallbackSnippetEl = el.querySelector('.VwiC3b');
+          if (!url.startsWith('http') || url.includes('google.com') || url.includes('google.co.in')) return null;
+
+          // Find the container to get the snippet
+          const container = h3.closest('.g, .MjjYud, div[data-sokoban-container]') || h3.closest('div').parentElement;
           
-          if (snippetEl) {
-            snippet = snippetEl.innerText;
-          } else if (fallbackSnippetEl) {
-            snippet = fallbackSnippetEl.innerText;
+          let snippet = '';
+          if (container) {
+            const snippetEl = container.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .yXK7lf, .MUxGbd');
+            if (snippetEl) {
+              snippet = snippetEl.innerText;
+            }
           }
 
           return { title, url, snippet };
-        }).filter(item => item !== null && item.url.startsWith('http'));
+        }).filter(item => item !== null && item.title.trim() !== '');
       });
 
       // Add domain property to each result
