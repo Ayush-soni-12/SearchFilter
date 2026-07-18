@@ -9,12 +9,14 @@ function App() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [preferences, setPreferences] = useState({});
+  const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    // Load preferences on mount
+    // Load preferences and history on mount
     api.getPreferences().then(setPreferences).catch(console.error);
+    api.getHistory().then(setHistory).catch(console.error);
   }, []);
 
   const handleSearch = async (searchQuery) => {
@@ -27,6 +29,7 @@ function App() {
     try {
       const data = await api.search(searchQuery);
       setResults(data.results);
+      api.getHistory().then(setHistory).catch(console.error);
     } catch (error) {
       console.error(error);
       setErrorMsg(error.message);
@@ -86,7 +89,7 @@ function App() {
 
       <main>
         {activePage !== 'settings' && (
-          <SearchBar onSearch={handleSearch} initialQuery={query} isLoading={isLoading} />
+          <SearchBar onSearch={handleSearch} initialQuery={query} isLoading={isLoading} history={history} />
         )}
 
         {errorMsg && (

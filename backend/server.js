@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import searchRoutes from './routes/searchRoutes.js';
 import preferencesRoutes from './routes/preferencesRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -12,6 +13,7 @@ app.use(express.json());
 // API Routes
 app.use('/api/search', searchRoutes);
 app.use('/api/preferences', preferencesRoutes);
+app.use('/api/history', historyRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'SearchFilter backend is running' });

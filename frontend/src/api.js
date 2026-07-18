@@ -11,6 +11,11 @@ export const api = {
     if (!res.ok) throw new Error('Failed to get preferences');
     return res.json();
   },
+  getHistory: async () => {
+    const res = await fetch(`${API_BASE}/history`);
+    if (!res.ok) throw new Error('Failed to get history');
+    return res.json();
+  },
   updatePreference: async (domain, status) => {
     const res = await fetch(`${API_BASE}/preferences`, {
       method: 'POST',
