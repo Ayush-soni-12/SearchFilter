@@ -5,6 +5,7 @@ A privacy-first, local-only search engine re-ranker. SearchFilter sits between y
 ## ✨ Features
 - **Local-Only Privacy**: Your history and preferences never leave your machine (`history.json` and `preferences.json`).
 - **Live Re-ranking**: Upvote or downvote domains on the fly, and watch your search results re-sort instantly.
+- **Junk Filtering**: Results from your "avoid" domains are completely hidden from the main view to keep your feed clean, with a toggle to reveal them if necessary.
 - **Glassmorphism UI**: A beautiful, premium React interface.
 - **Headful Scraping**: Bypasses bot detection by using a persistent, headful Chromium instance that allows you to easily solve CAPTCHAs if they appear.
 - **Deep Pagination**: Scrapes 4 full pages (up to 40 results) behind the scenes to give you maximum filtering power.
