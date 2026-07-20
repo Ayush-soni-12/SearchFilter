@@ -12,6 +12,7 @@ function App() {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showHidden, setShowHidden] = useState(false);
 
   useEffect(() => {
     // Load preferences and history on mount
@@ -25,6 +26,7 @@ function App() {
     setIsLoading(true);
     setErrorMsg('');
     setActivePage('results');
+    setShowHidden(false);
     
     try {
       const data = await api.search(searchQuery);
@@ -111,14 +113,47 @@ function App() {
             {results.length === 0 ? (
               <p>No results found.</p>
             ) : (
-              results.map((result, i) => (
-                <ResultCard 
-                  key={result.url + i} 
-                  result={result} 
-                  currentPref={preferences[result.domain] || 'neutral'}
-                  onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
-                />
-              ))
+              (() => {
+                const visibleResults = results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid');
+                const hiddenResults = results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid');
+                
+                return (
+                  <>
+                    {visibleResults.map((result, i) => (
+                      <ResultCard 
+                        key={result.url + i} 
+                        result={result} 
+                        currentPref={preferences[result.domain] || 'neutral'}
+                        onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                      />
+                    ))}
+                    
+                    {hiddenResults.length > 0 && (
+                      <div className="hidden-results-container">
+                        <button 
+                          className="toggle-hidden-btn"
+                          onClick={() => setShowHidden(!showHidden)}
+                        >
+                          {showHidden ? `Hide ${hiddenResults.length} avoided results` : `👀 Show ${hiddenResults.length} hidden results (avoided domains)`}
+                        </button>
+                        
+                        {showHidden && (
+                          <div className="hidden-results-list animate-slide-up" style={{ marginTop: '1rem', opacity: 0.8 }}>
+                            {hiddenResults.map((result, i) => (
+                              <ResultCard 
+                                key={result.url + i} 
+                                result={result} 
+                                currentPref={preferences[result.domain] || 'neutral'}
+                                onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+              })()
             )}
           </div>
         )}
