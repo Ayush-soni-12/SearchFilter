@@ -3,3 +3,4 @@ node_modules/
 preferences.json
 history.json
 playwright-profile/
+searchCache/
