@@ -13,6 +13,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showHidden, setShowHidden] = useState(false);
+  const [cacheNotification, setCacheNotification] = useState(null);
+  const [activeCache, setActiveCache] = useState(null);
 
   useEffect(() => {
     // Load preferences and history on mount
@@ -20,23 +22,83 @@ function App() {
     api.getHistory().then(setHistory).catch(console.error);
   }, []);
 
-  const handleSearch = async (searchQuery) => {
+  const handleSearch = async (searchQuery, options = {}) => {
     if (!searchQuery.trim()) return;
-    setQuery(searchQuery);
+    
+    if (!options.forceSearch && !options.useCacheId) {
+      setQuery(searchQuery);
+      setCacheNotification(null);
+      setActiveCache(null);
+    }
+    
     setIsLoading(true);
     setErrorMsg('');
     setActivePage('results');
     setShowHidden(false);
     
     try {
-      const data = await api.search(searchQuery);
+      const data = await api.search(searchQuery, options);
+      
+      if (data.cacheAvailable) {
+        setCacheNotification(data.cacheInfo);
+        setResults([]);
+        return;
+      }
+
       setResults(data.results);
+      if (options.useCacheId && cacheNotification) {
+        setActiveCache(cacheNotification);
+      } else {
+        setActiveCache(null);
+      }
+      
       api.getHistory().then(setHistory).catch(console.error);
     } catch (error) {
       console.error(error);
       setErrorMsg(error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const proceedWithCache = () => {
+    handleSearch(query, { useCacheId: cacheNotification.id });
+    setCacheNotification(null);
+  };
+
+  const forceSearchAnyway = () => {
+    handleSearch(query, { forceSearch: true });
+    setCacheNotification(null);
+  };
+
+  const handleRenew = async () => {
+    try {
+      await api.renewCache(activeCache.id);
+      setActiveCache(prev => ({ ...prev, isStale: false }));
+      alert('Cache renewed successfully!');
+    } catch (err) {
+      alert('Failed to renew cache.');
+    }
+  };
+
+  const handlePin = async () => {
+    try {
+      await api.pinCache(activeCache.id);
+      setActiveCache(prev => ({ ...prev, permanent: true }));
+      alert('Cache pinned permanently!');
+    } catch (err) {
+      alert('Failed to pin cache.');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.deleteCache(activeCache.id);
+      setActiveCache(null);
+      setResults([]);
+      alert('Cache deleted. Search again to fetch new results.');
+    } catch (err) {
+      alert('Failed to delete cache.');
     }
   };
 
@@ -108,8 +170,37 @@ function App() {
           </div>
         )}
 
-        {!isLoading && activePage === 'results' && (
+        {!isLoading && activePage === 'results' && cacheNotification && (
+          <div className="glass-panel animate-slide-up" style={{ padding: '2rem', marginBottom: '2rem', textAlign: 'center', borderColor: '#3b82f6' }}>
+            <h3>🔍 Cache Found!</h3>
+            <p style={{ margin: '1rem 0' }}>We found a cached result for a similar query: <strong>"{cacheNotification.matchedQuery}"</strong>.</p>
+            {cacheNotification.isStale && (
+              <p style={{ color: '#ef4444', marginBottom: '1rem' }}><AlertCircle size={16} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> This cache is older than 2 days (stale).</p>
+            )}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button className="primary-btn" onClick={proceedWithCache}>View Cached Results</button>
+              <button className="secondary-btn" onClick={forceSearchAnyway} style={{ background: 'rgba(255,255,255,0.1)' }}>Search Anyway</button>
+            </div>
+          </div>
+        )}
+
+        {!isLoading && activePage === 'results' && !cacheNotification && (
           <div className="animate-slide-up">
+            {activeCache && (
+              <div className="cache-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.5)' }}>
+                <div>
+                  <strong>Viewing Cached Results</strong>
+                  {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
+                  {activeCache.permanent && <span style={{ marginLeft: '10px', color: '#4ade80' }}>(Pinned)</span>}
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {!activeCache.permanent && <button className="secondary-btn" onClick={handlePin} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>📌 Pin</button>}
+                  {activeCache.isStale && !activeCache.permanent && <button className="secondary-btn" onClick={handleRenew} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>🔄 Renew</button>}
+                  <button className="secondary-btn" onClick={handleDelete} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.5)' }}>🗑 Delete</button>
+                </div>
+              </div>
+            )}
+
             {results.length === 0 ? (
               <p>No results found.</p>
             ) : (
