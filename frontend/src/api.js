@@ -1,8 +1,12 @@
 const API_BASE = `http://${window.location.hostname}:4000/api`;
 
 export const api = {
-  search: async (query) => {
-    const res = await fetch(`${API_BASE}/search?query=${encodeURIComponent(query)}`);
+  search: async (query, options = {}) => {
+    let url = `${API_BASE}/search?query=${encodeURIComponent(query)}`;
+    if (options.forceSearch) url += '&forceSearch=true';
+    if (options.useCacheId) url += `&useCacheId=${options.useCacheId}`;
+    
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');
     return res.json();
   },
@@ -23,6 +27,21 @@ export const api = {
       body: JSON.stringify({ domain, status })
     });
     if (!res.ok) throw new Error('Failed to update preference');
+    return res.json();
+  },
+  renewCache: async (id) => {
+    const res = await fetch(`${API_BASE}/search/cache/${id}/renew`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to renew cache');
+    return res.json();
+  },
+  pinCache: async (id) => {
+    const res = await fetch(`${API_BASE}/search/cache/${id}/pin`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to pin cache');
+    return res.json();
+  },
+  deleteCache: async (id) => {
+    const res = await fetch(`${API_BASE}/search/cache/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete cache');
     return res.json();
   }
 };
