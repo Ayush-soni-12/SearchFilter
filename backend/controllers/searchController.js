@@ -1,11 +1,12 @@
 import { GoogleSearchService } from '../services/googleSearchService.js';
 import { preferenceEngine } from '../services/preferenceEngine.js';
 import { storageService } from '../services/storageService.js';
+import { cacheService } from '../services/cacheService.js';
 
 const googleService = new GoogleSearchService();
 
 export const handleSearch = async (req, res) => {
-  const { query } = req.query;
+  const { query, forceSearch, useCacheId } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
@@ -15,9 +16,32 @@ export const handleSearch = async (req, res) => {
     // Log history
     await storageService.addHistory(query);
 
+    if (useCacheId) {
+      const cachedResults = await cacheService.getCache(useCacheId);
+      if (cachedResults) {
+        return res.json({
+          query,
+          results: cachedResults,
+          fromCache: true
+        });
+      }
+    }
+
+    if (forceSearch !== 'true') {
+      const match = await cacheService.findMatch(query);
+      if (match.available) {
+        return res.json({
+          cacheAvailable: true,
+          cacheInfo: match.cacheInfo
+        });
+      }
+    }
+
     const rawResults = await googleService.search(query);
     const rankedResults = await preferenceEngine.rankResults(rawResults);
     
+    await cacheService.saveCache(query, rankedResults);
+
     res.json({
       query,
       results: rankedResults
@@ -31,4 +55,22 @@ export const handleSearch = async (req, res) => {
     
     res.status(500).json({ error: 'Failed to perform search' });
   }
+};
+
+export const renewCache = async (req, res) => {
+  const { id } = req.params;
+  const success = await cacheService.renewCache(id);
+  res.json({ success });
+};
+
+export const pinCache = async (req, res) => {
+  const { id } = req.params;
+  const success = await cacheService.pinCache(id);
+  res.json({ success });
+};
+
+export const deleteCache = async (req, res) => {
+  const { id } = req.params;
+  const success = await cacheService.deleteCache(id);
+  res.json({ success });
 };
