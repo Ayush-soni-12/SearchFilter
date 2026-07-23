@@ -119,17 +119,8 @@ function App() {
                 
                 return (
                   <>
-                    {visibleResults.map((result, i) => (
-                      <ResultCard 
-                        key={result.url + i} 
-                        result={result} 
-                        currentPref={preferences[result.domain] || 'neutral'}
-                        onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
-                      />
-                    ))}
-                    
                     {hiddenResults.length > 0 && (
-                      <div className="hidden-results-container">
+                      <div className="hidden-results-container" style={{ marginBottom: '1.5rem' }}>
                         <button 
                           className="toggle-hidden-btn"
                           onClick={() => setShowHidden(!showHidden)}
@@ -151,6 +142,15 @@ function App() {
                         )}
                       </div>
                     )}
+
+                    {visibleResults.map((result, i) => (
+                      <ResultCard 
+                        key={result.url + i} 
+                        result={result} 
+                        currentPref={preferences[result.domain] || 'neutral'}
+                        onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                      />
+                    ))}
                   </>
                 );
               })()
