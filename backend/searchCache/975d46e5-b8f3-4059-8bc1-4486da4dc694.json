@@ -1,0 +1,344 @@
+[
+  {
+    "title": "A Beginner's Guide to Retrieval Augmented Generation",
+    "url": "https://www.singlestore.com/blog/a-guide-to-retrieval-augmented-generation-rag",
+    "snippet": "17 Jan 2025 — RAG is a specialized model that integrates retrieval and generation processes to boost the performance of Large Language Models (LLMs).Read more",
+    "domain": "singlestore.com",
+    "positionScore": 37,
+    "preferenceScore": 20,
+    "finalScore": 57
+  },
+  {
+    "title": "An end-to-end tutorial for developing a RAG Application ...",
+    "url": "https://medium.com/data-science-collective/from-data-to-dialogue-development-of-a-retrieval-augmented-generation-rag-chatbot-for-fitness-b9fbaf818ace",
+    "snippet": "In this post, I'll walk you through a simple implementation of a Retrieval-Augmented Generation (RAG) system designed for Fitness Passport.Read more",
+    "domain": "medium.com",
+    "positionScore": 38,
+    "preferenceScore": 0,
+    "finalScore": 38
+  },
+  {
+    "title": "Retrieval Augmented Generation (RAG) with MongoDB",
+    "url": "https://learn.mongodb.com/courses/rag-with-mongodb",
+    "snippet": "Learn how to build a retrieval augmented generation (RAG) application using MongoDB Atlas, all within one hour! Show off your skills with a verified credly ...",
+    "domain": "learn.mongodb.com",
+    "positionScore": 35,
+    "preferenceScore": 0,
+    "finalScore": 35
+  },
+  {
+    "title": "What Is RAG? A Guide to Retrieval Augmented Generation",
+    "url": "https://www.datacamp.com/blog/what-is-retrieval-augmented-generation-rag",
+    "snippet": "Learn how Retrieval Augmented Generation (RAG) works, why it reduces LLM hallucinations, and how to build RAG pipelines with vector databases. For a hands-on ...",
+    "domain": "datacamp.com",
+    "positionScore": 34,
+    "preferenceScore": 0,
+    "finalScore": 34
+  },
+  {
+    "title": "Retrieval Augmented Generation (RAG)",
+    "url": "https://www.deeplearning.ai/courses/retrieval-augmented-generation",
+    "snippet": "RAG for real-world applications: Learn how retrieval and generation work together, and how to design each component to build reliable, flexible RAG systems.Read more",
+    "domain": "deeplearning.ai",
+    "positionScore": 33,
+    "preferenceScore": 0,
+    "finalScore": 33
+  },
+  {
+    "title": "Building RAG Systems: From Zero to Hero",
+    "url": "https://dev.to/gautamvhavle/building-production-rag-systems-from-zero-to-hero-2f1i",
+    "snippet": "24 Dec 2025 — What I learned building RAG systems from scratch—and how you can too. The Journey That Changed How I Think About AI.Read more",
+    "domain": "dev.to",
+    "positionScore": 32,
+    "preferenceScore": 0,
+    "finalScore": 32
+  },
+  {
+    "title": "LLM RAG Tutorial: How to Build a Reliable Retrieval Pipeline",
+    "url": "https://launchdarkly.com/blog/llm-rag-tutorial/",
+    "snippet": "10 Sept 2025 — Building a RAG pipeline · Step 1: Load your data · Step 2: Break your text into chunks · Step 3: Create embeddings and store data in a vector ...Read more",
+    "domain": "launchdarkly.com",
+    "positionScore": 31,
+    "preferenceScore": 0,
+    "finalScore": 31
+  },
+  {
+    "title": "NirDiamant/RAG_Techniques: This repository showcases ...",
+    "url": "https://github.com/NirDiamant/rag_techniques",
+    "snippet": "This repository showcases various advanced techniques for Retrieval-Augmented Generation (RAG) systems. Each technique has a detailed notebook tutorial.",
+    "domain": "github.com",
+    "positionScore": 30,
+    "preferenceScore": 0,
+    "finalScore": 30
+  },
+  {
+    "title": "Retrieval-Augmented Generation (RAG)",
+    "url": "https://www.pinecone.io/learn/retrieval-augmented-generation/",
+    "snippet": "12 Jun 2025 — With agentic RAG, it's about deciding which questions to ask, which tools to use, when to use them, and then aggregating results to ground ...Read more",
+    "domain": "pinecone.io",
+    "positionScore": 29,
+    "preferenceScore": 0,
+    "finalScore": 29
+  },
+  {
+    "title": "Any good and easy tutorial on how to build a RAG?",
+    "url": "https://www.reddit.com/r/LangChain/comments/1k6p59i/any_good_and_easy_tutorial_on_how_to_build_a_rag/",
+    "snippet": "So I got assigned a school project to make a chatbot-type AI for the school to answer questions, I started studying and looking up what would be ...",
+    "domain": "reddit.com",
+    "positionScore": 27,
+    "preferenceScore": 0,
+    "finalScore": 27
+  },
+  {
+    "title": "Learn RAG from Scratch – Python AI Tutorial from a ...",
+    "url": "https://www.freecodecamp.org/news/mastering-rag-from-scratch/",
+    "snippet": "17 Apr 2024 — Retrieval-Augmented Generation (RAG) is a powerful framework that integrates retrieval into the sequence generation process.Read more",
+    "domain": "freecodecamp.org",
+    "positionScore": 26,
+    "preferenceScore": 0,
+    "finalScore": 26
+  },
+  {
+    "title": "RAG - Tutorials",
+    "url": "https://developer.ibm.com/technologies/rag/tutorials/",
+    "snippet": "This tutorial will show you an implementation of Agentic Retrieval-Augmented Generation (RAG). It can perform multi-step workflows like combining document ...Read more",
+    "domain": "developer.ibm.com",
+    "positionScore": 25,
+    "preferenceScore": 0,
+    "finalScore": 25
+  },
+  {
+    "title": "Retrieval-Augmented Generation (RAG) Tutorial - Glukhov.org",
+    "url": "https://www.glukhov.org/rag/",
+    "snippet": "Step-by-Step RAG Tutorial: How to Build a RAG System · Step 1: Prepare and Chunk Your Data · Step 2: Choose a Vector Database for RAG · Step 3: Implement ...Read more",
+    "domain": "glukhov.org",
+    "positionScore": 23,
+    "preferenceScore": 0,
+    "finalScore": 23
+  },
+  {
+    "title": "How to build a RAG system on a knowledge graph",
+    "url": "https://neo4j.com/blog/developer/rag-tutorial/",
+    "snippet": "22 Aug 2025 — In this walkthrough, you'll learn how to build a RAG app using knowledge graphs and vector search, combining the best of both structured and ...Read more",
+    "domain": "neo4j.com",
+    "positionScore": 22,
+    "preferenceScore": 0,
+    "finalScore": 22
+  },
+  {
+    "title": "What is RAG (Retrieval-Augmented Generation)?",
+    "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+    "snippet": "RAG is the process of optimizing the output of a large language model, so it references an authoritative knowledge base outside of its training data sources ...Read more",
+    "domain": "aws.amazon.com",
+    "positionScore": 21,
+    "preferenceScore": 0,
+    "finalScore": 21
+  },
+  {
+    "title": "Introduction to RAG with Python & LangChain",
+    "url": "https://medium.com/@o39joey/introduction-to-rag-with-python-langchain-62beeb5719ad",
+    "snippet": "In this tutorial, we'll walk through a basic RAG flow using Python, LangChain, ChromaDB, and OpenAI. A basic RAG flow generally consists of two ...Read more",
+    "domain": "medium.com",
+    "positionScore": 20,
+    "preferenceScore": 0,
+    "finalScore": 20
+  },
+  {
+    "title": "Code a simple RAG from scratch",
+    "url": "https://huggingface.co/blog/ngxson/make-your-own-rag",
+    "snippet": "29 Oct 2024 — In this blog post, we'll explore RAG and build a simple RAG system from scratch using Python and ollama.Read more",
+    "domain": "huggingface.co",
+    "positionScore": 19,
+    "preferenceScore": 0,
+    "finalScore": 19
+  },
+  {
+    "title": "Build Custom RAG Systems With Logic & Control",
+    "url": "https://n8n.io/rag/",
+    "snippet": "In this step-by-step tutorial, I'll show you how to go from zero to building your very first RAG (Retrieval-Augmented Generation) agent in just 20 minutes ...Read more",
+    "domain": "n8n.io",
+    "positionScore": 18,
+    "preferenceScore": 0,
+    "finalScore": 18
+  },
+  {
+    "title": "Introduction to RAG | Developer Documentation - LlamaParse",
+    "url": "https://developers.llamaindex.ai/python/framework/understanding/rag/",
+    "snippet": "In RAG, your data is loaded and prepared for queries or “indexed”. User queries act on the index, which filters your data down to the most relevant context.Read more",
+    "domain": "developers.llamaindex.ai",
+    "positionScore": 17,
+    "preferenceScore": 0,
+    "finalScore": 17
+  },
+  {
+    "title": "What is Retrieval-Augmented Generation (RAG)",
+    "url": "https://www.geeksforgeeks.org/nlp/what-is-retrieval-augmented-generation-rag/",
+    "snippet": "1 May 2026 — Retrieval-Augmented Generation (RAG) is a way to make AI answers more reliable by combining searching for relevant information and then ...Read more",
+    "domain": "geeksforgeeks.org",
+    "positionScore": 36,
+    "preferenceScore": -20,
+    "finalScore": 16
+  },
+  {
+    "title": "Tutorial: Build Your Own RAG in 10 lines of Python",
+    "url": "https://openmined.org/blog/tutorial-build-your-own-rag-in-10-lines-of-python/",
+    "snippet": "Tutorial: Build Your Own RAG in 10 lines of Python · Step 1. User Knowledge Base (Documents) · Step 2. Indexing (Embedding + Storage) · Step 3. Saving the Data ...Read more",
+    "domain": "openmined.org",
+    "positionScore": 15,
+    "preferenceScore": 0,
+    "finalScore": 15
+  },
+  {
+    "title": "Retrieval Augmented Generation (RAG)",
+    "url": "https://www.promptingguide.ai/techniques/rag",
+    "snippet": "1 Feb 2026 — RAG combines an information retrieval component with a text generator model. RAG can be fine-tuned and its internal knowledge can be modified in an efficient ...Read more",
+    "domain": "promptingguide.ai",
+    "positionScore": 14,
+    "preferenceScore": 0,
+    "finalScore": 14
+  },
+  {
+    "title": "RAG with Deep Agents - Docs by LangChain",
+    "url": "https://docs.langchain.com/oss/python/deepagents/rag",
+    "snippet": "RAG patterns for Deep Agents, including skills-guided retrieval, rubric grading, and a tutorial that indexes LangChain docs, offloads chunks to the ...",
+    "domain": "docs.langchain.com",
+    "positionScore": 13,
+    "preferenceScore": 0,
+    "finalScore": 13
+  },
+  {
+    "title": "Retrieval-Augmented Generation (RAG) Tutorial & Best ...",
+    "url": "https://nexla.com/ai-infrastructure/retrieval-augmented-generation/",
+    "snippet": "Learn how retrieval-augmented generation (RAG) combines traditional AI language models with dynamic external data to improve machine understanding and ...",
+    "domain": "nexla.com",
+    "positionScore": 12,
+    "preferenceScore": 0,
+    "finalScore": 12
+  },
+  {
+    "title": "Retrieval Augmented Generation (RAG)",
+    "url": "https://www.coursera.org/learn/retrieval-augmented-generation-rag",
+    "snippet": "In this course, you'll learn how to build RAG systems that connect LLMs to external data sources. You'll explore core components like retrievers, vector ...Read more",
+    "domain": "coursera.org",
+    "positionScore": 11,
+    "preferenceScore": 0,
+    "finalScore": 11
+  },
+  {
+    "title": "RAG Tutorial 2026: Build Retrieval-Augmented Generation ...",
+    "url": "https://ailearnings.in/rag-tutorial/",
+    "snippet": "Complete RAG tutorial for developers in 2026. Learn to build a Retrieval-Augmented Generation pipeline from scratch — document ingestion, vector embeddings, ...",
+    "domain": "ailearnings.in",
+    "positionScore": 10,
+    "preferenceScore": 0,
+    "finalScore": 10
+  },
+  {
+    "title": "Retrieval Augmented Generation, or RAG ...",
+    "url": "https://learnbybuilding.ai/tutorial/rag-from-scratch/",
+    "snippet": "22 Oct 2023 — This tutorial is designed to help beginners learn how to build RAG applications from scratch. No fluff, no (ok, minimal) jargon, no libraries, just a simple ...Read more",
+    "domain": "learnbybuilding.ai",
+    "positionScore": 9,
+    "preferenceScore": 0,
+    "finalScore": 9
+  },
+  {
+    "title": "RAG Tutorial 2025 #1: Complete Introduction to Retrieval ...",
+    "url": "https://www.youtube.com/watch?v=63B-3rqRFbQ",
+    "snippet": "By the end of this course you are going to master every single component of rag from the fundamentals like you know what is rag.",
+    "domain": "youtube.com",
+    "positionScore": 28,
+    "preferenceScore": -20,
+    "finalScore": 8
+  },
+  {
+    "title": "RAG — Complete Tutorial. Indexing Pipeline - GoPenAI",
+    "url": "https://blog.gopenai.com/rag-complete-tutorial-c0443703b04d",
+    "snippet": "10 Aug 2024 — RAG — Complete Tutorial · Step 1: Data Loading · Step 2: Data Preprocessing · Step 3: Chunking · 20 Most Important AI Concepts Explained in Just ...Read more",
+    "domain": "blog.gopenai.com",
+    "positionScore": 8,
+    "preferenceScore": 0,
+    "finalScore": 8
+  },
+  {
+    "title": "RAG App Tutorial: Build Retrieval-Augmented Generation ...",
+    "url": "https://www.guvi.in/blog/rag-app-tutorial/",
+    "snippet": "10 Jul 2026 — Learn to build a RAG app using LangChain. Load docs, create embeddings, store in vector DB, retrieve context, and generate accurate AI ...",
+    "domain": "guvi.in",
+    "positionScore": 7,
+    "preferenceScore": 0,
+    "finalScore": 7
+  },
+  {
+    "title": "Building A Simple RAG Application — A Step-by- ...",
+    "url": "https://medium.com/@genuine.opinion/building-a-simple-rag-application-a-step-by-step-approach-a9b77fce04f9",
+    "snippet": "In this LangChain and Streamlit tutorial, we'll create a Retrieval-Augmented Generation (RAG) Model using LangChain integration with Streamlit.Read more",
+    "domain": "medium.com",
+    "positionScore": 6,
+    "preferenceScore": 0,
+    "finalScore": 6
+  },
+  {
+    "title": "LightRAG: Simple and Fast Retrieval-Augmented Generation",
+    "url": "http://github.com/hkuds/lightrag",
+    "snippet": "LightRAG is a lightweight Retrieval-Augmented Generation (RAG) framework specifically designed for analyzing complex documents in fields such as law, healthcare ...Read more",
+    "domain": "github.com",
+    "positionScore": 5,
+    "preferenceScore": 0,
+    "finalScore": 5
+  },
+  {
+    "title": "Learn RAG From Scratch – Python AI Tutorial from a ...",
+    "url": "https://www.youtube.com/watch?v=sVcwVQRHIc8",
+    "snippet": "Learn how to implement RAG (Retrieval Augmented Generation) from scratch, straight from a LangChain software engineer. This Python course ...",
+    "domain": "youtube.com",
+    "positionScore": 24,
+    "preferenceScore": -20,
+    "finalScore": 4
+  },
+  {
+    "title": "What is the proper roadmap for learning rag?",
+    "url": "https://community.openai.com/t/what-is-the-proper-roadmap-for-learning-rag/1099348",
+    "snippet": "23 Jan 2025 — 'This AI tutorial section introduces retrieval-augmented generation (RAG) fundamentals: the data pipline, RAG series, evaluation, governance, ...Read more",
+    "domain": "community.openai.com",
+    "positionScore": 4,
+    "preferenceScore": 0,
+    "finalScore": 4
+  },
+  {
+    "title": "How to Implement RAG Systems Tutorial - Complete Guide ...",
+    "url": "https://zenvanriel.com/ai-engineer-blog/implement-rag-systems-tutorial-complete-guide/",
+    "snippet": "Master retrieval-augmented generation (RAG) implementation with this comprehensive tutorial covering architecture, vector databases, and production ...",
+    "domain": "zenvanriel.com",
+    "positionScore": 3,
+    "preferenceScore": 0,
+    "finalScore": 3
+  },
+  {
+    "title": "What Is RAG (Retrieval-Augmented Generation)? A Full ...",
+    "url": "https://www.snowflake.com/en/fundamentals/rag/",
+    "snippet": "RAG is a popular framework in which a large language model (LLM) accesses a specific knowledge base used to generate a response.Read more",
+    "domain": "snowflake.com",
+    "positionScore": 2,
+    "preferenceScore": 0,
+    "finalScore": 2
+  },
+  {
+    "title": "Python RAG Tutorial (with Local LLMs): AI For Your PDFs",
+    "url": "https://www.youtube.com/watch?v=2TJxpyO3ei4",
+    "snippet": "Learn how to build a RAG (Retrieval Augmented Generation) app in Python that can let you query/chat with your PDFs using generative AI.",
+    "domain": "youtube.com",
+    "positionScore": 16,
+    "preferenceScore": -20,
+    "finalScore": -4
+  },
+  {
+    "title": "RAG Explained For Beginners",
+    "url": "https://www.youtube.com/watch?v=_HQ2H_0Ayy0",
+    "snippet": "Don't learn AI Agents without Learning these Fundamentals · Is RAG Still Needed? · RAG Crash Course for Beginners · Complete Agentic AI Course - AI ...",
+    "domain": "youtube.com",
+    "positionScore": 1,
+    "preferenceScore": -20,
+    "finalScore": -19
+  }
+]

@@ -1,1 +1,20 @@
-{}
+{
+  "568a0a4a-0573-4e19-a137-67fb8a14a65c": {
+    "originalQuery": "components react",
+    "createdAt": 1784875772563,
+    "staleAt": 1785048572563,
+    "permanent": false
+  },
+  "e4fc2c1f-e3c4-47e6-af7f-f5b76e6c5f53": {
+    "originalQuery": "components react",
+    "createdAt": 1784875868824,
+    "staleAt": 1785048668824,
+    "permanent": false
+  },
+  "975d46e5-b8f3-4059-8bc1-4486da4dc694": {
+    "originalQuery": "rag tutorial",
+    "createdAt": 1784875894815,
+    "staleAt": 1785048694815,
+    "permanent": false
+  }
+}

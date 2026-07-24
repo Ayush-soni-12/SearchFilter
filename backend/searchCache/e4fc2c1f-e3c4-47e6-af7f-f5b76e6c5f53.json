@@ -1,0 +1,371 @@
+[
+  {
+    "title": "Component",
+    "url": "https://react.dev/reference/react/Component",
+    "snippet": "Component is the base class for the React components defined as JavaScript classes. Class components are still supported by React, but we don't recommend using ...Read more",
+    "domain": "react.dev",
+    "positionScore": 41,
+    "preferenceScore": 0,
+    "finalScore": 41
+  },
+  {
+    "title": "React Components",
+    "url": "https://www.w3schools.com/react/react_components.asp",
+    "snippet": "Components are independent and reusable bits of code. They serve the same purpose as JavaScript functions, but work in isolation and return HTML.",
+    "domain": "w3schools.com",
+    "positionScore": 40,
+    "preferenceScore": 0,
+    "finalScore": 40
+  },
+  {
+    "title": "Open-source React UI components",
+    "url": "https://www.untitledui.com/react/components",
+    "snippet": "React is the world's largest collection of open-source React components. Everything you need to design and develop modern, beautiful interfaces and websites— ...",
+    "domain": "untitledui.com",
+    "positionScore": 39,
+    "preferenceScore": 0,
+    "finalScore": 39
+  },
+  {
+    "title": "Components and Props",
+    "url": "https://legacy.reactjs.org/docs/components-and-props.html",
+    "snippet": "Components are like JavaScript functions. They accept arbitrary inputs (called “props”) and return React elements describing what should appear on the screen.Read more",
+    "domain": "legacy.reactjs.org",
+    "positionScore": 38,
+    "preferenceScore": 0,
+    "finalScore": 38
+  },
+  {
+    "title": "MUI: The React component library you always wanted",
+    "url": "https://mui.com/",
+    "snippet": "MUI provides a simple, customizable, and accessible library of React components. Follow your own design system, or start with Material Design.",
+    "domain": "mui.com",
+    "positionScore": 37,
+    "preferenceScore": 0,
+    "finalScore": 37
+  },
+  {
+    "title": "React Components and JSX - Medium",
+    "url": "https://medium.com/@techathoncert/react-components-and-jsx-a80599c1ea7c#:~:text=They%20are%20reusable%2C%20self%2Dcontained,directly%20within%20your%20JavaScript%20code.",
+    "snippet": "",
+    "domain": "medium.com",
+    "positionScore": 36,
+    "preferenceScore": 0,
+    "finalScore": 36
+  },
+  {
+    "title": "Types of components (class vs functional) - Codeskiller",
+    "url": "https://codeskiller.codingblocks.com/library/articles/types-of-components-(class-vs-functional)#:~:text=In%20React%20JS%20%2C%20there%20are,writing%20components%20in%20most%20cases.",
+    "snippet": "",
+    "domain": "codeskiller.codingblocks.com",
+    "positionScore": 35,
+    "preferenceScore": 0,
+    "finalScore": 35
+  },
+  {
+    "title": "React Components - W3Schools",
+    "url": "https://www.w3schools.com/react/react_components.asp#:~:text=Components%20come%20in%20two%20types,Hooks%2C%20instead%20of%20Class%20components.",
+    "snippet": "",
+    "domain": "w3schools.com",
+    "positionScore": 34,
+    "preferenceScore": 0,
+    "finalScore": 34
+  },
+  {
+    "title": "Your First Component",
+    "url": "https://react.dev/learn/your-first-component",
+    "snippet": "React lets you combine your markup, CSS, and JavaScript into custom “components”, reusable UI elements for your app.Read more",
+    "domain": "react.dev",
+    "positionScore": 33,
+    "preferenceScore": 0,
+    "finalScore": 33
+  },
+  {
+    "title": "The Complete React UI Components Library",
+    "url": "https://www.syncfusion.com/react-components",
+    "snippet": "React UI Components Library offers 140+ high-performance, lightweight, responsive, and enterprise-grade React UI components.",
+    "domain": "syncfusion.com",
+    "positionScore": 32,
+    "preferenceScore": 0,
+    "finalScore": 32
+  },
+  {
+    "title": "Absolutely Awesome React Components & Libraries",
+    "url": "https://github.com/brillout/awesome-react-components",
+    "snippet": "This is a list of AWESOME components. Nope, it's NOT a comprehensive list of every React component under the sun.Read more",
+    "domain": "github.com",
+    "positionScore": 30,
+    "preferenceScore": 0,
+    "finalScore": 30
+  },
+  {
+    "title": "Types of React Components, Class, Functional",
+    "url": "https://trainings.internshala.com/blog/react-components/",
+    "snippet": "12 Feb 2024 — React components are the key feature of React JS library, which allow developers to break down a user interface into small, reusable pieces of code.Read more",
+    "domain": "trainings.internshala.com",
+    "positionScore": 29,
+    "preferenceScore": 0,
+    "finalScore": 29
+  },
+  {
+    "title": "Core Components and Native Components",
+    "url": "https://reactnative.dev/docs/intro-react-native-components",
+    "snippet": "3 Jun 2026 — React Native has many Core Components for everything from controls to activity indicators. You can find them all documented in the API section.Read more",
+    "domain": "reactnative.dev",
+    "positionScore": 27,
+    "preferenceScore": 0,
+    "finalScore": 27
+  },
+  {
+    "title": "React DOM Components",
+    "url": "https://react.dev/reference/react-dom/components",
+    "snippet": "React supports all of the browser built-in HTML and SVG components. Common components All of the built-in browser components support some props and events.Read more",
+    "domain": "react.dev",
+    "positionScore": 26,
+    "preferenceScore": 0,
+    "finalScore": 26
+  },
+  {
+    "title": "React Components, Elements, and Instances – React Blog",
+    "url": "https://legacy.reactjs.org/blog/2015/12/18/react-components-elements-and-instances.html",
+    "snippet": "18 Dec 2015 — An element is a plain object describing a component instance or DOM node and its desired properties. It contains only information about the component type.Read more",
+    "domain": "legacy.reactjs.org",
+    "positionScore": 25,
+    "preferenceScore": 0,
+    "finalScore": 25
+  },
+  {
+    "title": "What Are React Components?",
+    "url": "https://www.cromacampus.com/blogs/what-are-react-components/",
+    "snippet": "9 Apr 2024 — React components are the building blocks of React applications. These components allow developers to create reusable and modular UI elements.Read more",
+    "domain": "cromacampus.com",
+    "positionScore": 24,
+    "preferenceScore": 0,
+    "finalScore": 24
+  },
+  {
+    "title": "React Components",
+    "url": "https://www.reactcomponents.com/?__clerk_synced=true",
+    "snippet": "Command Palette · AnimatedGradientText · TypingAnimatedText · Marquee · Simple Animated Testimonials · Glass Time Card · Drawer · Pricing Tab · Pricing Card.Read more",
+    "domain": "reactcomponents.com",
+    "positionScore": 23,
+    "preferenceScore": 0,
+    "finalScore": 23
+  },
+  {
+    "title": "Common components (e.g. <div>)",
+    "url": "https://react.dev/reference/react-dom/components/common",
+    "snippet": "Common components (eg <div>) All built-in browser components, such as <div>, support some common props and events.Read more",
+    "domain": "react.dev",
+    "positionScore": 22,
+    "preferenceScore": 0,
+    "finalScore": 22
+  },
+  {
+    "title": "Componentizing our React app - Learn web development | MDN",
+    "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Frameworks_libraries/React_components",
+    "snippet": "24 Jun 2025 — Before we can make a component, we should create a new file for it. In fact, we should make a directory just for our components. Make sure you' ...Read more",
+    "domain": "developer.mozilla.org",
+    "positionScore": 21,
+    "preferenceScore": 0,
+    "finalScore": 21
+  },
+  {
+    "title": "What Are Components in React JS? A Simple Explanation",
+    "url": "https://medium.com/@vipusrihar/what-are-components-in-react-js-a-simple-explanation-816205c157b4",
+    "snippet": "Components help us write clean, readable, and organized code. There are two main types of components in React: Functional Components; Class ...Read more",
+    "domain": "medium.com",
+    "positionScore": 20,
+    "preferenceScore": 0,
+    "finalScore": 20
+  },
+  {
+    "title": "React Components: Syntax, Usage, and Examples",
+    "url": "https://mimo.org/glossary/react/components",
+    "snippet": "React components are reusable UI units. Learn syntax, props, state, lifecycle methods, hooks, and best practices for building scalable React applications.",
+    "domain": "mimo.org",
+    "positionScore": 18,
+    "preferenceScore": 0,
+    "finalScore": 18
+  },
+  {
+    "title": "React Class Components",
+    "url": "https://www.w3schools.com/react/react_class.asp",
+    "snippet": "Before React 16.8, Class components were the only way to track state and lifecycle on a React component. Function components were considered \"state-less\".Read more",
+    "domain": "w3schools.com",
+    "positionScore": 17,
+    "preferenceScore": 0,
+    "finalScore": 17
+  },
+  {
+    "title": "Brief explanation of React Components",
+    "url": "https://www.achieversit.com/what-is-react-component",
+    "snippet": "Components are the building blocks of a React Application that represent a part of the user interface.",
+    "domain": "achieversit.com",
+    "positionScore": 16,
+    "preferenceScore": 0,
+    "finalScore": 16
+  },
+  {
+    "title": "5 React Component Libraries to Know",
+    "url": "https://builtin.com/articles/react-component-library",
+    "snippet": "15 Jan 2025 — A React component library provides UI tools for creating efficient and visually appealing web applications. They can help developers streamline ...Read more",
+    "domain": "builtin.com",
+    "positionScore": 15,
+    "preferenceScore": 0,
+    "finalScore": 15
+  },
+  {
+    "title": "Core Components and APIs",
+    "url": "https://reactnative.dev/docs/components-and-apis",
+    "snippet": "7 May 2026 — React Native provides a number of built-in Core Components ready for you to use in your app. You can find them all in the left sidebar (or menu above, if you ...Read more",
+    "domain": "reactnative.dev",
+    "positionScore": 14,
+    "preferenceScore": 0,
+    "finalScore": 14
+  },
+  {
+    "title": "React",
+    "url": "https://react.dev/",
+    "snippet": "React lets you build user interfaces out of individual pieces called components. Create your own React components like Thumbnail, LikeButton, and Video.Read more",
+    "domain": "react.dev",
+    "positionScore": 13,
+    "preferenceScore": 0,
+    "finalScore": 13
+  },
+  {
+    "title": "React Components",
+    "url": "https://www.geeksforgeeks.org/reactjs/reactjs-components/",
+    "snippet": "25 Jun 2026 — React components are reusable UI units that handle their own logic, accept data through props, manage state, and efficiently update only the ...Read more",
+    "domain": "geeksforgeeks.org",
+    "positionScore": 31,
+    "preferenceScore": -20,
+    "finalScore": 11
+  },
+  {
+    "title": "React Components: An Ultimate Guide for 2025",
+    "url": "https://www.guvi.in/blog/guide-on-react-components/",
+    "snippet": "30 Oct 2025 — Learn how React Components boost performance, reusability, and scalability. Explore types, best practices, and examples for building modern ...",
+    "domain": "guvi.in",
+    "positionScore": 11,
+    "preferenceScore": 0,
+    "finalScore": 11
+  },
+  {
+    "title": "React | Components",
+    "url": "https://www.codecademy.com/resources/docs/react/components",
+    "snippet": "29 Jul 2021 — In React, components are pieces of reusable, independent code that make up the user interface (UI) of the application. Each component comes ...Read more",
+    "domain": "codecademy.com",
+    "positionScore": 10,
+    "preferenceScore": 0,
+    "finalScore": 10
+  },
+  {
+    "title": "React Components",
+    "url": "https://dev.to/katherineh/react-components-l34",
+    "snippet": "19 Jan 2025 — React components use props (short for properties) to share data. Props let you pass this data, like a username, from one component to another.Read more",
+    "domain": "dev.to",
+    "positionScore": 9,
+    "preferenceScore": 0,
+    "finalScore": 9
+  },
+  {
+    "title": "React JS Components Explained for Beginners (With Examples)",
+    "url": "https://www.youtube.com/watch?v=PCQY9rhQN4Q",
+    "snippet": "All React Hooks Explained - React Hooks Tutorial 2025. PedroTech · 110K views ; Learn React With This One Project. Web Dev Simplified · 1M views.",
+    "domain": "youtube.com",
+    "positionScore": 28,
+    "preferenceScore": -20,
+    "finalScore": 8
+  },
+  {
+    "title": "React Foundations: Building UI with Components",
+    "url": "https://nextjs.org/learn/react-foundations/building-ui-with-components",
+    "snippet": "User interfaces can be broken down into smaller building blocks called components. Components allow you to build self-contained, reusable snippets of code.Read more",
+    "domain": "nextjs.org",
+    "positionScore": 8,
+    "preferenceScore": 0,
+    "finalScore": 8
+  },
+  {
+    "title": "Components: The building blocks in React",
+    "url": "https://blog.atomxel.com/react-components",
+    "snippet": "1 Mar 2024 — Components are the foundation of React development, enabling developers to create scalable and maintainable applications. Understanding their ...Read more",
+    "domain": "blog.atomxel.com",
+    "positionScore": 7,
+    "preferenceScore": 0,
+    "finalScore": 7
+  },
+  {
+    "title": "Components",
+    "url": "https://mui.com/components/",
+    "snippet": "MUI provides a simple, customizable, and accessible library of React components. Follow your own design system, or start with Material Design.",
+    "domain": "mui.com",
+    "positionScore": 6,
+    "preferenceScore": 0,
+    "finalScore": 6
+  },
+  {
+    "title": "What are components and types of components in React?",
+    "url": "https://www.quora.com/What-are-components-and-types-of-components-in-React",
+    "snippet": "What are components and types of components in React?",
+    "domain": "quora.com",
+    "positionScore": 5,
+    "preferenceScore": 0,
+    "finalScore": 5
+  },
+  {
+    "title": "Types of React Components you should know - wesionaryTEAM",
+    "url": "https://articles.wesionary.team/types-of-react-components-you-should-know-251cceacd8ac",
+    "snippet": "10 Apr 2020 — In React we mainly have two types of components: Functional Components and Class Components. However, there are other components in React that goes similar to ...Read more",
+    "domain": "articles.wesionary.team",
+    "positionScore": 4,
+    "preferenceScore": 0,
+    "finalScore": 4
+  },
+  {
+    "title": "Components In React",
+    "url": "https://www.c-sharpcorner.com/learn/reactjs-for-beginners/components-in-react",
+    "snippet": "In React, a component is referred to as an isolated piece of code which can be reused in one or the other module. The React application contains a root ...Read more",
+    "domain": "c-sharpcorner.com",
+    "positionScore": 3,
+    "preferenceScore": 0,
+    "finalScore": 3
+  },
+  {
+    "title": "React Components Explained: A 2025 Guide for Developers",
+    "url": "https://www.brilworks.com/blog/react-components/",
+    "snippet": "7 May 2026 — React components are the building blocks of any React app. They help you create reusable, modular UI pieces that make development faster and ...Read more",
+    "domain": "brilworks.com",
+    "positionScore": 2,
+    "preferenceScore": 0,
+    "finalScore": 2
+  },
+  {
+    "title": "React JS 19 Tutorial in 2026 #8| Props In ReactJs | Reusable ...",
+    "url": "https://www.youtube.com/watch?v=RL6NVFEk-jk",
+    "snippet": "What are props in React JS? · Why do we use props? · How to pass data from parent component to child component · How to create reusable components ...",
+    "domain": "youtube.com",
+    "positionScore": 19,
+    "preferenceScore": -20,
+    "finalScore": -1
+  },
+  {
+    "title": "Components and Types of Components in React JS | React ...",
+    "url": "https://www.youtube.com/watch?v=Css3n8syisM",
+    "snippet": "React Components are the basic building blocks of React applications, serving as independent and reusable pieces of code that render HTML.",
+    "domain": "youtube.com",
+    "positionScore": 12,
+    "preferenceScore": -20,
+    "finalScore": -8
+  },
+  {
+    "title": "2.1. What are Components? | React Tutorial for Beginners ...",
+    "url": "https://www.youtube.com/watch?v=_rtRMcnKuRo",
+    "snippet": "Dive into the exciting world of React with our beginner-friendly tutorial on React Components! Discover the building blocks of React ...",
+    "domain": "youtube.com",
+    "positionScore": 1,
+    "preferenceScore": -20,
+    "finalScore": -19
+  }
+]
