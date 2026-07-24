@@ -43,5 +43,28 @@ export const api = {
     const res = await fetch(`${API_BASE}/search/cache/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Failed to delete cache');
     return res.json();
+  },
+  getBookmarks: async () => {
+    const res = await fetch(`${API_BASE}/bookmarks`);
+    if (!res.ok) throw new Error('Failed to get bookmarks');
+    return res.json();
+  },
+  toggleBookmark: async (query, result) => {
+    const res = await fetch(`${API_BASE}/bookmarks/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, result })
+    });
+    if (!res.ok) throw new Error('Failed to toggle bookmark');
+    return res.json();
+  },
+  removeBookmark: async (url) => {
+    const res = await fetch(`${API_BASE}/bookmarks/remove`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    if (!res.ok) throw new Error('Failed to remove bookmark');
+    return res.json();
   }
 };
