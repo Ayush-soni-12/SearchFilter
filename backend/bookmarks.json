@@ -1,0 +1,24 @@
+{
+  "components react": [
+    {
+      "title": "React Components",
+      "url": "https://www.w3schools.com/react/react_components.asp",
+      "snippet": "Components are independent and reusable bits of code. They serve the same purpose as JavaScript functions, but work in isolation and return HTML.",
+      "domain": "w3schools.com"
+    },
+    {
+      "title": "Open-source React UI components",
+      "url": "https://www.untitledui.com/react/components",
+      "snippet": "React is the world's largest collection of open-source React components. Everything you need to design and develop modern, beautiful interfaces and websites— ...",
+      "domain": "untitledui.com"
+    }
+  ],
+  "rag tutorial": [
+    {
+      "title": "An end-to-end tutorial for developing a RAG Application ...",
+      "url": "https://medium.com/data-science-collective/from-data-to-dialogue-development-of-a-retrieval-augmented-generation-rag-chatbot-for-fitness-b9fbaf818ace",
+      "snippet": "In this post, I'll walk you through a simple implementation of a Retrieval-Augmented Generation (RAG) system designed for Fitness Passport.Read more",
+      "domain": "medium.com"
+    }
+  ]
+}
