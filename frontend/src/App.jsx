@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -10,6 +10,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [preferences, setPreferences] = useState({});
   const [history, setHistory] = useState([]);
+  const [bookmarks, setBookmarks] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showHidden, setShowHidden] = useState(false);
@@ -17,9 +18,10 @@ function App() {
   const [activeCache, setActiveCache] = useState(null);
 
   useEffect(() => {
-    // Load preferences and history on mount
+    // Load preferences, history, and bookmarks on mount
     api.getPreferences().then(setPreferences).catch(console.error);
     api.getHistory().then(setHistory).catch(console.error);
+    api.getBookmarks().then(setBookmarks).catch(console.error);
   }, []);
 
   const handleSearch = async (searchQuery, options = {}) => {
@@ -136,23 +138,75 @@ function App() {
     }
   };
 
+  const isBookmarked = (url) => {
+    return Object.values(bookmarks).some(list => Array.isArray(list) && list.some(item => item.url === url));
+  };
+
+  const handleBookmarkToggle = async (result) => {
+    try {
+      const updated = await api.toggleBookmark(query, result);
+      setBookmarks(updated);
+    } catch (error) {
+      console.error('Failed to toggle bookmark', error);
+    }
+  };
+
+  const handleRemoveBookmark = async (url) => {
+    try {
+      const updated = await api.removeBookmark(url);
+      setBookmarks(updated);
+    } catch (error) {
+      console.error('Failed to remove bookmark', error);
+    }
+  };
+
+  const getFlatBookmarks = () => {
+    const seen = new Set();
+    const list = [];
+    for (const q of Object.keys(bookmarks)) {
+      if (Array.isArray(bookmarks[q])) {
+        for (const item of bookmarks[q]) {
+          if (!seen.has(item.url)) {
+            seen.add(item.url);
+            list.push(item);
+          }
+        }
+      }
+    }
+    return list;
+  };
+
   return (
     <div className="app-container">
       <nav className="navbar">
         <div className="nav-brand" onClick={() => setActivePage(results.length > 0 ? 'results' : 'home')}>
           SearchFilter
         </div>
-        <button 
-          className="open-btn" 
-          onClick={() => setActivePage(activePage === 'settings' ? (results.length > 0 ? 'results' : 'home') : 'settings')}
-        >
-          <Settings size={18} />
-          {activePage === 'settings' ? 'Close Settings' : 'Settings'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button 
+            className="open-btn" 
+            onClick={() => setActivePage(activePage === 'bookmarks' ? (results.length > 0 ? 'results' : 'home') : 'bookmarks')}
+            style={{
+              background: activePage === 'bookmarks' ? 'rgba(59, 130, 246, 0.25)' : undefined,
+              borderColor: activePage === 'bookmarks' ? 'rgba(59, 130, 246, 0.6)' : undefined,
+              color: activePage === 'bookmarks' ? '#60a5fa' : undefined
+            }}
+          >
+            <Bookmark size={18} />
+            <span>Bookmarks</span>
+          </button>
+          <button 
+            className="open-btn" 
+            onClick={() => setActivePage(activePage === 'settings' ? (results.length > 0 ? 'results' : 'home') : 'settings')}
+          >
+            <Settings size={18} />
+            {activePage === 'settings' ? 'Close Settings' : 'Settings'}
+          </button>
+        </div>
       </nav>
 
       <main>
-        {activePage !== 'settings' && (
+        {activePage !== 'settings' && activePage !== 'bookmarks' && (
           <SearchBar onSearch={handleSearch} initialQuery={query} isLoading={isLoading} history={history} />
         )}
 
@@ -227,6 +281,8 @@ function App() {
                                 result={result} 
                                 currentPref={preferences[result.domain] || 'neutral'}
                                 onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                                isBookmarked={isBookmarked(result.url)}
+                                onBookmarkToggle={() => handleBookmarkToggle(result)}
                               />
                             ))}
                           </div>
@@ -240,12 +296,42 @@ function App() {
                         result={result} 
                         currentPref={preferences[result.domain] || 'neutral'}
                         onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                        isBookmarked={isBookmarked(result.url)}
+                        onBookmarkToggle={() => handleBookmarkToggle(result)}
                       />
                     ))}
                   </>
                 );
               })()
             )}
+          </div>
+        )}
+
+        {activePage === 'bookmarks' && (
+          <div className="glass-panel animate-slide-up" style={{ padding: '2rem' }}>
+            <div className="settings-header">
+              <h2>Bookmarked Results</h2>
+              <p>Your saved results stored locally.</p>
+            </div>
+            
+            <div>
+              {getFlatBookmarks().length === 0 ? (
+                <p>No bookmarks saved yet. Search and bookmark useful results!</p>
+              ) : (
+                <div>
+                  {getFlatBookmarks().map((result, i) => (
+                    <ResultCard 
+                      key={result.url + i} 
+                      result={result} 
+                      currentPref={preferences[result.domain] || 'neutral'}
+                      onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                      isBookmarked={true}
+                      onBookmarkToggle={() => handleRemoveBookmark(result.url)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -289,3 +375,4 @@ function App() {
 }
 
 export default App;
+
