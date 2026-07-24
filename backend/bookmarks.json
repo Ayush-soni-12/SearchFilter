@@ -1,24 +1,30 @@
 {
-  "components react": [
+  "Delhi protest": [
     {
-      "title": "React Components",
-      "url": "https://www.w3schools.com/react/react_components.asp",
-      "snippet": "Components are independent and reusable bits of code. They serve the same purpose as JavaScript functions, but work in isolation and return HTML.",
-      "domain": "w3schools.com"
+      "title": "Jantar Mantar protest updates: Wangchuk breaks 26-day ...",
+      "url": "https://www.thehindu.com/news/national/cjp-jantar-mantar-protest-live-updates-abhijeet-dipke-saurav-das-sonam-wangchuk-hunger-strike-dharmendra-pradhan-resignation/article71256169.ece",
+      "snippet": "6 hours ago — Protests continue in Delhi as the Cockroach Janta Party rejects government dialogue offers, demanding student rights and Education Minister's ...Read more",
+      "domain": "thehindu.com"
     },
     {
-      "title": "Open-source React UI components",
-      "url": "https://www.untitledui.com/react/components",
-      "snippet": "React is the world's largest collection of open-source React components. Everything you need to design and develop modern, beautiful interfaces and websites— ...",
-      "domain": "untitledui.com"
+      "title": "2026 Delhi Jantar Mantar protests",
+      "url": "https://en.wikipedia.org/wiki/2026_Delhi_Jantar_Mantar_protests",
+      "snippet": "12 minutes ago — Held primarily at Jantar Mantar in New Delhi, the protesters have demanded the resignation of Union Education Minister Dharmendra Pradhan over the 2026 NEET ...Read more",
+      "domain": "en.wikipedia.org"
     }
   ],
   "rag tutorial": [
     {
-      "title": "An end-to-end tutorial for developing a RAG Application ...",
-      "url": "https://medium.com/data-science-collective/from-data-to-dialogue-development-of-a-retrieval-augmented-generation-rag-chatbot-for-fitness-b9fbaf818ace",
-      "snippet": "In this post, I'll walk you through a simple implementation of a Retrieval-Augmented Generation (RAG) system designed for Fitness Passport.Read more",
-      "domain": "medium.com"
+      "title": "A Beginner's Guide to Retrieval Augmented Generation",
+      "url": "https://www.singlestore.com/blog/a-guide-to-retrieval-augmented-generation-rag",
+      "snippet": "17 Jan 2025 — RAG is a specialized model that integrates retrieval and generation processes to boost the performance of Large Language Models (LLMs).Read more",
+      "domain": "singlestore.com"
+    },
+    {
+      "title": "What Is RAG? A Guide to Retrieval Augmented Generation",
+      "url": "https://www.datacamp.com/blog/what-is-retrieval-augmented-generation-rag",
+      "snippet": "Learn how Retrieval Augmented Generation (RAG) works, why it reduces LLM hallucinations, and how to build RAG pipelines with vector databases. For a hands-on ...",
+      "domain": "datacamp.com"
     }
   ]
 }

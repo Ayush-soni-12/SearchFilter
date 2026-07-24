@@ -11,10 +11,22 @@
     "staleAt": 1785048668824,
     "permanent": false
   },
-  "975d46e5-b8f3-4059-8bc1-4486da4dc694": {
+  "274b5496-8240-4c56-bed8-3867a8787376": {
+    "originalQuery": "Delhi protest",
+    "createdAt": 1784877348549,
+    "staleAt": 1785050148549,
+    "permanent": false
+  },
+  "9c11751a-7977-4ea7-b8c0-0147b927c817": {
+    "originalQuery": "jantar mantar protest",
+    "createdAt": 1784877422342,
+    "staleAt": 1785050222342,
+    "permanent": false
+  },
+  "ea778364-6d23-47a4-8d4c-e9dd41a87cb3": {
     "originalQuery": "rag tutorial",
-    "createdAt": 1784875894815,
-    "staleAt": 1785048694815,
+    "createdAt": 1784877461632,
+    "staleAt": 1785050261632,
     "permanent": false
   }
 }

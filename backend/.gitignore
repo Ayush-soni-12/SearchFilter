@@ -2,4 +2,7 @@ node_modules/
 .env
 preferences.json
 history.json
+bookmarks.json
+searchCache/
 playwright-profile/
+
