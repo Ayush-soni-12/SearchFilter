@@ -1,6 +1,6 @@
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck } from 'lucide-react';
 
-export default function ResultCard({ result, currentPref, onPreferenceChange }) {
+export default function ResultCard({ result, currentPref, onPreferenceChange, isBookmarked, onBookmarkToggle }) {
   return (
     <div className="result-card glass-panel">
       <div className="result-header">
@@ -12,10 +12,27 @@ export default function ResultCard({ result, currentPref, onPreferenceChange }) 
             {result.domain}
           </div>
         </div>
-        <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
-          <span>Open</span>
-          <ExternalLink size={16} />
-        </a>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {onBookmarkToggle && (
+            <button 
+              className={`open-btn ${isBookmarked ? 'bookmarked' : ''}`}
+              onClick={onBookmarkToggle}
+              title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
+              style={{
+                background: isBookmarked ? 'rgba(59, 130, 246, 0.25)' : undefined,
+                borderColor: isBookmarked ? 'rgba(59, 130, 246, 0.6)' : undefined,
+                color: isBookmarked ? '#60a5fa' : undefined
+              }}
+            >
+              {isBookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+              <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+            </button>
+          )}
+          <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
+            <span>Open</span>
+            <ExternalLink size={16} />
+          </a>
+        </div>
       </div>
       
       <p className="result-snippet">{result.snippet}</p>
