@@ -16,6 +16,7 @@ function App() {
   const [showHidden, setShowHidden] = useState(false);
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
+  const [isFromBookmarks, setIsFromBookmarks] = useState(false);
 
   useEffect(() => {
     // Load preferences, history, and bookmarks on mount
@@ -37,6 +38,7 @@ function App() {
     setErrorMsg('');
     setActivePage('results');
     setShowHidden(false);
+    setIsFromBookmarks(false);
     
     try {
       const data = await api.search(searchQuery, options);
@@ -48,6 +50,7 @@ function App() {
       }
 
       setResults(data.results);
+      setIsFromBookmarks(!!data.fromBookmarks);
       if (options.useCacheId && cacheNotification) {
         setActiveCache(cacheNotification);
       } else {
@@ -240,6 +243,15 @@ function App() {
 
         {!isLoading && activePage === 'results' && !cacheNotification && (
           <div className="animate-slide-up">
+            {isFromBookmarks && (
+              <div className="cache-banner" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.5)' }}>
+                <Bookmark size={20} style={{ color: '#60a5fa' }} />
+                <div>
+                  <strong>Searching Bookmarks Only</strong> — Showing results matching your local bookmarks.
+                </div>
+              </div>
+            )}
+
             {activeCache && (
               <div className="cache-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.5)' }}>
                 <div>
