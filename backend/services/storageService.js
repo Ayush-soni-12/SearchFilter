@@ -85,6 +85,43 @@ export const storageService = {
     }
     await writeJsonFile(BOOKMARKS_FILE, bookmarks);
     return bookmarks;
+  },
+  searchBookmarks: async (query) => {
+    const bookmarks = await readJsonFile(BOOKMARKS_FILE, {});
+    if (!query || !query.trim()) return [];
+    
+    const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const seenUrls = new Set();
+    const results = [];
+
+    for (const [queryKey, list] of Object.entries(bookmarks)) {
+      const qKeyLower = queryKey.toLowerCase();
+      if (Array.isArray(list)) {
+        for (const item of list) {
+          if (!item.url || seenUrls.has(item.url)) continue;
+          
+          const titleLower = (item.title || '').toLowerCase();
+          const snippetLower = (item.snippet || '').toLowerCase();
+          const domainLower = (item.domain || '').toLowerCase();
+          const urlLower = (item.url || '').toLowerCase();
+          
+          const matches = terms.some(term => 
+            qKeyLower.includes(term) ||
+            titleLower.includes(term) ||
+            snippetLower.includes(term) ||
+            domainLower.includes(term) ||
+            urlLower.includes(term)
+          );
+          
+          if (matches) {
+            seenUrls.add(item.url);
+            results.push(item);
+          }
+        }
+      }
+    }
+    return results;
   }
 };
+
 

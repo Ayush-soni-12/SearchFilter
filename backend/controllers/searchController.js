@@ -6,7 +6,7 @@ import { cacheService } from '../services/cacheService.js';
 const googleService = new GoogleSearchService();
 
 export const handleSearch = async (req, res) => {
-  const { query, forceSearch, useCacheId } = req.query;
+  const { query, forceSearch, useCacheId, searchInBookmarks } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
@@ -15,6 +15,16 @@ export const handleSearch = async (req, res) => {
   try {
     // Log history
     await storageService.addHistory(query);
+
+    if (searchInBookmarks === 'true') {
+      const bookmarkResults = await storageService.searchBookmarks(query);
+      const rankedResults = await preferenceEngine.rankResults(bookmarkResults);
+      return res.json({
+        query,
+        results: rankedResults,
+        fromBookmarks: true
+      });
+    }
 
     if (useCacheId) {
       const cachedResults = await cacheService.getCache(useCacheId);
