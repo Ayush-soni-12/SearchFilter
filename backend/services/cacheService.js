@@ -46,8 +46,17 @@ const parseToTimestamp = (val) => {
   return isNaN(parsed) ? 0 : parsed;
 };
 
+const ensureCacheDir = async () => {
+  try {
+    await fs.mkdir(CACHE_DIR, { recursive: true });
+  } catch (err) {
+    console.error('Error ensuring cache directory:', err);
+  }
+};
+
 const readIndex = async () => {
   try {
+    await ensureCacheDir();
     const data = await fs.readFile(INDEX_FILE, 'utf-8');
     const index = JSON.parse(data);
     
@@ -68,18 +77,26 @@ const readIndex = async () => {
     }
     return index;
   } catch (err) {
+    if (err.code === 'ENOENT') {
+      try {
+        await writeIndex({});
+      } catch {
+        // ignore
+      }
+    }
     return {};
   }
 };
 
 const writeIndex = async (index) => {
+  await ensureCacheDir();
   await fs.writeFile(INDEX_FILE, JSON.stringify(index, null, 2), 'utf-8');
 };
 
 export const cacheService = {
   initCache: async () => {
     try {
-      await fs.mkdir(CACHE_DIR, { recursive: true });
+      await ensureCacheDir();
       try {
         await fs.access(INDEX_FILE);
       } catch {
@@ -126,6 +143,7 @@ export const cacheService = {
 
   getCache: async (id) => {
     try {
+      await ensureCacheDir();
       const cachePath = path.join(CACHE_DIR, `${id}.json`);
       const data = await fs.readFile(cachePath, 'utf-8');
       return JSON.parse(data);
@@ -136,22 +154,28 @@ export const cacheService = {
   },
 
   saveCache: async (query, results) => {
-    const id = crypto.randomUUID();
-    const now = Date.now();
-    const cachePath = path.join(CACHE_DIR, `${id}.json`);
-    
-    await fs.writeFile(cachePath, JSON.stringify(results, null, 2), 'utf-8');
-    
-    const index = await readIndex();
-    index[id] = {
-      originalQuery: query,
-      createdAt: formatReadableDate(now),
-      staleAt: formatReadableDate(now + STALE_MS),
-      permanent: false
-    };
-    await writeIndex(index);
-    
-    return id;
+    try {
+      await ensureCacheDir();
+      const id = crypto.randomUUID();
+      const now = Date.now();
+      const cachePath = path.join(CACHE_DIR, `${id}.json`);
+      
+      await fs.writeFile(cachePath, JSON.stringify(results, null, 2), 'utf-8');
+      
+      const index = await readIndex();
+      index[id] = {
+        originalQuery: query,
+        createdAt: formatReadableDate(now),
+        staleAt: formatReadableDate(now + STALE_MS),
+        permanent: false
+      };
+      await writeIndex(index);
+      
+      return id;
+    } catch (err) {
+      console.warn('Cache save warning (continuing search without throwing):', err.message);
+      return null;
+    }
   },
 
   renewCache: async (id) => {
