@@ -26,10 +26,40 @@ const calculateSimilarity = (query1, query2) => {
   return intersection / union;
 };
 
+const formatToISO = (val) => {
+  if (typeof val === 'number') {
+    return new Date(val).toISOString();
+  }
+  return val;
+};
+
+const parseToTimestamp = (val) => {
+  if (typeof val === 'number') return val;
+  const parsed = new Date(val).getTime();
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 const readIndex = async () => {
   try {
     const data = await fs.readFile(INDEX_FILE, 'utf-8');
-    return JSON.parse(data);
+    const index = JSON.parse(data);
+    
+    // Auto-migrate any numeric timestamps to human-readable ISO date strings
+    let hasChanges = false;
+    for (const id of Object.keys(index)) {
+      if (typeof index[id].createdAt === 'number') {
+        index[id].createdAt = formatToISO(index[id].createdAt);
+        hasChanges = true;
+      }
+      if (typeof index[id].staleAt === 'number') {
+        index[id].staleAt = formatToISO(index[id].staleAt);
+        hasChanges = true;
+      }
+    }
+    if (hasChanges) {
+      await writeIndex(index);
+    }
+    return index;
   } catch (err) {
     return {};
   }
@@ -48,6 +78,7 @@ export const cacheService = {
       } catch {
         await writeIndex({});
       }
+      await readIndex(); // Trigger auto-migration if index exists
     } catch (err) {
       console.error('Error initializing cache:', err);
     }
@@ -70,13 +101,16 @@ export const cacheService = {
     if (!bestMatch) return { available: false };
 
     const { id, meta } = bestMatch;
-    const isStale = now > meta.staleAt && !meta.permanent;
+    const staleTime = parseToTimestamp(meta.staleAt);
+    const isStale = now > staleTime && !meta.permanent;
 
     return {
       available: true,
       cacheInfo: {
         id,
         matchedQuery: meta.originalQuery,
+        createdAt: meta.createdAt,
+        staleAt: meta.staleAt,
         isStale,
         permanent: meta.permanent || false
       }
@@ -104,8 +138,8 @@ export const cacheService = {
     const index = await readIndex();
     index[id] = {
       originalQuery: query,
-      createdAt: now,
-      staleAt: now + STALE_MS,
+      createdAt: new Date(now).toISOString(),
+      staleAt: new Date(now + STALE_MS).toISOString(),
       permanent: false
     };
     await writeIndex(index);
@@ -116,7 +150,7 @@ export const cacheService = {
   renewCache: async (id) => {
     const index = await readIndex();
     if (index[id]) {
-      index[id].staleAt = Date.now() + STALE_MS;
+      index[id].staleAt = new Date(Date.now() + STALE_MS).toISOString();
       await writeIndex(index);
       return true;
     }
