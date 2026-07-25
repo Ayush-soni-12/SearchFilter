@@ -26,11 +26,18 @@ const calculateSimilarity = (query1, query2) => {
   return intersection / union;
 };
 
-const formatToISO = (val) => {
-  if (typeof val === 'number') {
-    return new Date(val).toISOString();
-  }
-  return val;
+const formatReadableDate = (val) => {
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return String(val);
+  return d.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
 };
 
 const parseToTimestamp = (val) => {
@@ -44,15 +51,15 @@ const readIndex = async () => {
     const data = await fs.readFile(INDEX_FILE, 'utf-8');
     const index = JSON.parse(data);
     
-    // Auto-migrate any numeric timestamps to human-readable ISO date strings
+    // Auto-migrate any numeric or ISO timestamps to clean human-readable date strings
     let hasChanges = false;
     for (const id of Object.keys(index)) {
-      if (typeof index[id].createdAt === 'number') {
-        index[id].createdAt = formatToISO(index[id].createdAt);
+      if (typeof index[id].createdAt === 'number' || (typeof index[id].createdAt === 'string' && index[id].createdAt.includes('T'))) {
+        index[id].createdAt = formatReadableDate(index[id].createdAt);
         hasChanges = true;
       }
-      if (typeof index[id].staleAt === 'number') {
-        index[id].staleAt = formatToISO(index[id].staleAt);
+      if (typeof index[id].staleAt === 'number' || (typeof index[id].staleAt === 'string' && index[id].staleAt.includes('T'))) {
+        index[id].staleAt = formatReadableDate(index[id].staleAt);
         hasChanges = true;
       }
     }
@@ -138,8 +145,8 @@ export const cacheService = {
     const index = await readIndex();
     index[id] = {
       originalQuery: query,
-      createdAt: new Date(now).toISOString(),
-      staleAt: new Date(now + STALE_MS).toISOString(),
+      createdAt: formatReadableDate(now),
+      staleAt: formatReadableDate(now + STALE_MS),
       permanent: false
     };
     await writeIndex(index);
@@ -150,7 +157,7 @@ export const cacheService = {
   renewCache: async (id) => {
     const index = await readIndex();
     if (index[id]) {
-      index[id].staleAt = new Date(Date.now() + STALE_MS).toISOString();
+      index[id].staleAt = formatReadableDate(Date.now() + STALE_MS);
       await writeIndex(index);
       return true;
     }
