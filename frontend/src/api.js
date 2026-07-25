@@ -6,6 +6,7 @@ export const api = {
     if (options.forceSearch) url += '&forceSearch=true';
     if (options.useCacheId) url += `&useCacheId=${options.useCacheId}`;
     if (options.searchInBookmarks) url += '&searchInBookmarks=true';
+    if (options.engine) url += `&engine=${encodeURIComponent(options.engine)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');

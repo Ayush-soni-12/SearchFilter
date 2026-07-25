@@ -17,6 +17,7 @@ function App() {
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
+  const [activeEngine, setActiveEngine] = useState('google');
 
   useEffect(() => {
     // Load preferences, history, and bookmarks on mount
@@ -27,6 +28,11 @@ function App() {
 
   const handleSearch = async (searchQuery, options = {}) => {
     if (!searchQuery.trim()) return;
+    
+    const engineToUse = options.engine || activeEngine;
+    if (options.engine) {
+      setActiveEngine(options.engine);
+    }
     
     if (!options.forceSearch && !options.useCacheId) {
       setQuery(searchQuery);
@@ -41,7 +47,8 @@ function App() {
     setIsFromBookmarks(false);
     
     try {
-      const data = await api.search(searchQuery, options);
+      const searchOptions = { ...options, engine: engineToUse };
+      const data = await api.search(searchQuery, searchOptions);
       
       if (data.cacheAvailable) {
         setCacheNotification(data.cacheInfo);
@@ -67,12 +74,12 @@ function App() {
   };
 
   const proceedWithCache = () => {
-    handleSearch(query, { useCacheId: cacheNotification.id });
+    handleSearch(query, { useCacheId: cacheNotification.id, engine: activeEngine });
     setCacheNotification(null);
   };
 
   const forceSearchAnyway = () => {
-    handleSearch(query, { forceSearch: true });
+    handleSearch(query, { forceSearch: true, engine: activeEngine });
     setCacheNotification(null);
   };
 

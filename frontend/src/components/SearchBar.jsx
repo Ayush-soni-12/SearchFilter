@@ -5,6 +5,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const [val, setVal] = useState(initialQuery);
   const [showHistory, setShowHistory] = useState(false);
   const [searchInBookmarks, setSearchInBookmarks] = useState(false);
+  const [engine, setEngine] = useState('google');
   const wrapperRef = useRef(null);
 
   useEffect(() => {
@@ -21,25 +22,73 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     e.preventDefault();
     if (val.trim()) {
       setShowHistory(false);
-      onSearch(val, { searchInBookmarks });
+      onSearch(val, { searchInBookmarks, engine });
     }
   };
 
   const handleHistoryClick = (query) => {
     setVal(query);
     setShowHistory(false);
-    onSearch(query, { searchInBookmarks });
+    onSearch(query, { searchInBookmarks, engine });
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
+      {!searchInBookmarks && (
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginRight: '0.25rem' }}>Engine:</span>
+          <button
+            type="button"
+            className="open-btn"
+            onClick={() => setEngine('google')}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.35rem 0.75rem',
+              background: engine === 'google' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
+              borderColor: engine === 'google' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
+              color: engine === 'google' ? '#60a5fa' : 'var(--text-secondary)'
+            }}
+          >
+            🌐 Google
+          </button>
+          <button
+            type="button"
+            className="open-btn"
+            onClick={() => setEngine('duckduckgo')}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.35rem 0.75rem',
+              background: engine === 'duckduckgo' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
+              borderColor: engine === 'duckduckgo' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
+              color: engine === 'duckduckgo' ? '#60a5fa' : 'var(--text-secondary)'
+            }}
+          >
+            🦆 DuckDuckGo (Fast)
+          </button>
+          <button
+            type="button"
+            className="open-btn"
+            onClick={() => setEngine('bing')}
+            style={{
+              fontSize: '0.85rem',
+              padding: '0.35rem 0.75rem',
+              background: engine === 'bing' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
+              borderColor: engine === 'bing' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
+              color: engine === 'bing' ? '#60a5fa' : 'var(--text-secondary)'
+            }}
+          >
+            🔍 Bing (Fast)
+          </button>
+        </div>
+      )}
+
       <form className="search-container" style={{ marginBottom: 0 }} onSubmit={handleSubmit}>
         <div className="search-wrapper" ref={wrapperRef}>
           <input
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : "What do you want to learn today?"}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : 'Brave'}...`}
             value={val}
             onChange={(e) => setVal(e.target.value)}
             onFocus={() => setShowHistory(true)}

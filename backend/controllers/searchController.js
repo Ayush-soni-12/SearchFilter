@@ -1,12 +1,10 @@
-import { GoogleSearchService } from '../services/googleSearchService.js';
+import { searchProviderFactory } from '../services/searchProviderFactory.js';
 import { preferenceEngine } from '../services/preferenceEngine.js';
 import { storageService } from '../services/storageService.js';
 import { cacheService } from '../services/cacheService.js';
 
-const googleService = new GoogleSearchService();
-
 export const handleSearch = async (req, res) => {
-  const { query, forceSearch, useCacheId, searchInBookmarks } = req.query;
+  const { query, forceSearch, useCacheId, searchInBookmarks, engine } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
@@ -37,8 +35,10 @@ export const handleSearch = async (req, res) => {
       }
     }
 
+    const selectedEngine = engine || 'google';
+
     if (forceSearch !== 'true') {
-      const match = await cacheService.findMatch(query);
+      const match = await cacheService.findMatch(`${selectedEngine}:${query}`);
       if (match.available) {
         return res.json({
           cacheAvailable: true,
@@ -47,13 +47,15 @@ export const handleSearch = async (req, res) => {
       }
     }
 
-    const rawResults = await googleService.search(query);
+    const provider = searchProviderFactory.getProvider(selectedEngine);
+    const rawResults = await provider.search(query);
     const rankedResults = await preferenceEngine.rankResults(rawResults);
     
-    await cacheService.saveCache(query, rankedResults);
+    await cacheService.saveCache(`${selectedEngine}:${query}`, rankedResults);
 
     res.json({
       query,
+      engine: selectedEngine,
       results: rankedResults
     });
   } catch (error) {
