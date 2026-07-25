@@ -76,3 +76,49 @@ Last updated: 2026-07-20
 
 **Pattern notes:**
 Uses a dashed top-border to visually separate the hidden results from the primary results, clearly delineating the curated boundary.
+
+### SearchBar Component
+
+File: `frontend/src/components/SearchBar.jsx`  
+Last updated: 2026-07-25  
+
+| Property | Class / Value |
+| --- | --- |
+| Background | Input: `rgba(15, 23, 42, 0.6)` / Dropdown: `var(--surface-color)` (blur 16px) |
+| Border | Input & Dropdown: `1px solid var(--border-color)` (`rgba(255,255,255,0.08)`) |
+| Border radius | Input/Button: `99px` (Pill) / Dropdown: `16px` / Buttons: `8px` / Kbd: `4px` |
+| Text — primary | Input & Active Buttons: `var(--text-primary)` (`#f8fafc`), Active Accent: `#60a5fa` |
+| Text — secondary | Helper Labels & Shortcuts: `var(--text-secondary)` (`#94a3b8`) |
+| Spacing | Input Padding: `1rem 1.5rem` / Dropdown Item: `0.75rem 1.5rem` / Container Gap: `0.75rem` |
+| Hover state | Buttons: `background: rgba(255,255,255,0.2)` / Items: `background: rgba(255,255,255,0.05)` |
+| Shadow | Dropdown: `0 10px 40px rgba(0, 0, 0, 0.3)` / Focus ring: `0 0 0 3px rgba(59, 130, 246, 0.2)` |
+| Accent usage | Primary Action: `var(--accent-color)` (`#3b82f6`) / Active Engine: `#60a5fa` |
+
+**Pattern notes:**
+- Search input uses pill radius (`99px`) with glassmorphism backdrop filter (`blur(8px)`).
+- History dropdown uses absolute positioning below input with high z-index (`50`), slide-up animation (`animate-slide-up`), and keyboard shortcut indicator header (`Esc` / `Ctrl+Space`).
+- Interactive engine toggle buttons use subtle transparent backgrounds with active blue highlight (`rgba(59, 130, 246, 0.25)`).
+
+### CachePopup Card & Button System
+
+File: `frontend/src/App.jsx`, `frontend/src/index.css`  
+Last updated: 2026-07-25  
+
+| Property | Class / Value |
+| --- | --- |
+| Background | Container: `linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)` (blur 16px) |
+| Primary Button | `.primary-btn`: `linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)`, text `#ffffff` |
+| Secondary Button | `.secondary-btn`: `rgba(255, 255, 255, 0.08)`, border `rgba(255, 255, 255, 0.12)`, text `#e2e8f0` |
+| Border | Card: `1px solid rgba(59, 130, 246, 0.35)` |
+| Border radius | Card: `20px` / Buttons: `99px` (Pill) / Tag: `6px` |
+| Text — primary | Card Title: `#f8fafc` (`1.35rem`, bold) / Primary Action: `#ffffff` |
+| Text — secondary | Card Description: `#94a3b8` (`1rem`) / Tag Text: `#60a5fa` |
+| Spacing | Card Padding: `2rem` / Button Padding: `0.75rem 1.5rem` / Button Gap: `1rem` |
+| Hover state | Primary: `linear-gradient(135deg, #60a5fa, #3b82f6)` (`translateY(-2px)`) / Secondary: `rgba(255, 255, 255, 0.16)` |
+| Shadow | Card: `0 12px 40px rgba(0, 0, 0, 0.35)`, `0 0 20px rgba(59, 130, 246, 0.15)` |
+
+**Pattern notes:**
+- CachePopup uses glassmorphic dark panel with a soft blue ambient glow (`0 0 20px rgba(59, 130, 246, 0.15)`).
+- Matched queries are rendered inside `.matched-query-tag` pill badges (`rgba(59, 130, 246, 0.15)` background, monospace font).
+- Action buttons follow the standard app button system (`.primary-btn` for primary CTA, `.secondary-btn` for secondary CTA) with smooth hover transitions (`all 0.25s cubic-bezier(0.16, 1, 0.3, 1)`).
+
