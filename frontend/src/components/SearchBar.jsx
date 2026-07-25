@@ -32,6 +32,15 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     onSearch(query, { searchInBookmarks, engine });
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setShowHistory(false);
+    } else if (e.ctrlKey && (e.key === ' ' || e.code === 'Space')) {
+      e.preventDefault();
+      setShowHistory(true);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
       {!searchInBookmarks && (
@@ -88,15 +97,31 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : 'Brave'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : 'Bing'}...`}
             value={val}
             onChange={(e) => setVal(e.target.value)}
             onFocus={() => setShowHistory(true)}
+            onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
           
           {showHistory && history.length > 0 && !isLoading && (
             <div className="history-dropdown animate-slide-up">
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.4rem 1rem',
+                fontSize: '0.75rem',
+                color: 'var(--text-secondary)',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(0,0,0,0.2)'
+              }}>
+                <span>Search History</span>
+                <span>
+                  <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)' }}>Esc</kbd> hide • <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)' }}>Ctrl+Space</kbd> show
+                </span>
+              </div>
               {history.map((item, idx) => (
                 <button 
                   key={idx} 
