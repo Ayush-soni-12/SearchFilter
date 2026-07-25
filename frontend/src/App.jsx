@@ -235,15 +235,37 @@ function App() {
         )}
 
         {!isLoading && activePage === 'results' && cacheNotification && (
-          <div className="glass-panel animate-slide-up" style={{ padding: '2rem', marginBottom: '2rem', textAlign: 'center', borderColor: '#3b82f6' }}>
-            <h3>🔍 Cache Found!</h3>
-            <p style={{ margin: '1rem 0' }}>We found a cached result for a similar query: <strong>"{cacheNotification.matchedQuery}"</strong>.</p>
+          <div className="cache-popup-card animate-slide-up">
+            <h3 className="cache-popup-title">
+              <span>🔍</span> Cache Found!
+            </h3>
+            <p className="cache-popup-desc">
+              We found a cached result for a similar query: <span className="matched-query-tag">"{cacheNotification.matchedQuery}"</span>
+            </p>
             {cacheNotification.isStale && (
-              <p style={{ color: '#ef4444', marginBottom: '1rem' }}><AlertCircle size={16} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> This cache is older than 2 days (stale).</p>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: '#fca5a5',
+                padding: '0.4rem 1rem',
+                borderRadius: '99px',
+                fontSize: '0.85rem',
+                marginBottom: '1.25rem'
+              }}>
+                <AlertCircle size={15} />
+                <span>This cache is older than 2 days (stale)</span>
+              </div>
             )}
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <button className="primary-btn" onClick={proceedWithCache}>View Cached Results</button>
-              <button className="secondary-btn" onClick={forceSearchAnyway} style={{ background: 'rgba(255,255,255,0.1)' }}>Search Anyway</button>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '0.5rem' }}>
+              <button className="primary-btn" onClick={proceedWithCache}>
+                View Cached Results
+              </button>
+              <button className="secondary-btn" onClick={forceSearchAnyway}>
+                Search Anyway
+              </button>
             </div>
           </div>
         )}
