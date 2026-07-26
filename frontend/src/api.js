@@ -7,6 +7,9 @@ export const api = {
     if (options.useCacheId) url += `&useCacheId=${options.useCacheId}`;
     if (options.searchInBookmarks) url += '&searchInBookmarks=true';
     if (options.engine) url += `&engine=${encodeURIComponent(options.engine)}`;
+    if (options.maxViews !== undefined) url += `&maxViews=${encodeURIComponent(options.maxViews)}`;
+    if (options.hideShorts !== undefined) url += `&hideShorts=${encodeURIComponent(options.hideShorts)}`;
+    if (options.blacklistedChannels) url += `&blacklistedChannels=${encodeURIComponent(options.blacklistedChannels)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');

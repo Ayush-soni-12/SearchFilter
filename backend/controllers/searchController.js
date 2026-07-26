@@ -4,7 +4,7 @@ import { storageService } from '../services/storageService.js';
 import { cacheService } from '../services/cacheService.js';
 
 export const handleSearch = async (req, res) => {
-  const { query, forceSearch, useCacheId, searchInBookmarks, engine } = req.query;
+  const { query, forceSearch, useCacheId, searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
@@ -36,9 +36,14 @@ export const handleSearch = async (req, res) => {
     }
 
     const selectedEngine = engine || 'google';
+    const parsedMaxViews = maxViews !== undefined ? parseInt(maxViews, 10) : 50000;
+    const parsedHideShorts = hideShorts === 'true';
+    const parsedBlacklist = blacklistedChannels ? String(blacklistedChannels).split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    const cacheKey = `${selectedEngine}:${query}:${parsedMaxViews}:${parsedHideShorts}:${parsedBlacklist.join('-')}`;
 
     if (forceSearch !== 'true') {
-      const match = await cacheService.findMatch(`${selectedEngine}:${query}`);
+      const match = await cacheService.findMatch(cacheKey);
       if (match.available) {
         return res.json({
           cacheAvailable: true,
@@ -48,10 +53,14 @@ export const handleSearch = async (req, res) => {
     }
 
     const provider = searchProviderFactory.getProvider(selectedEngine);
-    const rawResults = await provider.search(query);
+    const rawResults = await provider.search(query, {
+      maxViews: parsedMaxViews,
+      hideShorts: parsedHideShorts,
+      blacklistedChannels: parsedBlacklist
+    });
     const rankedResults = await preferenceEngine.rankResults(rawResults);
     
-    await cacheService.saveCache(`${selectedEngine}:${query}`, rankedResults);
+    await cacheService.saveCache(cacheKey, rankedResults);
 
     res.json({
       query,
