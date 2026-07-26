@@ -9,21 +9,51 @@ const INDEX_FILE = path.join(CACHE_DIR, 'index.json');
 
 const STALE_MS = 2 * 24 * 60 * 60 * 1000; // 2 days
 
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'in', 'on', 'at', 'for', 'of', 'to', 'with', 'and', 'or',
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'by', 'about', 'how',
+  'what', 'where', 'when', 'who', 'which', 'why', 'detail', 'details', 'more',
+  'explain', 'show', 'list', 'please', 'get', 'give', 'me', 'i', 'my', 'it',
+  'its', 'this', 'that', 'these', 'those', 'from', 'as'
+]);
+
+const tokenize = (q) => {
+  if (!q || typeof q !== 'string') return [];
+  const words = q.toLowerCase().replace(/[^\w\s]/g, ' ').split(/\s+/).filter(Boolean);
+  const filtered = words.filter(w => !STOP_WORDS.has(w));
+  return filtered.length > 0 ? filtered : words;
+};
+
 const calculateSimilarity = (query1, query2) => {
-  const getWords = q => new Set(q.toLowerCase().split(/\s+/).filter(w => w.length > 0));
-  const set1 = getWords(query1);
-  const set2 = getWords(query2);
+  const words1 = tokenize(query1);
+  const words2 = tokenize(query2);
+
+  const set1 = new Set(words1);
+  const set2 = new Set(words2);
   
   if (set1.size === 0 && set2.size === 0) return 1;
   if (set1.size === 0 || set2.size === 0) return 0;
 
   let intersection = 0;
-  for (let word of set1) {
+  for (const word of set1) {
     if (set2.has(word)) intersection++;
   }
   
   const union = set1.size + set2.size - intersection;
-  return intersection / union;
+  const jaccard = intersection / union;
+
+  const coverage1 = intersection / set1.size;
+  const coverage2 = intersection / set2.size;
+  const maxCoverage = Math.max(coverage1, coverage2);
+  const minCoverage = Math.min(coverage1, coverage2);
+
+  // If key tokens of one query are completely covered by the other query
+  if (maxCoverage === 1.0 && intersection >= 1) {
+    return Math.max(jaccard, 0.8 + (0.2 * jaccard));
+  }
+
+  // Hybrid score weighting Jaccard and Token Coverage
+  return (0.6 * jaccard) + (0.4 * minCoverage);
 };
 
 const formatReadableDate = (val) => {
