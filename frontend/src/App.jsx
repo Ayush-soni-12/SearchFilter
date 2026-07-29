@@ -18,6 +18,10 @@ function App() {
   const [activeCache, setActiveCache] = useState(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
   const [activeEngine, setActiveEngine] = useState('google');
+  const [lastOptions, setLastOptions] = useState({});
+  const [nextContinuationToken, setNextContinuationToken] = useState(null);
+  const [apiKey, setApiKey] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     // Load preferences, history, and bookmarks on mount
@@ -33,9 +37,34 @@ function App() {
     if (options.engine) {
       setActiveEngine(options.engine);
     }
+
+    if (options.isContinuation) {
+      setIsLoadingMore(true);
+      try {
+        const searchOptions = {
+          ...lastOptions,
+          ...options,
+          engine: engineToUse,
+          continuationToken: options.continuationToken || nextContinuationToken,
+          apiKey: options.apiKey || apiKey
+        };
+        const data = await api.search(searchQuery, searchOptions);
+        if (data.results && data.results.length > 0) {
+          setResults(prev => [...prev, ...data.results]);
+        }
+        setNextContinuationToken(data.nextContinuationToken || null);
+        if (data.apiKey) setApiKey(data.apiKey);
+      } catch (error) {
+        console.error('Continuation search error:', error);
+      } finally {
+        setIsLoadingMore(false);
+      }
+      return;
+    }
     
     if (!options.forceSearch && !options.useCacheId) {
       setQuery(searchQuery);
+      setLastOptions(options);
       setCacheNotification(null);
       setActiveCache(null);
     }
@@ -45,9 +74,12 @@ function App() {
     setActivePage('results');
     setShowHidden(false);
     setIsFromBookmarks(false);
+    setNextContinuationToken(null);
+    setApiKey(null);
+    setIsLoadingMore(false);
     
     try {
-      const searchOptions = { ...options, engine: engineToUse };
+      const searchOptions = { ...lastOptions, ...options, engine: engineToUse };
       const data = await api.search(searchQuery, searchOptions);
       
       if (data.cacheAvailable) {
@@ -56,7 +88,9 @@ function App() {
         return;
       }
 
-      setResults(data.results);
+      setResults(data.results || []);
+      setNextContinuationToken(data.nextContinuationToken || null);
+      if (data.apiKey) setApiKey(data.apiKey);
       setIsFromBookmarks(!!data.fromBookmarks);
       if (options.useCacheId && cacheNotification) {
         setActiveCache(cacheNotification);
@@ -73,13 +107,37 @@ function App() {
     }
   };
 
+  const handleLoadMore = () => {
+    if (!nextContinuationToken || isLoadingMore || isLoading) return;
+    handleSearch(query, {
+      ...lastOptions,
+      isContinuation: true,
+      continuationToken: nextContinuationToken,
+      apiKey: apiKey
+    });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (activePage !== 'results' || !nextContinuationToken || isLoadingMore || isLoading) return;
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.documentElement.offsetHeight - 600;
+      if (scrollPosition >= threshold) {
+        handleLoadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey]);
+
   const proceedWithCache = () => {
-    handleSearch(query, { useCacheId: cacheNotification.id, engine: activeEngine });
+    handleSearch(query, { ...lastOptions, useCacheId: cacheNotification.id, engine: activeEngine });
     setCacheNotification(null);
   };
 
   const forceSearchAnyway = () => {
-    handleSearch(query, { forceSearch: true, engine: activeEngine });
+    handleSearch(query, { ...lastOptions, forceSearch: true, engine: activeEngine });
     setCacheNotification(null);
   };
 
@@ -341,6 +399,34 @@ function App() {
                         onBookmarkToggle={() => handleBookmarkToggle(result)}
                       />
                     ))}
+
+                    {/* Pagination & Infinite Scroll Controls */}
+                    {isLoadingMore && (
+                      <div className="loader animate-slide-up" style={{ padding: '1.5rem 0', margin: '1rem 0' }}>
+                        <SearchIcon size={32} className="animate-pulse" style={{ color: '#ef4444' }} />
+                        <p style={{ fontSize: '0.95rem', color: '#94a3b8' }}>Fetching more filtered YouTube videos...</p>
+                      </div>
+                    )}
+
+                    {!isLoadingMore && nextContinuationToken && (
+                      <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
+                        <button 
+                          className="secondary-btn" 
+                          onClick={handleLoadMore}
+                          style={{
+                            padding: '0.75rem 2rem',
+                            borderRadius: '99px',
+                            background: 'rgba(239, 68, 68, 0.15)',
+                            borderColor: 'rgba(239, 68, 68, 0.4)',
+                            color: '#f87171',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          🎬 Load More Filtered Videos
+                        </button>
+                      </div>
+                    )}
                   </>
                 );
               })()
