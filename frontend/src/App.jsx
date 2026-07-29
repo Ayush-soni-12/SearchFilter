@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
 
 function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const [activePage, setActivePage] = useState('home');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -22,6 +23,15 @@ function App() {
   const [nextContinuationToken, setNextContinuationToken] = useState(null);
   const [apiKey, setApiKey] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   useEffect(() => {
     // Load preferences, history, and bookmarks on mount
@@ -129,6 +139,7 @@ function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey]);
 
   const proceedWithCache = () => {
@@ -147,7 +158,7 @@ function App() {
       setActiveCache(prev => ({ ...prev, isStale: false }));
       alert('Cache renewed successfully!');
     } catch (err) {
-      alert('Failed to renew cache.');
+      alert('Failed to renew cache.',err);
     }
   };
 
@@ -157,7 +168,7 @@ function App() {
       setActiveCache(prev => ({ ...prev, permanent: true }));
       alert('Cache pinned permanently!');
     } catch (err) {
-      alert('Failed to pin cache.');
+      alert('Failed to pin cache.',err);
     }
   };
 
@@ -168,7 +179,7 @@ function App() {
       setResults([]);
       alert('Cache deleted. Search again to fetch new results.');
     } catch (err) {
-      alert('Failed to delete cache.');
+      alert('Failed to delete cache.',err);
     }
   };
 
@@ -251,6 +262,14 @@ function App() {
           SearchFilter
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button 
+            className="open-btn" 
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
           <button 
             className="open-btn" 
             onClick={() => setActivePage(activePage === 'bookmarks' ? (results.length > 0 ? 'results' : 'home') : 'bookmarks')}
