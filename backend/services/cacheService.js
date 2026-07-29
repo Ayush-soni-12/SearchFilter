@@ -90,15 +90,36 @@ const readIndex = async () => {
     const data = await fs.readFile(INDEX_FILE, 'utf-8');
     const index = JSON.parse(data);
     
-    // Auto-migrate any numeric or ISO timestamps to clean human-readable date strings
+    // Auto-migrate any numeric/ISO timestamps and old prefixed originalQuery strings
     let hasChanges = false;
     for (const id of Object.keys(index)) {
-      if (typeof index[id].createdAt === 'number' || (typeof index[id].createdAt === 'string' && index[id].createdAt.includes('T'))) {
-        index[id].createdAt = formatReadableDate(index[id].createdAt);
+      const item = index[id];
+
+      // Auto-parse legacy "engine:query:maxViews:hideShorts:blacklist" strings
+      if (typeof item.originalQuery === 'string' && item.originalQuery.includes(':')) {
+        const parts = item.originalQuery.split(':');
+        const first = parts[0].toLowerCase();
+        if (['youtube', 'yt', 'google', 'duckduckgo', 'ddg', 'bing'].includes(first)) {
+          item.engine = first;
+          item.originalQuery = parts[1] || item.originalQuery;
+          if (parts.length >= 4) {
+            item.filters = {
+              maxViews: parseInt(parts[2], 10) || 50000,
+              hideShorts: parts[3] === 'true',
+              blacklistedChannels: parts[4] ? parts[4].split('-') : [],
+              uploadTime: parts[5] || 'all'
+            };
+          }
+          hasChanges = true;
+        }
+      }
+
+      if (typeof item.createdAt === 'number' || (typeof item.createdAt === 'string' && item.createdAt.includes('T'))) {
+        item.createdAt = formatReadableDate(item.createdAt);
         hasChanges = true;
       }
-      if (typeof index[id].staleAt === 'number' || (typeof index[id].staleAt === 'string' && index[id].staleAt.includes('T'))) {
-        index[id].staleAt = formatReadableDate(index[id].staleAt);
+      if (typeof item.staleAt === 'number' || (typeof item.staleAt === 'string' && item.staleAt.includes('T'))) {
+        item.staleAt = formatReadableDate(item.staleAt);
         hasChanges = true;
       }
     }
@@ -138,15 +159,44 @@ export const cacheService = {
     }
   },
 
-  findMatch: async (query) => {
+  findMatch: async (query, options = {}) => {
     const index = await readIndex();
     const now = Date.now();
     let bestMatch = null;
     let highestScore = 0;
 
+    const targetEngine = (options.engine || 'google').toLowerCase();
+
     for (const [id, meta] of Object.entries(index)) {
+      // 1. Engine must match exactly
+      const metaEngine = (meta.engine || 'google').toLowerCase();
+      if (metaEngine !== targetEngine) continue;
+
+      // 2. If engine is YouTube, filter options must match exactly
+      if (targetEngine === 'youtube') {
+        const targetMaxViews = options.maxViews !== undefined ? Number(options.maxViews) : 50000;
+        const targetHideShorts = Boolean(options.hideShorts);
+        const targetBlacklist = (options.blacklistedChannels || []).join(',');
+        const targetUploadTime = options.uploadTime || 'all';
+
+        const metaMaxViews = meta.filters?.maxViews !== undefined ? Number(meta.filters.maxViews) : 50000;
+        const metaHideShorts = Boolean(meta.filters?.hideShorts);
+        const metaBlacklist = (meta.filters?.blacklistedChannels || []).join(',');
+        const metaUploadTime = meta.filters?.uploadTime || 'all';
+
+        if (
+          targetMaxViews !== metaMaxViews ||
+          targetHideShorts !== metaHideShorts ||
+          targetBlacklist !== metaBlacklist ||
+          targetUploadTime !== metaUploadTime
+        ) {
+          continue;
+        }
+      }
+
+      // 3. Textual query similarity match on clean query string
       const score = calculateSimilarity(query, meta.originalQuery);
-      if (score >= 0.6 && score > highestScore) { // 60% similarity threshold
+      if (score >= 0.6 && score > highestScore) {
         highestScore = score;
         bestMatch = { id, meta };
       }
@@ -183,7 +233,7 @@ export const cacheService = {
     }
   },
 
-  saveCache: async (query, results) => {
+  saveCache: async (query, results, options = {}) => {
     try {
       await ensureCacheDir();
       const id = crypto.randomUUID();
@@ -195,6 +245,8 @@ export const cacheService = {
       const index = await readIndex();
       index[id] = {
         originalQuery: query,
+        engine: (options.engine || 'google').toLowerCase(),
+        filters: options.filters || {},
         createdAt: formatReadableDate(now),
         staleAt: formatReadableDate(now + STALE_MS),
         permanent: false
