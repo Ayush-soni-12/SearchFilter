@@ -122,3 +122,40 @@ Last updated: 2026-07-25
 - Matched queries are rendered inside `.matched-query-tag` pill badges (`rgba(59, 130, 246, 0.15)` background, monospace font).
 - Action buttons follow the standard app button system (`.primary-btn` for primary CTA, `.secondary-btn` for secondary CTA) with smooth hover transitions (`all 0.25s cubic-bezier(0.16, 1, 0.3, 1)`).
 
+### YouTube Filter Control Bar
+File: `frontend/src/components/SearchBar.jsx`
+Last updated: 2026-07-26
+
+| Property         | Class / Value                                                |
+| ---------------- | ------------------------------------------------------------ |
+| Background       | `rgba(239, 68, 68, 0.08)` (soft red brand container)        |
+| Border           | `1px solid rgba(239, 68, 68, 0.25)`                           |
+| Border radius    | `12px`                                                       |
+| Inputs / Selects | `background: rgba(0,0,0,0.4)`, `border: 1px solid rgba(255,255,255,0.15)`, `radius: 6px` |
+| Text — primary   | `#f87171` (red active headers & labels)                      |
+| Text — secondary | `var(--text-secondary)` (`#94a3b8`)                          |
+| Active Engine    | `background: rgba(239, 68, 68, 0.25)`, `borderColor: rgba(239, 68, 68, 0.6)` |
+| Primary Submit   | `linear-gradient(135deg, #ef4444 0%, #dc2626 100%)`, shadow `0 4px 14px rgba(239, 68, 68, 0.4)` |
+
+**Pattern notes:**
+- YouTube engine controls adopt a distinct red accent theme (`#ef4444` / `#f87171`) to visually differentiate video filtering from web search.
+- Filter inputs use a semi-transparent dark backdrop (`rgba(0,0,0,0.4)`) with subtle white borders (`0.15` opacity) and `6px` rounded corners.
+
+### YouTube Video Result Card
+File: `frontend/src/components/ResultCard.jsx`
+Last updated: 2026-07-26
+
+| Property         | Class / Value                                                |
+| ---------------- | ------------------------------------------------------------ |
+| Card Layout      | Flex row (`gap: 1.25rem`, `align-items: flex-start`)         |
+| Thumbnail Container | `width: 220px`, `height: 124px`, `radius: 10px`, `border: 1px solid rgba(255,255,255,0.1)` |
+| Duration Badge   | `position: absolute`, `bottom: 6px`, `right: 6px`, `background: rgba(0,0,0,0.85)`, `color: #fff`, `radius: 4px` |
+| Channel Tag      | `color: #f87171`, `font-weight: 600`                         |
+| View Count Badge | `background: rgba(59, 130, 246, 0.15)`, `color: #60a5fa`, `border: 1px solid rgba(59, 130, 246, 0.3)`, `radius: 12px` |
+| Watch Action     | `background: rgba(239, 68, 68, 0.2)`, `borderColor: rgba(239, 68, 68, 0.5)`, `color: #f87171` |
+
+**Pattern notes:**
+- Reuses `.glass-panel` container styling while transforming layout to a horizontal media card.
+- Video thumbnails include an overlaid dark duration badge (`rgba(0,0,0,0.85)`).
+- View counts use the standard pill badge styling (`12px` radius) with soft blue tint (`rgba(59, 130, 246, 0.15)`).
+

@@ -21,19 +21,20 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const [maxViews, setMaxViews] = useState(50000);
   const [hideShorts, setHideShorts] = useState(true);
   const [blacklistedChannels, setBlacklistedChannels] = useState('');
+  const [uploadTime, setUploadTime] = useState('all');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (val.trim()) {
       setShowHistory(false);
-      onSearch(val, { searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels });
+      onSearch(val, { searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels, uploadTime });
     }
   };
 
   const handleHistoryClick = (query) => {
     setVal(query);
     setShowHistory(false);
-    onSearch(query, { searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels });
+    onSearch(query, { searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels, uploadTime });
   };
 
   const handleKeyDown = (e) => {
@@ -141,6 +142,29 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
               <option value={100000}>Under 100,000 views (Under-the-radar)</option>
               <option value={500000}>Under 500,000 views</option>
               <option value={0}>No view limit (All videos)</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#f87171', fontWeight: 600 }}>Upload Date:</span>
+            <select
+              value={uploadTime}
+              onChange={(e) => setUploadTime(e.target.value)}
+              style={{
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#fff',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value="all">Anytime</option>
+              <option value="hour">Past Hour</option>
+              <option value="today">Past 24 Hours</option>
+              <option value="week">Past Week</option>
+              <option value="month">Past Month</option>
+              <option value="year">Past Year</option>
             </select>
           </div>
 
