@@ -49,18 +49,18 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
       {!searchInBookmarks && (
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginRight: '0.25rem' }}>Engine:</span>
+        <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.85rem', color: '#666666', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
           <button
             type="button"
             className="open-btn"
             onClick={() => setEngine('google')}
             style={{
-              fontSize: '0.85rem',
-              padding: '0.35rem 0.75rem',
-              background: engine === 'google' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
-              borderColor: engine === 'google' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
-              color: engine === 'google' ? '#60a5fa' : 'var(--text-secondary)'
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'google' ? '#111111' : '#ffffff',
+              borderColor: engine === 'google' ? '#111111' : '#eaeaea',
+              color: engine === 'google' ? '#ffffff' : '#666666'
             }}
           >
             🌐 Google
@@ -70,39 +70,39 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             className="open-btn"
             onClick={() => setEngine('duckduckgo')}
             style={{
-              fontSize: '0.85rem',
-              padding: '0.35rem 0.75rem',
-              background: engine === 'duckduckgo' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
-              borderColor: engine === 'duckduckgo' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
-              color: engine === 'duckduckgo' ? '#60a5fa' : 'var(--text-secondary)'
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'duckduckgo' ? '#111111' : '#ffffff',
+              borderColor: engine === 'duckduckgo' ? '#111111' : '#eaeaea',
+              color: engine === 'duckduckgo' ? '#ffffff' : '#666666'
             }}
           >
-            🦆 DuckDuckGo (Fast)
+            🦆 DuckDuckGo
           </button>
           <button
             type="button"
             className="open-btn"
             onClick={() => setEngine('bing')}
             style={{
-              fontSize: '0.85rem',
-              padding: '0.35rem 0.75rem',
-              background: engine === 'bing' ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
-              borderColor: engine === 'bing' ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
-              color: engine === 'bing' ? '#60a5fa' : 'var(--text-secondary)'
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'bing' ? '#111111' : '#ffffff',
+              borderColor: engine === 'bing' ? '#111111' : '#eaeaea',
+              color: engine === 'bing' ? '#ffffff' : '#666666'
             }}
           >
-            🔍 Bing (Fast)
+            🔍 Bing
           </button>
           <button
             type="button"
             className="open-btn"
             onClick={() => setEngine('youtube')}
             style={{
-              fontSize: '0.85rem',
-              padding: '0.35rem 0.75rem',
-              background: engine === 'youtube' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.05)',
-              borderColor: engine === 'youtube' ? 'rgba(239, 68, 68, 0.6)' : 'rgba(255,255,255,0.1)',
-              color: engine === 'youtube' ? '#f87171' : 'var(--text-secondary)'
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'youtube' ? '#dc2626' : '#fef2f2',
+              borderColor: engine === 'youtube' ? '#dc2626' : '#fca5a5',
+              color: engine === 'youtube' ? '#ffffff' : '#dc2626'
             }}
           >
             ▶️ YouTube (Hidden Gems)
@@ -110,7 +110,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
         </div>
       )}
 
-      {/* YouTube Specific Filter Bar */}
+      {/* YouTube Specific Filter Bar (Vercel Pastel Aesthetic) */}
       {!searchInBookmarks && engine === 'youtube' && (
         <div style={{
           display: 'flex',
@@ -118,20 +118,20 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           alignItems: 'center',
           flexWrap: 'wrap',
           padding: '0.75rem 1rem',
-          background: 'rgba(239, 68, 68, 0.08)',
-          border: '1px solid rgba(239, 68, 68, 0.25)',
+          background: '#fef2f2',
+          border: '1px solid #fca5a5',
           borderRadius: '12px',
           fontSize: '0.85rem'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#f87171', fontWeight: 600 }}>Max Views:</span>
+            <span style={{ color: '#dc2626', fontWeight: 600 }}>Max Views:</span>
             <select
               value={maxViews}
               onChange={(e) => setMaxViews(Number(e.target.value))}
               style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                color: '#fff',
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
                 padding: '0.25rem 0.5rem',
                 borderRadius: '6px',
                 fontSize: '0.85rem'
@@ -146,14 +146,14 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#f87171', fontWeight: 600 }}>Upload Date:</span>
+            <span style={{ color: '#dc2626', fontWeight: 600 }}>Upload Date:</span>
             <select
               value={uploadTime}
               onChange={(e) => setUploadTime(e.target.value)}
               style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                color: '#fff',
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
                 padding: '0.25rem 0.5rem',
                 borderRadius: '6px',
                 fontSize: '0.85rem'
@@ -168,27 +168,27 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             </select>
           </div>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#737373' }}>
             <input
               type="checkbox"
               checked={hideShorts}
               onChange={(e) => setHideShorts(e.target.checked)}
-              style={{ accentColor: '#ef4444' }}
+              style={{ accentColor: '#dc2626' }}
             />
             <span>Hide Shorts</span>
           </label>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
-            <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Blacklist Channels:</span>
+            <span style={{ color: '#737373', whiteSpace: 'nowrap' }}>Blacklist Channels:</span>
             <input
               type="text"
               placeholder="e.g. 5-Minute Crafts, T-Series"
               value={blacklistedChannels}
               onChange={(e) => setBlacklistedChannels(e.target.value)}
               style={{
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                color: '#fff',
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
                 padding: '0.25rem 0.6rem',
                 borderRadius: '6px',
                 fontSize: '0.85rem',
@@ -221,13 +221,13 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                 alignItems: 'center',
                 padding: '0.4rem 1rem',
                 fontSize: '0.75rem',
-                color: 'var(--text-secondary)',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(0,0,0,0.2)'
+                color: '#737373',
+                borderBottom: '1px solid #eaeaea',
+                background: '#fafafa'
               }}>
                 <span>Search History</span>
                 <span>
-                  <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)' }}>Esc</kbd> hide • <kbd style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 5px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)' }}>Ctrl+Space</kbd> show
+                  <kbd style={{ background: '#ffffff', padding: '2px 5px', borderRadius: '4px', border: '1px solid #e5e5e5', fontFamily: 'monospace' }}>Esc</kbd> hide • <kbd style={{ background: '#ffffff', padding: '2px 5px', borderRadius: '4px', border: '1px solid #e5e5e5', fontFamily: 'monospace' }}>Ctrl+Space</kbd> show
                 </span>
               </div>
               {history.map((item, idx) => (
@@ -237,7 +237,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                   className="history-item"
                   onClick={() => handleHistoryClick(item.query)}
                 >
-                  <Clock size={16} />
+                  <Clock size={15} />
                   <span className="history-text">{item.query}</span>
                 </button>
               ))}
@@ -249,23 +249,23 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           type="submit" 
           className="search-button"
           disabled={isLoading || !val.trim()}
-          style={engine === 'youtube' ? { background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)' } : {}}
+          style={engine === 'youtube' ? { background: '#dc2626', borderColor: '#dc2626', color: '#ffffff' } : {}}
         >
           {isLoading ? 'Searching...' : 'Search'}
         </button>
       </form>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '0.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '0.25rem' }}>
         <button
           type="button"
           className="open-btn"
           onClick={() => setSearchInBookmarks(!searchInBookmarks)}
           style={{
-            fontSize: '0.85rem',
-            padding: '0.4rem 0.8rem',
-            background: searchInBookmarks ? 'rgba(59, 130, 246, 0.25)' : 'rgba(255,255,255,0.05)',
-            borderColor: searchInBookmarks ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255,255,255,0.1)',
-            color: searchInBookmarks ? '#60a5fa' : 'var(--text-secondary)'
+            fontSize: '0.82rem',
+            padding: '0.35rem 0.8rem',
+            background: searchInBookmarks ? '#111111' : '#ffffff',
+            borderColor: searchInBookmarks ? '#111111' : '#eaeaea',
+            color: searchInBookmarks ? '#ffffff' : '#666666'
           }}
         >
           <Bookmark size={14} />
@@ -275,4 +275,3 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     </div>
   );
 }
-

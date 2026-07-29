@@ -2,160 +2,34 @@
 
 ### Base Application and Glass Panels
 File: `frontend/src/index.css`
-Last updated: 2026-07-18
+Last updated: 2026-07-29
 
 | Property         | Class / Variable |
 | ---------------- | --------------- |
 | Background (App) | `var(--bg-color)` with radial gradient |
-| Panel Background | `.glass-panel` (`var(--surface-color)`) |
-| Panel Border     | `var(--border-color)` |
-| Panel Radius     | `16px` |
-| Shadow           | `0 4px 30px rgba(0, 0, 0, 0.1)` |
+| Panel Background | `.glass-panel` (`var(--surface-color)`) / `.vercel-card` (`#0a0a0a`) |
+| Panel Border     | `1px solid rgba(255, 255, 255, 0.08)` |
+| Panel Radius     | `12px` (Vercel Cards) / `16px` (Panels) |
+| Shadow           | `0 4px 20px rgba(0, 0, 0, 0.4)` |
 
 **Pattern notes:**
-The primary aesthetic is glassmorphism. Any new container, card, or modal should use the `.glass-panel` class to inherit the correct blur, surface transparency, and 16px radius. Never hardcode container backgrounds.
+The primary aesthetic is Vercel-inspired monochrome dark mode with subtle transparent borders, optical alignment, and concentric border radii. Any new container, card, or modal should use `.vercel-card` or `.glass-panel`.
 
-### Typography and Colors
-File: `frontend/src/index.css`
-Last updated: 2026-07-18
-
-| Property         | Class / Variable |
-| ---------------- | --------------- |
-| Font Family      | `Inter` |
-| Text Primary     | `var(--text-primary)` |
-| Text Secondary   | `var(--text-secondary)` |
-| Result Titles    | `#60a5fa` |
-| Prefer Status    | `var(--prefer-color)` / `var(--prefer-bg)` |
-| Neutral Status   | `var(--neutral-color)` / `var(--neutral-bg)` |
-| Avoid Status     | `var(--avoid-color)` / `var(--avoid-bg)` |
-
-**Pattern notes:**
-Always fall back to `var(--text-primary)` for standard text and `var(--text-secondary)` for metadata, hints, or domains. Status badges and preference buttons should strictly use the defined semantic color variables.
-
-### Buttons and Inputs
-File: `frontend/src/index.css`
-Last updated: 2026-07-18
-
-| Property         | Class / Variable |
-| ---------------- | --------------- |
-| Radius (Pill)    | `99px` (Primary buttons, inputs, status badges) |
-| Radius (Small)   | `8px` (Secondary actions like `.open-btn`) |
-| Primary Bg       | `var(--accent-color)` |
-| Primary Hover    | `var(--accent-hover)`, `transform: translateY(-2px)` |
-| Secondary Bg     | `rgba(255, 255, 255, 0.1)` |
-| Secondary Hover  | `rgba(255, 255, 255, 0.2)` |
-
-**Pattern notes:**
-Primary interactive elements (search bar, main buttons) use the fully rounded `99px` pill shape. Secondary/utility buttons use `8px`. Hover states rely on slight background opacity increases or subtle Y-axis transforms, keeping the interface feeling dynamic but not overly heavy.
-
-### Hidden Results Toggle Button
-File: `frontend/src/index.css`
-Last updated: 2026-07-20
-
-| Property         | Class / Value                                                |
-| ---------------- | ------------------------------------------------------------ |
-| Background       | `rgba(239, 68, 68, 0.1)` (matches --avoid-bg)                 |
-| Border           | `1px solid rgba(239, 68, 68, 0.2)`                            |
-| Border radius    | `99px` (pill shape)                                          |
-| Text — primary   | `#fca5a5` (light red)                                        |
-| Text — secondary | `font-size: 0.95rem`, `font-weight: 500`                     |
-| Spacing          | `padding: 0.75rem 1.5rem`, `gap: 0.5rem`                     |
-| Hover state      | `background: rgba(239, 68, 68, 0.2)`, `transform: translateY(-2px)`, shadow |
-
-**Pattern notes:**
-Button uses a soft red tint to indicate it relates to "avoided" domains, matching the main `avoid` badge styling. Uses the standard pill-shape (`99px` radius) used by other primary buttons, and the same `-2px` Y-axis hover lift.
-
-### Hidden Results Container
-File: `frontend/src/index.css`
-Last updated: 2026-07-20
-
-| Property         | Class / Value                                                |
-| ---------------- | ------------------------------------------------------------ |
-| Border           | `border-top: 1px dashed var(--border-color)`                  |
-| Spacing          | `margin-top: 2rem`, `padding-top: 1.5rem`                    |
-
-**Pattern notes:**
-Uses a dashed top-border to visually separate the hidden results from the primary results, clearly delineating the curated boundary.
-
-### SearchBar Component
-
-File: `frontend/src/components/SearchBar.jsx`  
-Last updated: 2026-07-25  
+### Vercel Aesthetic YouTube Video Card (UI Skills Imprint)
+File: `frontend/src/components/ResultCard.jsx`, `frontend/src/index.css`  
+Last updated: 2026-07-29 (Inspired by `jakubkrehel/better-ui`)  
 
 | Property | Class / Value |
 | --- | --- |
-| Background | Input: `rgba(15, 23, 42, 0.6)` / Dropdown: `var(--surface-color)` (blur 16px) |
-| Border | Input & Dropdown: `1px solid var(--border-color)` (`rgba(255,255,255,0.08)`) |
-| Border radius | Input/Button: `99px` (Pill) / Dropdown: `16px` / Buttons: `8px` / Kbd: `4px` |
-| Text — primary | Input & Active Buttons: `var(--text-primary)` (`#f8fafc`), Active Accent: `#60a5fa` |
-| Text — secondary | Helper Labels & Shortcuts: `var(--text-secondary)` (`#94a3b8`) |
-| Spacing | Input Padding: `1rem 1.5rem` / Dropdown Item: `0.75rem 1.5rem` / Container Gap: `0.75rem` |
-| Hover state | Buttons: `background: rgba(255,255,255,0.2)` / Items: `background: rgba(255,255,255,0.05)` |
-| Shadow | Dropdown: `0 10px 40px rgba(0, 0, 0, 0.3)` / Focus ring: `0 0 0 3px rgba(59, 130, 246, 0.2)` |
-| Accent usage | Primary Action: `var(--accent-color)` (`#3b82f6`) / Active Engine: `#60a5fa` |
+| Card Container | `.vercel-card`: `background: #0a0a0a`, `border: 1px solid rgba(255, 255, 255, 0.08)`, `border-radius: 12px` |
+| Concentric Radii | Outer card `12px` ➔ Thumbnail `8px` ➔ Badges `4px-6px` |
+| Image Outline | Thumbnail overlay: `outline: 1px solid rgba(255, 255, 255, 0.1); outline-offset: -1px` |
+| Hover State | `border-color: rgba(255, 255, 255, 0.18)`, `transform: translateY(-2px)`, `box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6)` |
+| Title Typography | `#ededed`, `1.05rem`, `letter-spacing: -0.01em`, hover highlight `#f87171` |
+| Tabular Numbers | Duration & view counts use `font-variant-numeric: tabular-nums` |
+| Watch CTA | `.watch-btn`: `background: rgba(239, 68, 68, 0.15)`, `border: 1px solid rgba(239, 68, 68, 0.35)`, `color: #fca5a5`, active `scale(0.97)` |
 
 **Pattern notes:**
-- Search input uses pill radius (`99px`) with glassmorphism backdrop filter (`blur(8px)`).
-- History dropdown uses absolute positioning below input with high z-index (`50`), slide-up animation (`animate-slide-up`), and keyboard shortcut indicator header (`Esc` / `Ctrl+Space`).
-- Interactive engine toggle buttons use subtle transparent backgrounds with active blue highlight (`rgba(59, 130, 246, 0.25)`).
-
-### CachePopup Card & Button System
-
-File: `frontend/src/App.jsx`, `frontend/src/index.css`  
-Last updated: 2026-07-25  
-
-| Property | Class / Value |
-| --- | --- |
-| Background | Container: `linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)` (blur 16px) |
-| Primary Button | `.primary-btn`: `linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)`, text `#ffffff` |
-| Secondary Button | `.secondary-btn`: `rgba(255, 255, 255, 0.08)`, border `rgba(255, 255, 255, 0.12)`, text `#e2e8f0` |
-| Border | Card: `1px solid rgba(59, 130, 246, 0.35)` |
-| Border radius | Card: `20px` / Buttons: `99px` (Pill) / Tag: `6px` |
-| Text — primary | Card Title: `#f8fafc` (`1.35rem`, bold) / Primary Action: `#ffffff` |
-| Text — secondary | Card Description: `#94a3b8` (`1rem`) / Tag Text: `#60a5fa` |
-| Spacing | Card Padding: `2rem` / Button Padding: `0.75rem 1.5rem` / Button Gap: `1rem` |
-| Hover state | Primary: `linear-gradient(135deg, #60a5fa, #3b82f6)` (`translateY(-2px)`) / Secondary: `rgba(255, 255, 255, 0.16)` |
-| Shadow | Card: `0 12px 40px rgba(0, 0, 0, 0.35)`, `0 0 20px rgba(59, 130, 246, 0.15)` |
-
-**Pattern notes:**
-- CachePopup uses glassmorphic dark panel with a soft blue ambient glow (`0 0 20px rgba(59, 130, 246, 0.15)`).
-- Matched queries are rendered inside `.matched-query-tag` pill badges (`rgba(59, 130, 246, 0.15)` background, monospace font).
-- Action buttons follow the standard app button system (`.primary-btn` for primary CTA, `.secondary-btn` for secondary CTA) with smooth hover transitions (`all 0.25s cubic-bezier(0.16, 1, 0.3, 1)`).
-
-### YouTube Filter Control Bar
-File: `frontend/src/components/SearchBar.jsx`
-Last updated: 2026-07-26
-
-| Property         | Class / Value                                                |
-| ---------------- | ------------------------------------------------------------ |
-| Background       | `rgba(239, 68, 68, 0.08)` (soft red brand container)        |
-| Border           | `1px solid rgba(239, 68, 68, 0.25)`                           |
-| Border radius    | `12px`                                                       |
-| Inputs / Selects | `background: rgba(0,0,0,0.4)`, `border: 1px solid rgba(255,255,255,0.15)`, `radius: 6px` |
-| Text — primary   | `#f87171` (red active headers & labels)                      |
-| Text — secondary | `var(--text-secondary)` (`#94a3b8`)                          |
-| Active Engine    | `background: rgba(239, 68, 68, 0.25)`, `borderColor: rgba(239, 68, 68, 0.6)` |
-| Primary Submit   | `linear-gradient(135deg, #ef4444 0%, #dc2626 100%)`, shadow `0 4px 14px rgba(239, 68, 68, 0.4)` |
-
-**Pattern notes:**
-- YouTube engine controls adopt a distinct red accent theme (`#ef4444` / `#f87171`) to visually differentiate video filtering from web search.
-- Filter inputs use a semi-transparent dark backdrop (`rgba(0,0,0,0.4)`) with subtle white borders (`0.15` opacity) and `6px` rounded corners.
-
-### YouTube Video Result Card
-File: `frontend/src/components/ResultCard.jsx`
-Last updated: 2026-07-26
-
-| Property         | Class / Value                                                |
-| ---------------- | ------------------------------------------------------------ |
-| Card Layout      | Flex row (`gap: 1.25rem`, `align-items: flex-start`)         |
-| Thumbnail Container | `width: 220px`, `height: 124px`, `radius: 10px`, `border: 1px solid rgba(255,255,255,0.1)` |
-| Duration Badge   | `position: absolute`, `bottom: 6px`, `right: 6px`, `background: rgba(0,0,0,0.85)`, `color: #fff`, `radius: 4px` |
-| Channel Tag      | `color: #f87171`, `font-weight: 600`                         |
-| View Count Badge | `background: rgba(59, 130, 246, 0.15)`, `color: #60a5fa`, `border: 1px solid rgba(59, 130, 246, 0.3)`, `radius: 12px` |
-| Watch Action     | `background: rgba(239, 68, 68, 0.2)`, `borderColor: rgba(239, 68, 68, 0.5)`, `color: #f87171` |
-
-**Pattern notes:**
-- Reuses `.glass-panel` container styling while transforming layout to a horizontal media card.
-- Video thumbnails include an overlaid dark duration badge (`rgba(0,0,0,0.85)`).
-- View counts use the standard pill badge styling (`12px` radius) with soft blue tint (`rgba(59, 130, 246, 0.15)`).
-
+- Follows concentric border radius principles (`outer = inner + padding`).
+- Employs low-opacity white outlines over thumbnails to ensure image crispness against dark backdrops.
+- Micro-interactions include hover scale on thumbnails (`scale(1.04)`), play button overlay fade-in, and tactile press scaling (`scale(0.97)`).
