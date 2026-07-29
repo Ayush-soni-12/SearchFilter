@@ -5,8 +5,11 @@ import { BingSearchService } from './bingSearchService.js';
 const bingFallback = new BingSearchService();
 
 export class DuckDuckGoSearchService extends SearchProvider {
-  async search(query) {
-    console.log(`Starting DuckDuckGo Search for: "${query}"`);
+  async search(query, options = {}) {
+    const page = options.continuationToken ? parseInt(options.continuationToken, 10) : 1;
+    const offset = (page - 1) * 30;
+
+    console.log(`Starting DuckDuckGo Search for: "${query}" (page ${page}, offset=${offset})`);
     try {
       let allRawResults = [];
       const headers = {
@@ -17,7 +20,9 @@ export class DuckDuckGoSearchService extends SearchProvider {
 
       const fetchDDGPage = async (searchQuery) => {
         try {
-          const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
+          const url = offset > 0 
+            ? `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}&s=${offset}`
+            : `https://html.duckduckgo.com/html/?q=${encodeURIComponent(searchQuery)}`;
           const response = await fetch(url, { headers });
           if (!response.ok || response.status !== 200) return [];
 
@@ -64,8 +69,7 @@ export class DuckDuckGoSearchService extends SearchProvider {
       const variations = [
         query,
         `${query} tutorial`,
-        `${query} documentation`,
-        `${query} guide`
+        `${query} documentation`
       ];
 
       const resArrays = await Promise.all(variations.map(v => fetchDDGPage(v)));
@@ -79,15 +83,18 @@ export class DuckDuckGoSearchService extends SearchProvider {
         return true;
       });
 
-      if (dedupedResults.length >= 10) {
-        console.log(`DuckDuckGo Search found ${dedupedResults.length} results.`);
-        return dedupedResults;
+      if (dedupedResults.length > 0) {
+        console.log(`DuckDuckGo Search page ${page} found ${dedupedResults.length} results.`);
+        return {
+          results: dedupedResults,
+          nextContinuationToken: String(page + 1)
+        };
       }
     } catch (error) {
       console.warn('DuckDuckGo direct fetch failed/rate limited, using fallback:', error.message);
     }
 
     console.log('Falling back to Bing search for DuckDuckGo service...');
-    return await bingFallback.search(query);
+    return await bingFallback.search(query, options);
   }
 }

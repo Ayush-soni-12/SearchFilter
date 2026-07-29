@@ -2,8 +2,11 @@ import * as cheerio from 'cheerio';
 import { SearchProvider } from './searchProvider.js';
 
 export class BingSearchService extends SearchProvider {
-  async search(query) {
-    console.log(`Starting Bing Search for: "${query}"`);
+  async search(query, options = {}) {
+    const page = options.continuationToken ? parseInt(options.continuationToken, 10) : 1;
+    const first = (page - 1) * 10 + 1;
+
+    console.log(`Starting Bing Search for: "${query}" (page ${page}, first=${first})`);
     try {
       const headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -13,7 +16,7 @@ export class BingSearchService extends SearchProvider {
 
       const fetchBingQuery = async (searchQuery) => {
         try {
-          const url = `https://www.bing.com/search?q=${encodeURIComponent(searchQuery)}`;
+          const url = `https://www.bing.com/search?q=${encodeURIComponent(searchQuery)}&first=${first}`;
           const response = await fetch(url, { headers });
           if (!response.ok) return [];
 
@@ -60,11 +63,7 @@ export class BingSearchService extends SearchProvider {
       const variations = [
         query,
         `${query} documentation`,
-        `${query} github cheatsheet`,
-        `learn ${query} online`,
-        `best ${query} courses`,
-        `${query} examples articles`,
-        `${query} guide overview`
+        `${query} github cheatsheet`
       ];
 
       const resultsArray = await Promise.all(variations.map(v => fetchBingQuery(v)));
@@ -78,11 +77,14 @@ export class BingSearchService extends SearchProvider {
         return true;
       });
 
-      console.log(`Bing Search found ${dedupedResults.length} results.`);
-      return dedupedResults;
+      console.log(`Bing Search page ${page} found ${dedupedResults.length} results.`);
+      return {
+        results: dedupedResults,
+        nextContinuationToken: dedupedResults.length > 0 ? String(page + 1) : null
+      };
     } catch (error) {
       console.error('Bing search error:', error);
-      return [];
+      return { results: [], nextContinuationToken: null };
     }
   }
 }

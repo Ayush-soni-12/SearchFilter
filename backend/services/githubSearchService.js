@@ -46,14 +46,17 @@ export class GitHubSearchService {
         queryParts.push(`pushed:>=${isoDate}`);
       }
 
+      const page = options.continuationToken ? parseInt(options.continuationToken, 10) : 1;
       const fullQuery = queryParts.join(' ');
       
       // Determine GitHub API sort strategy:
       // If maxStars > 0 (Hidden Gem mode), sort by recently updated to find active small repos.
       // If maxStars === 0 (No filter / All repos), sort by stars descending.
-      const apiUrl = maxStars > 0
-        ? `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=updated&order=desc&per_page=40`
-        : `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=stars&order=desc&per_page=40`;
+      const baseUrl = maxStars > 0
+        ? `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=updated&order=desc&per_page=30`
+        : `https://api.github.com/search/repositories?q=${encodeURIComponent(fullQuery)}&sort=stars&order=desc&per_page=30`;
+
+      const apiUrl = `${baseUrl}&page=${page}`;
 
       const headers = {
         'User-Agent': 'SearchFilter-App (https://github.com)',
@@ -147,7 +150,8 @@ export class GitHubSearchService {
       }
 
       return {
-        results: processedResults
+        results: processedResults,
+        nextContinuationToken: processedResults.length > 0 ? String(page + 1) : null
       };
 
     } catch (error) {
