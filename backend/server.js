@@ -6,7 +6,7 @@ import historyRoutes from './routes/historyRoutes.js';
 import bookmarksRoutes from './routes/bookmarksRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
