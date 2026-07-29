@@ -4,7 +4,24 @@ import { storageService } from '../services/storageService.js';
 import { cacheService } from '../services/cacheService.js';
 
 export const handleSearch = async (req, res) => {
-  const { query, forceSearch, useCacheId, searchInBookmarks, engine, maxViews, hideShorts, blacklistedChannels, uploadTime, continuationToken, apiKey } = req.query;
+  const {
+    query,
+    forceSearch,
+    useCacheId,
+    searchInBookmarks,
+    engine,
+    maxViews,
+    hideShorts,
+    blacklistedChannels,
+    uploadTime,
+    maxStars,
+    minStars,
+    githubLanguage,
+    blacklistedOrgs,
+    excludeStudyNotes,
+    continuationToken,
+    apiKey
+  } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter is required' });
@@ -41,12 +58,23 @@ export const handleSearch = async (req, res) => {
     const parsedBlacklist = blacklistedChannels ? String(blacklistedChannels).split(',').map(s => s.trim()).filter(Boolean) : [];
     const parsedUploadTime = uploadTime || 'all';
 
+    const parsedMaxStars = maxStars !== undefined ? parseInt(maxStars, 10) : 500;
+    const parsedMinStars = minStars !== undefined ? parseInt(minStars, 10) : 5;
+    const parsedGithubLanguage = githubLanguage || 'all';
+    const parsedBlacklistedOrgs = blacklistedOrgs ? String(blacklistedOrgs).split(',').map(s => s.trim()).filter(Boolean) : [];
+    const parsedExcludeStudyNotes = excludeStudyNotes === 'true';
+
     const cacheOptions = {
       engine: selectedEngine,
       maxViews: parsedMaxViews,
       hideShorts: parsedHideShorts,
       blacklistedChannels: parsedBlacklist,
-      uploadTime: parsedUploadTime
+      uploadTime: parsedUploadTime,
+      maxStars: parsedMaxStars,
+      minStars: parsedMinStars,
+      githubLanguage: parsedGithubLanguage,
+      blacklistedOrgs: parsedBlacklistedOrgs,
+      excludeStudyNotes: parsedExcludeStudyNotes
     };
 
     // If fetching next page via continuationToken, skip cache match check
@@ -66,6 +94,11 @@ export const handleSearch = async (req, res) => {
       hideShorts: parsedHideShorts,
       blacklistedChannels: parsedBlacklist,
       uploadTime: parsedUploadTime,
+      maxStars: parsedMaxStars,
+      minStars: parsedMinStars,
+      githubLanguage: parsedGithubLanguage,
+      blacklistedOrgs: parsedBlacklistedOrgs,
+      excludeStudyNotes: parsedExcludeStudyNotes,
       continuationToken,
       apiKey
     });
@@ -92,7 +125,12 @@ export const handleSearch = async (req, res) => {
           maxViews: parsedMaxViews,
           hideShorts: parsedHideShorts,
           blacklistedChannels: parsedBlacklist,
-          uploadTime: parsedUploadTime
+          uploadTime: parsedUploadTime,
+          maxStars: parsedMaxStars,
+          minStars: parsedMinStars,
+          githubLanguage: parsedGithubLanguage,
+          blacklistedOrgs: parsedBlacklistedOrgs,
+          excludeStudyNotes: parsedExcludeStudyNotes
         }
       });
     }

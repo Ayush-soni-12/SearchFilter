@@ -172,7 +172,7 @@ export const cacheService = {
       const metaEngine = (meta.engine || 'google').toLowerCase();
       if (metaEngine !== targetEngine) continue;
 
-      // 2. If engine is YouTube, filter options must match exactly
+      // 2. If engine is YouTube or GitHub, filter options must match exactly
       if (targetEngine === 'youtube') {
         const targetMaxViews = options.maxViews !== undefined ? Number(options.maxViews) : 50000;
         const targetHideShorts = Boolean(options.hideShorts);
@@ -188,6 +188,31 @@ export const cacheService = {
           targetMaxViews !== metaMaxViews ||
           targetHideShorts !== metaHideShorts ||
           targetBlacklist !== metaBlacklist ||
+          targetUploadTime !== metaUploadTime
+        ) {
+          continue;
+        }
+      } else if (targetEngine === 'github' || targetEngine === 'gh') {
+        const targetMaxStars = options.maxStars !== undefined ? Number(options.maxStars) : 500;
+        const targetMinStars = options.minStars !== undefined ? Number(options.minStars) : 5;
+        const targetLanguage = options.githubLanguage || 'all';
+        const targetBlacklist = (options.blacklistedOrgs || []).join(',');
+        const targetExcludeNotes = Boolean(options.excludeStudyNotes);
+        const targetUploadTime = options.uploadTime || 'all';
+
+        const metaMaxStars = meta.filters?.maxStars !== undefined ? Number(meta.filters.maxStars) : 500;
+        const metaMinStars = meta.filters?.minStars !== undefined ? Number(meta.filters.minStars) : 5;
+        const metaLanguage = meta.filters?.githubLanguage || 'all';
+        const metaBlacklist = (meta.filters?.blacklistedOrgs || []).join(',');
+        const metaExcludeNotes = Boolean(meta.filters?.excludeStudyNotes);
+        const metaUploadTime = meta.filters?.uploadTime || 'all';
+
+        if (
+          targetMaxStars !== metaMaxStars ||
+          targetMinStars !== metaMinStars ||
+          targetLanguage !== metaLanguage ||
+          targetBlacklist !== metaBlacklist ||
+          targetExcludeNotes !== metaExcludeNotes ||
           targetUploadTime !== metaUploadTime
         ) {
           continue;

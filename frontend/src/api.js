@@ -11,6 +11,11 @@ export const api = {
     if (options.hideShorts !== undefined) url += `&hideShorts=${encodeURIComponent(options.hideShorts)}`;
     if (options.blacklistedChannels) url += `&blacklistedChannels=${encodeURIComponent(options.blacklistedChannels)}`;
     if (options.uploadTime) url += `&uploadTime=${encodeURIComponent(options.uploadTime)}`;
+    if (options.maxStars !== undefined) url += `&maxStars=${encodeURIComponent(options.maxStars)}`;
+    if (options.minStars !== undefined) url += `&minStars=${encodeURIComponent(options.minStars)}`;
+    if (options.githubLanguage) url += `&githubLanguage=${encodeURIComponent(options.githubLanguage)}`;
+    if (options.blacklistedOrgs) url += `&blacklistedOrgs=${encodeURIComponent(options.blacklistedOrgs)}`;
+    if (options.excludeStudyNotes !== undefined) url += `&excludeStudyNotes=${encodeURIComponent(options.excludeStudyNotes)}`;
     if (options.continuationToken) url += `&continuationToken=${encodeURIComponent(options.continuationToken)}`;
     if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
     
