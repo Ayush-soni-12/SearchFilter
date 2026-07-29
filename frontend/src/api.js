@@ -10,6 +10,9 @@ export const api = {
     if (options.maxViews !== undefined) url += `&maxViews=${encodeURIComponent(options.maxViews)}`;
     if (options.hideShorts !== undefined) url += `&hideShorts=${encodeURIComponent(options.hideShorts)}`;
     if (options.blacklistedChannels) url += `&blacklistedChannels=${encodeURIComponent(options.blacklistedChannels)}`;
+    if (options.uploadTime) url += `&uploadTime=${encodeURIComponent(options.uploadTime)}`;
+    if (options.continuationToken) url += `&continuationToken=${encodeURIComponent(options.continuationToken)}`;
+    if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');
