@@ -1,6 +1,84 @@
 import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play } from 'lucide-react';
 
 export default function ResultCard({ result, currentPref, onPreferenceChange, isBookmarked, onBookmarkToggle }) {
+  if (result.engine === 'hackernews' || result.isHackerNews) {
+    const formattedDate = result.createdAt
+      ? new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : null;
+
+    return (
+      <div className="result-card vercel-card animate-slide-up">
+        <div className="yt-card-content" style={{ gap: '1rem', alignItems: 'flex-start' }}>
+          <div className="yt-details" style={{ flex: 1 }}>
+            <div className="yt-header">
+              <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
+                <h3 className="yt-title">{result.title}</h3>
+              </a>
+              <div className="yt-actions">
+                {onBookmarkToggle && (
+                  <button 
+                    className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                    onClick={onBookmarkToggle}
+                    title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
+                  >
+                    {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
+                  </button>
+                )}
+                <a href={result.hnUrl || result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
+                  <span>HN Discussion</span>
+                  <ExternalLink size={14} />
+                </a>
+                {result.url && result.url !== result.hnUrl && (
+                  <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
+                    <span>Visit Site</span>
+                    <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="yt-meta-row" style={{ marginTop: '0.35rem', marginBottom: '0.45rem' }}>
+              <span className="yt-channel-badge" style={{ background: '#f6f8fa', color: '#24292e', borderColor: '#d0d7de' }}>
+                ▲ {result.points} points
+              </span>
+              <span className="meta-dot">•</span>
+              <span className="yt-views-badge" style={{ background: '#f6f8fa', color: '#57606a', borderColor: '#d0d7de' }}>
+                💬 {result.commentsCount} comments
+              </span>
+              <span className="meta-dot">•</span>
+              <span className="yt-time-badge" style={{ background: '#f6f8fa', color: '#57606a', borderColor: '#d0d7de' }}>
+                👤 {result.author}
+              </span>
+              {result.postType && (
+                <>
+                  <span className="meta-dot">•</span>
+                  <span className="yt-time-badge" style={{ background: '#ddf4ff', color: '#0969da', borderColor: '#54aeff' }}>
+                    🏷️ {result.postType}
+                  </span>
+                </>
+              )}
+              {formattedDate && (
+                <>
+                  <span className="meta-dot">•</span>
+                  <span className="yt-time-badge">
+                    🕒 {formattedDate}
+                  </span>
+                </>
+              )}
+            </div>
+
+            <p className="yt-snippet">{result.snippet}</p>
+
+            <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', color: '#737373', fontFamily: 'monospace' }}>
+              <span>Domain: {result.domain}</span>
+              <span>Score: {result.finalScore}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (result.isGitHub) {
     return (
       <div className="result-card vercel-card animate-slide-up">
