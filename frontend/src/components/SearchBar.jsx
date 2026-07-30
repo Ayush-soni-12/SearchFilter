@@ -28,6 +28,12 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const [blacklistedOrgs, setBlacklistedOrgs] = useState('');
   const [excludeStudyNotes, setExcludeStudyNotes] = useState(true);
 
+  const [hnType, setHnType] = useState('story');
+  const [hnSort, setHnSort] = useState('relevance');
+  const [minPoints, setMinPoints] = useState(0);
+  const [minComments, setMinComments] = useState(0);
+  const [hnDateRange, setHnDateRange] = useState('all');
+
   const getSearchPayload = () => ({
     searchInBookmarks,
     engine,
@@ -38,7 +44,12 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     maxStars,
     githubLanguage,
     blacklistedOrgs,
-    excludeStudyNotes
+    excludeStudyNotes,
+    hnType,
+    hnSort,
+    minPoints,
+    minComments,
+    hnDateRange
   });
 
   const handleSubmit = (e) => {
@@ -110,6 +121,20 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             }}
           >
             🔍 Bing
+          </button>
+          <button
+            type="button"
+            className="open-btn"
+            onClick={() => setEngine('hackernews')}
+            style={{
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'hackernews' ? '#24292e' : '#f6f8fa',
+              borderColor: engine === 'hackernews' ? '#24292e' : '#d0d7de',
+              color: engine === 'hackernews' ? '#ffffff' : '#24292e'
+            }}
+          >
+            🟠 Hacker News
           </button>
           <button
             type="button"
@@ -227,6 +252,128 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                 width: '100%'
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Hacker News Specific Filter Bar (Clean Vercel Theme) */}
+      {!searchInBookmarks && (engine === 'hackernews' || engine === 'hn') && (
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          padding: '0.75rem 1rem',
+          background: '#f6f8fa',
+          border: '1px solid #d0d7de',
+          borderRadius: '12px',
+          fontSize: '0.85rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#24292e', fontWeight: 600 }}>Type:</span>
+            <select
+              value={hnType}
+              onChange={(e) => setHnType(e.target.value)}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value="story">Stories / Articles</option>
+              <option value="ask_hn">Ask HN</option>
+              <option value="show_hn">Show HN</option>
+              <option value="poll">Polls</option>
+              <option value="comment">Comments</option>
+              <option value="all">All Content</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#24292e', fontWeight: 600 }}>Sort By:</span>
+            <select
+              value={hnSort}
+              onChange={(e) => setHnSort(e.target.value)}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value="relevance">Relevance</option>
+              <option value="date">Latest Date</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#24292e', fontWeight: 600 }}>Min Points:</span>
+            <select
+              value={minPoints}
+              onChange={(e) => setMinPoints(Number(e.target.value))}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value={0}>Any Points</option>
+              <option value={10}>10+ Points</option>
+              <option value={50}>50+ Points</option>
+              <option value={100}>100+ Points</option>
+              <option value={500}>500+ Points</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#24292e', fontWeight: 600 }}>Min Comments:</span>
+            <select
+              value={minComments}
+              onChange={(e) => setMinComments(Number(e.target.value))}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value={0}>Any Comments</option>
+              <option value={5}>5+ Comments</option>
+              <option value={20}>20+ Comments</option>
+              <option value={50}>50+ Comments</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: '#24292e', fontWeight: 600 }}>Date Range:</span>
+            <select
+              value={hnDateRange}
+              onChange={(e) => setHnDateRange(e.target.value)}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e5e5e5',
+                color: '#111111',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem'
+              }}
+            >
+              <option value="all">All Time</option>
+              <option value="24h">Past 24 Hours</option>
+              <option value="past_week">Past Week</option>
+              <option value="past_month">Past Month</option>
+              <option value="past_year">Past Year</option>
+            </select>
           </div>
         </div>
       )}
@@ -349,7 +496,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'bing' ? 'Bing' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'bing' ? 'Bing' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
             value={val}
             onChange={(e) => setVal(e.target.value)}
             onFocus={() => setShowHistory(true)}
@@ -393,7 +540,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           type="submit" 
           className="search-button"
           disabled={isLoading || !val.trim()}
-          style={(engine === 'youtube' || engine === 'github') ? { background: '#24292e', borderColor: '#24292e', color: '#ffffff' } : {}}
+          style={(engine === 'hackernews' || engine === 'youtube' || engine === 'github') ? { background: '#24292e', borderColor: '#24292e', color: '#ffffff' } : {}}
         >
           {isLoading ? 'Searching...' : 'Search'}
         </button>
