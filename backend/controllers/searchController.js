@@ -19,6 +19,11 @@ export const handleSearch = async (req, res) => {
     githubLanguage,
     blacklistedOrgs,
     excludeStudyNotes,
+    hnType,
+    hnSort,
+    minPoints,
+    minComments,
+    hnDateRange,
     continuationToken,
     apiKey
   } = req.query;
@@ -64,6 +69,12 @@ export const handleSearch = async (req, res) => {
     const parsedBlacklistedOrgs = blacklistedOrgs ? String(blacklistedOrgs).split(',').map(s => s.trim()).filter(Boolean) : [];
     const parsedExcludeStudyNotes = excludeStudyNotes === 'true';
 
+    const parsedHnType = hnType || 'story';
+    const parsedHnSort = hnSort || 'relevance';
+    const parsedMinPoints = minPoints !== undefined ? parseInt(minPoints, 10) : 0;
+    const parsedMinComments = minComments !== undefined ? parseInt(minComments, 10) : 0;
+    const parsedHnDateRange = hnDateRange || 'all';
+
     const cacheOptions = {
       engine: selectedEngine,
       maxViews: parsedMaxViews,
@@ -74,7 +85,12 @@ export const handleSearch = async (req, res) => {
       minStars: parsedMinStars,
       githubLanguage: parsedGithubLanguage,
       blacklistedOrgs: parsedBlacklistedOrgs,
-      excludeStudyNotes: parsedExcludeStudyNotes
+      excludeStudyNotes: parsedExcludeStudyNotes,
+      hnType: parsedHnType,
+      hnSort: parsedHnSort,
+      minPoints: parsedMinPoints,
+      minComments: parsedMinComments,
+      hnDateRange: parsedHnDateRange
     };
 
     // If fetching next page via continuationToken, skip cache match check
@@ -99,6 +115,11 @@ export const handleSearch = async (req, res) => {
       githubLanguage: parsedGithubLanguage,
       blacklistedOrgs: parsedBlacklistedOrgs,
       excludeStudyNotes: parsedExcludeStudyNotes,
+      hnType: parsedHnType,
+      hnSort: parsedHnSort,
+      minPoints: parsedMinPoints,
+      minComments: parsedMinComments,
+      hnDateRange: parsedHnDateRange,
       continuationToken,
       apiKey
     });
@@ -130,7 +151,12 @@ export const handleSearch = async (req, res) => {
           minStars: parsedMinStars,
           githubLanguage: parsedGithubLanguage,
           blacklistedOrgs: parsedBlacklistedOrgs,
-          excludeStudyNotes: parsedExcludeStudyNotes
+          excludeStudyNotes: parsedExcludeStudyNotes,
+          hnType: parsedHnType,
+          hnSort: parsedHnSort,
+          minPoints: parsedMinPoints,
+          minComments: parsedMinComments,
+          hnDateRange: parsedHnDateRange
         }
       });
     }

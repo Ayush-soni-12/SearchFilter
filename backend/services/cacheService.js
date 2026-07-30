@@ -217,6 +217,28 @@ export const cacheService = {
         ) {
           continue;
         }
+      } else if (targetEngine === 'hackernews' || targetEngine === 'hn') {
+        const targetHnType = options.hnType || 'story';
+        const targetHnSort = options.hnSort || 'relevance';
+        const targetMinPoints = options.minPoints !== undefined ? Number(options.minPoints) : 0;
+        const targetMinComments = options.minComments !== undefined ? Number(options.minComments) : 0;
+        const targetHnDateRange = options.hnDateRange || 'all';
+
+        const metaHnType = meta.filters?.hnType || 'story';
+        const metaHnSort = meta.filters?.hnSort || 'relevance';
+        const metaMinPoints = meta.filters?.minPoints !== undefined ? Number(meta.filters.minPoints) : 0;
+        const metaMinComments = meta.filters?.minComments !== undefined ? Number(meta.filters.minComments) : 0;
+        const metaHnDateRange = meta.filters?.hnDateRange || 'all';
+
+        if (
+          targetHnType !== metaHnType ||
+          targetHnSort !== metaHnSort ||
+          targetMinPoints !== metaMinPoints ||
+          targetMinComments !== metaMinComments ||
+          targetHnDateRange !== metaHnDateRange
+        ) {
+          continue;
+        }
       }
 
       // 3. Textual query similarity match on clean query string
