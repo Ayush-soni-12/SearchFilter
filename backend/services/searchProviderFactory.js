@@ -3,16 +3,21 @@ import { DuckDuckGoSearchService } from './duckDuckGoSearchService.js';
 import { BingSearchService } from './bingSearchService.js';
 import { YouTubeSearchService } from './youtubeSearchService.js';
 import { GitHubSearchService } from './githubSearchService.js';
+import { HnSearchService } from './hnSearchService.js';
 
 const googleService = new GoogleSearchService();
 const duckDuckGoService = new DuckDuckGoSearchService();
 const bingService = new BingSearchService();
 const youtubeService = new YouTubeSearchService();
 const githubService = new GitHubSearchService();
+const hnService = new HnSearchService();
 
 export const searchProviderFactory = {
   getProvider: (engine = 'google') => {
     switch ((engine || '').toLowerCase()) {
+      case 'hackernews':
+      case 'hn':
+        return hnService;
       case 'github':
       case 'gh':
         return githubService;
