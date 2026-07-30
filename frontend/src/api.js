@@ -16,6 +16,11 @@ export const api = {
     if (options.githubLanguage) url += `&githubLanguage=${encodeURIComponent(options.githubLanguage)}`;
     if (options.blacklistedOrgs) url += `&blacklistedOrgs=${encodeURIComponent(options.blacklistedOrgs)}`;
     if (options.excludeStudyNotes !== undefined) url += `&excludeStudyNotes=${encodeURIComponent(options.excludeStudyNotes)}`;
+    if (options.hnType) url += `&hnType=${encodeURIComponent(options.hnType)}`;
+    if (options.hnSort) url += `&hnSort=${encodeURIComponent(options.hnSort)}`;
+    if (options.minPoints !== undefined) url += `&minPoints=${encodeURIComponent(options.minPoints)}`;
+    if (options.minComments !== undefined) url += `&minComments=${encodeURIComponent(options.minComments)}`;
+    if (options.hnDateRange) url += `&hnDateRange=${encodeURIComponent(options.hnDateRange)}`;
     if (options.continuationToken) url += `&continuationToken=${encodeURIComponent(options.continuationToken)}`;
     if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
     
