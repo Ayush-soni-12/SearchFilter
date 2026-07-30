@@ -77,3 +77,26 @@ Last updated: 2026-07-29
 - Reuses exact Vercel card concentric radii and pastel background structure as YouTube and Google result cards.
 - Star, Fork, and Language pill tags use GitHub neutral pastel tokens (`#f6f8fa`, `#ddf4ff`, `#0969da`).
 
+---
+
+### Hacker News Engine Toolbar & Submission Cards
+File: `frontend/src/components/SearchBar.jsx`, `frontend/src/components/ResultCard.jsx`
+Last updated: 2026-07-30
+
+| Property | Class / Value |
+| --- | --- |
+| HN Engine Button | `.open-btn`: Active (`background: #24292e`, `color: #ffffff`, `border-color: #24292e`) / Inactive (`#f6f8fa`, `#24292e`) |
+| HN Filter Bar | `background: #f6f8fa`, `border: 1px solid #d0d7de`, `border-radius: 12px`, `font-size: 0.85rem` |
+| HN Type Filter | `Type`: Stories (`story`), Ask HN (`ask_hn`), Show HN (`show_hn`), Polls (`poll`), Comments (`comment`), All (`all`) |
+| HN Numeric Filters | `Min Points`: 0, 10+, 50+, 100+, 500+ \| `Min Comments`: 0, 5+, 20+, 50+ |
+| HN Date Filter | `Date Range`: All Time, Past 24 Hours, Past Week, Past Month, Past Year |
+| Search Submit CTA | `background: #24292e`, `border-color: #24292e`, `color: #ffffff` |
+| HN Card Design | `.vercel-card`: `border-radius: 12px`, `border: 1px solid var(--card-border)` |
+| HN Discussion CTA | `.open-btn`: `background: var(--btn-secondary-bg)`, `border-color: var(--border-color)`, `color: var(--text-primary)` |
+| HN Metadata Tags | Points (`#f6f8fa`, `#24292e`), Comments (`#f6f8fa`, `#57606a`), Author (`#f6f8fa`, `#57606a`), Post Type (`#ddf4ff`, `#0969da`) |
+
+**Pattern notes:**
+- Converted to match the standardized Vercel clean theme palette (`#24292e`, `#f6f8fa`, `#d0d7de`) used across GitHub and YouTube.
+- Provides two distinct CTAs (**HN Discussion** and **Visit Site**) formatted with concentric border radii and subtle hover interactions.
+
+
