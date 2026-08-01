@@ -1,8 +1,5 @@
 import * as cheerio from 'cheerio';
 import { SearchProvider } from './searchProvider.js';
-import { BingSearchService } from './bingSearchService.js';
-
-const bingFallback = new BingSearchService();
 
 export class DuckDuckGoSearchService extends SearchProvider {
   async search(query, options = {}) {
@@ -34,7 +31,7 @@ export class DuckDuckGoSearchService extends SearchProvider {
             const titleEl = $(el).find('.result__title a, .result__a');
             const title = titleEl.text().trim();
             let rawHref = titleEl.attr('href') || '';
-            
+
             let targetUrl = rawHref;
             if (rawHref.includes('uddg=')) {
               try {
@@ -48,7 +45,7 @@ export class DuckDuckGoSearchService extends SearchProvider {
             }
 
             const snippet = $(el).find('.result__snippet').text().trim();
-            
+
             if (title && targetUrl && targetUrl.startsWith('http')) {
               let domain = '';
               try {
@@ -92,9 +89,7 @@ export class DuckDuckGoSearchService extends SearchProvider {
       }
     } catch (error) {
       console.warn('DuckDuckGo direct fetch failed/rate limited, using fallback:', error.message);
+      return { results: [], nextContinuationToken: null };
     }
-
-    console.log('Falling back to Bing search for DuckDuckGo service...');
-    return await bingFallback.search(query, options);
   }
 }

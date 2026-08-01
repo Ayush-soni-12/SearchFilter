@@ -99,7 +99,7 @@ const readIndex = async () => {
       if (typeof item.originalQuery === 'string' && item.originalQuery.includes(':')) {
         const parts = item.originalQuery.split(':');
         const first = parts[0].toLowerCase();
-        if (['youtube', 'yt', 'google', 'duckduckgo', 'ddg', 'bing'].includes(first)) {
+        if (['youtube', 'yt', 'google', 'duckduckgo', 'ddg'].includes(first)) {
           item.engine = first;
           item.originalQuery = parts[1] || item.originalQuery;
           if (parts.length >= 4) {

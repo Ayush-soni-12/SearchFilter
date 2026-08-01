@@ -133,6 +133,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
       {!searchInBookmarks && (
         <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.85rem', color: '#666666', marginRight: '0.35rem', fontWeight: 500 }}>Search Engines:</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
           <button
             type="button"
@@ -150,6 +151,15 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           </button>
           <button
             type="button"
+            className="open-btn"
+            onClick={() => setEngine('hackernews')}
+            style={{
+              fontSize: '0.82rem',
+              padding: '0.35rem 0.85rem',
+              background: engine === 'hackernews' ? '#24292e' : '#f6f8fa',
+              borderColor: engine === 'hackernews' ? '#24292e' : '#d0d7de',
+              color: engine === 'hackernews' ? '#ffffff' : '#24292e'
+            }}
             className={`engine-btn${engine === 'bing' ? ' active' : ''}`}
             onClick={() => handleEngineChange('bing')}
           >
@@ -522,7 +532,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'bing' ? 'Bing' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
             value={val}
             onChange={(e) => { setVal(e.target.value); setActiveHistoryIndex(-1); }}
             onFocus={() => setShowHistory(true)}
