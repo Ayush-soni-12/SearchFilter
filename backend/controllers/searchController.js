@@ -33,8 +33,8 @@ export const handleSearch = async (req, res) => {
   }
 
   try {
-    // Log history
-    await storageService.addHistory(query);
+    // Log history with engine context
+    await storageService.addHistory({ query, engine: engine || 'google' });
 
     if (searchInBookmarks === 'true') {
       const bookmarkResults = await storageService.searchBookmarks(query);

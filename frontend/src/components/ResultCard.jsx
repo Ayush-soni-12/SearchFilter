@@ -1,6 +1,6 @@
 import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play } from 'lucide-react';
 
-export default function ResultCard({ result, currentPref, onPreferenceChange, isBookmarked, onBookmarkToggle }) {
+export default function ResultCard({ result, currentPref, onPreferenceChange, isBookmarked, onBookmarkToggle, onBlockChannel, blockedChannels = [] }) {
   if (result.engine === 'hackernews' || result.isHackerNews) {
     const formattedDate = result.createdAt
       ? new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -183,7 +183,7 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
               </a>
               <div className="yt-actions">
                 {onBookmarkToggle && (
-                  <button 
+                  <button
                     className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
                     onClick={onBookmarkToggle}
                     title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
@@ -191,6 +191,22 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
                     {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
                   </button>
                 )}
+                {onBlockChannel && result.channelName && (() => {
+                  const isBlocked = blockedChannels.includes(result.channelName);
+                  return (
+                    <button
+                      type="button"
+                      className={`block-channel-btn${isBlocked ? ' blocked' : ''}`}
+                      onClick={() => isBlocked
+                        ? undefined
+                        : onBlockChannel(result.channelName)
+                      }
+                      title={isBlocked ? `${result.channelName} is blocked` : `Block ${result.channelName}`}
+                    >
+                      {isBlocked ? '🚫 Blocked' : '🚫 Block Channel'}
+                    </button>
+                  );
+                })()}
                 <a href={result.url} target="_blank" rel="noopener noreferrer" className="watch-btn">
                   <span>Watch</span>
                   <ExternalLink size={14} />
