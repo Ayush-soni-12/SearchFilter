@@ -79,93 +79,52 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
       {!searchInBookmarks && (
         <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: '#666666', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'google' ? ' active' : ''}`}
             onClick={() => setEngine('google')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'google' ? '#111111' : '#ffffff',
-              borderColor: engine === 'google' ? '#111111' : '#eaeaea',
-              color: engine === 'google' ? '#ffffff' : '#666666'
-            }}
           >
             🌐 Google
           </button>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'duckduckgo' ? ' active' : ''}`}
             onClick={() => setEngine('duckduckgo')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'duckduckgo' ? '#111111' : '#ffffff',
-              borderColor: engine === 'duckduckgo' ? '#111111' : '#eaeaea',
-              color: engine === 'duckduckgo' ? '#ffffff' : '#666666'
-            }}
           >
             🦆 DuckDuckGo
           </button>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'bing' ? ' active' : ''}`}
             onClick={() => setEngine('bing')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'bing' ? '#111111' : '#ffffff',
-              borderColor: engine === 'bing' ? '#111111' : '#eaeaea',
-              color: engine === 'bing' ? '#ffffff' : '#666666'
-            }}
           >
             🔍 Bing
           </button>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'hackernews' ? ' active' : ''}`}
             onClick={() => setEngine('hackernews')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'hackernews' ? '#24292e' : '#f6f8fa',
-              borderColor: engine === 'hackernews' ? '#24292e' : '#d0d7de',
-              color: engine === 'hackernews' ? '#ffffff' : '#24292e'
-            }}
           >
             🟠 Hacker News
           </button>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'youtube' ? ' active' : ''}`}
             onClick={() => setEngine('youtube')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'youtube' ? '#24292e' : '#f6f8fa',
-              borderColor: engine === 'youtube' ? '#24292e' : '#d0d7de',
-              color: engine === 'youtube' ? '#ffffff' : '#24292e'
-            }}
           >
             ▶️ YouTube (Hidden Gems)
           </button>
           <button
             type="button"
-            className="open-btn"
+            className={`engine-btn${engine === 'github' ? ' active' : ''}`}
             onClick={() => setEngine('github')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'github' ? '#24292e' : '#f6f8fa',
-              borderColor: engine === 'github' ? '#24292e' : '#d0d7de',
-              color: engine === 'github' ? '#ffffff' : '#24292e'
-            }}
           >
             🐙 GitHub (Hidden Gems)
           </button>
         </div>
       )}
+
 
       {/* YouTube Specific Filter Bar (Clean Vercel Theme) */}
       {!searchInBookmarks && engine === 'youtube' && (

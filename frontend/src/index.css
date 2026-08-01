@@ -320,6 +320,46 @@ button {
   transform: scale(0.97);
 }
 
+/* Engine selector toggle buttons */
+.engine-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.85rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.engine-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+  background: var(--badge-bg);
+}
+
+.engine-btn.active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--bg-color);
+  font-weight: 600;
+}
+
+.engine-btn.active:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--bg-color);
+}
+
+.engine-btn:active {
+  transform: scale(0.97);
+}
+
 .loader {
   display: flex;
   flex-direction: column;
