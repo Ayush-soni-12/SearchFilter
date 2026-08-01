@@ -1,11 +1,13 @@
 import { GoogleSearchService } from './googleSearchService.js';
 import { DuckDuckGoSearchService } from './duckDuckGoSearchService.js';
+import { BraveSearchService } from './braveSearchService.js';
 import { YouTubeSearchService } from './youtubeSearchService.js';
 import { GitHubSearchService } from './githubSearchService.js';
 import { HnSearchService } from './hnSearchService.js';
 
 const googleService = new GoogleSearchService();
 const duckDuckGoService = new DuckDuckGoSearchService();
+const braveService = new BraveSearchService();
 const youtubeService = new YouTubeSearchService();
 const githubService = new GitHubSearchService();
 const hnService = new HnSearchService();
@@ -22,6 +24,8 @@ export const searchProviderFactory = {
       case 'youtube':
       case 'yt':
         return youtubeService;
+      case 'brave':
+        return braveService;
       case 'duckduckgo':
       case 'ddg':
         return duckDuckGoService;

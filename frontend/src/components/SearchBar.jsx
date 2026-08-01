@@ -150,6 +150,13 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           </button>
           <button
             type="button"
+            className={`engine-btn${engine === 'brave' ? ' active' : ''}`}
+            onClick={() => handleEngineChange('brave')}
+          >
+            🦁 Brave
+          </button>
+          <button
+            type="button"
             className={`engine-btn${engine === 'hackernews' ? ' active' : ''}`}
             onClick={() => handleEngineChange('hackernews')}
           >
@@ -515,7 +522,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'brave' ? 'Brave' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
             value={val}
             onChange={(e) => { setVal(e.target.value); setActiveHistoryIndex(-1); }}
             onFocus={() => setShowHistory(true)}
