@@ -33,8 +33,11 @@ export const api = {
     if (!res.ok) throw new Error('Failed to get preferences');
     return res.json();
   },
-  getHistory: async () => {
-    const res = await fetch(`${API_BASE}/history`);
+  getHistory: async (engine) => {
+    const url = engine
+      ? `${API_BASE}/history?engine=${encodeURIComponent(engine)}`
+      : `${API_BASE}/history`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to get history');
     return res.json();
   },

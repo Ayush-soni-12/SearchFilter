@@ -40,10 +40,13 @@ export const storageService = {
   savePreferences: async (prefs) => writeJsonFile(PREFERENCES_FILE, prefs),
   
   getHistory: async () => readJsonFile(HISTORY_FILE, []),
-  addHistory: async (entry) => {
+  addHistory: async ({ query, engine }) => {
     let history = await readJsonFile(HISTORY_FILE, []);
-    history = history.filter(item => item.query !== entry);
-    history.unshift({ query: entry, time: new Date().toISOString() });
+    // Deduplicate: remove existing entry with same query+engine
+    history = history.filter(
+      item => !(item.query === query && item.engine === engine)
+    );
+    history.unshift({ query, engine, time: new Date().toISOString() });
     if (history.length > 100) history.pop();
     await writeJsonFile(HISTORY_FILE, history);
   },

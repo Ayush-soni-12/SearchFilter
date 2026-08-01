@@ -56,11 +56,16 @@ function App() {
   };
 
   useEffect(() => {
-    // Load preferences, history, and bookmarks on mount
+    // Load preferences, history (for active engine), and bookmarks on mount
     api.getPreferences().then(setPreferences).catch(console.error);
-    api.getHistory().then(setHistory).catch(console.error);
+    api.getHistory(activeEngine).then(setHistory).catch(console.error);
     api.getBookmarks().then(setBookmarks).catch(console.error);
   }, []);
+
+  // Re-fetch history whenever the active engine changes
+  useEffect(() => {
+    api.getHistory(activeEngine).then(setHistory).catch(console.error);
+  }, [activeEngine]);
 
   const handleSearch = async (searchQuery, options = {}) => {
     if (!searchQuery.trim()) return;
@@ -130,7 +135,7 @@ function App() {
         setActiveCache(null);
       }
       
-      api.getHistory().then(setHistory).catch(console.error);
+      api.getHistory(engineToUse).then(setHistory).catch(console.error);
     } catch (error) {
       console.error(error);
       setErrorMsg(error.message);
@@ -324,6 +329,7 @@ function App() {
             blockedChannels={blockedChannels}
             onBlockChannel={blockChannel}
             onUnblockChannel={unblockChannel}
+            onEngineChange={setActiveEngine}
           />
         )}
 

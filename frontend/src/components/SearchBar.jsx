@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { Clock, Bookmark } from 'lucide-react';
 
-export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel }) {
+export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel, onEngineChange }) {
   const [val, setVal] = useState(initialQuery);
   const [showHistory, setShowHistory] = useState(false);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(-1);
   const [searchInBookmarks, setSearchInBookmarks] = useState(false);
   const [engine, setEngine] = useState('google');
+  const handleEngineChange = (newEngine) => {
+    setEngine(newEngine);
+    if (onEngineChange) onEngineChange(newEngine);
+  };
   const wrapperRef = useRef(null);
   const dropdownRef = useRef(null);
 
@@ -133,42 +137,42 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           <button
             type="button"
             className={`engine-btn${engine === 'google' ? ' active' : ''}`}
-            onClick={() => setEngine('google')}
+            onClick={() => handleEngineChange('google')}
           >
             🌐 Google
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'duckduckgo' ? ' active' : ''}`}
-            onClick={() => setEngine('duckduckgo')}
+            onClick={() => handleEngineChange('duckduckgo')}
           >
             🦆 DuckDuckGo
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'bing' ? ' active' : ''}`}
-            onClick={() => setEngine('bing')}
+            onClick={() => handleEngineChange('bing')}
           >
             🔍 Bing
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'hackernews' ? ' active' : ''}`}
-            onClick={() => setEngine('hackernews')}
+            onClick={() => handleEngineChange('hackernews')}
           >
             🟠 Hacker News
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'youtube' ? ' active' : ''}`}
-            onClick={() => setEngine('youtube')}
+            onClick={() => handleEngineChange('youtube')}
           >
             ▶️ YouTube (Hidden Gems)
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'github' ? ' active' : ''}`}
-            onClick={() => setEngine('github')}
+            onClick={() => handleEngineChange('github')}
           >
             🐙 GitHub (Hidden Gems)
           </button>
