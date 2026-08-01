@@ -79,7 +79,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
       {!searchInBookmarks && (
         <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: '#666666', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
+          <span style={{ fontSize: '0.85rem', color: '#666666', marginRight: '0.35rem', fontWeight: 500 }}>Search Engines:</span>
           <button
             type="button"
             className="open-btn"
