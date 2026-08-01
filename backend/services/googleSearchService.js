@@ -8,8 +8,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const USER_DATA_DIR = path.join(__dirname, '../playwright-profile');
 
 export class GoogleSearchService extends SearchProvider {
-  async search(query) {
-    console.log(`Starting Google Search for: "${query}"`);
+  async search(query, options = {}) {
+    const pageBatch = options.continuationToken ? parseInt(options.continuationToken, 10) : 1;
+    const PAGES_PER_BATCH = 2; // Scrapes 2 Google pages (20 results) per batch
+    const startPage = (pageBatch - 1) * PAGES_PER_BATCH;
+    const endPage = startPage + PAGES_PER_BATCH;
+
+    console.log(`Starting Google Search for: "${query}" (batch ${pageBatch}, pages ${startPage + 1}-${endPage})`);
     
     // Launch persistent context (Headful, so user can solve CAPTCHAs if needed)
     const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
@@ -22,8 +27,7 @@ export class GoogleSearchService extends SearchProvider {
     try {
       let allRawResults = [];
 
-      // Fetch 4 pages (up to 40 results)
-      for (let pageNum = 0; pageNum < 4; pageNum++) {
+      for (let pageNum = startPage; pageNum < endPage; pageNum++) {
         const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&start=${pageNum * 10}`;
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
@@ -56,7 +60,7 @@ export class GoogleSearchService extends SearchProvider {
         allRawResults = allRawResults.concat(pageResults);
         
         // Wait 500ms before fetching the next page to prevent aggressive rate limiting
-        if (pageNum < 3) await page.waitForTimeout(500);
+        if (pageNum < endPage - 1) await page.waitForTimeout(500);
       }
 
       // Deduplicate results just in case Google returned overlapping results
@@ -79,11 +83,18 @@ export class GoogleSearchService extends SearchProvider {
         }
       });
 
-      console.log(`Found ${enrichedResults.length} results.`);
+      console.log(`Google Search batch ${pageBatch} found ${enrichedResults.length} results.`);
       if (enrichedResults.length === 0) {
         console.warn('Warning: 0 results found. Google may have changed their HTML structure or a CAPTCHA blocked the search.');
       }
-      return enrichedResults;
+
+      // Max 5 batches (up to 10 Google pages / 100 results)
+      const nextContinuationToken = (enrichedResults.length > 0 && pageBatch < 5) ? String(pageBatch + 1) : null;
+
+      return {
+        results: enrichedResults,
+        nextContinuationToken
+      };
 
     } catch (error) {
       console.error('Error scraping Google:', error);
