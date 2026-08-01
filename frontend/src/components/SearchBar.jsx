@@ -111,20 +111,6 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           <button
             type="button"
             className="open-btn"
-            onClick={() => setEngine('bing')}
-            style={{
-              fontSize: '0.82rem',
-              padding: '0.35rem 0.85rem',
-              background: engine === 'bing' ? '#111111' : '#ffffff',
-              borderColor: engine === 'bing' ? '#111111' : '#eaeaea',
-              color: engine === 'bing' ? '#ffffff' : '#666666'
-            }}
-          >
-            🔍 Bing
-          </button>
-          <button
-            type="button"
-            className="open-btn"
             onClick={() => setEngine('hackernews')}
             style={{
               fontSize: '0.82rem',
@@ -496,7 +482,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             type="text"
             className="search-input"
             style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'bing' ? 'Bing' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
             value={val}
             onChange={(e) => setVal(e.target.value)}
             onFocus={() => setShowHistory(true)}
