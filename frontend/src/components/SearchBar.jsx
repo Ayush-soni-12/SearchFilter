@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Clock, Bookmark } from 'lucide-react';
 
-export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [] }) {
+export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel }) {
   const [val, setVal] = useState(initialQuery);
   const [showHistory, setShowHistory] = useState(false);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(-1);
@@ -31,7 +31,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
 
   const [maxViews, setMaxViews] = useState(50000);
   const [hideShorts, setHideShorts] = useState(true);
-  const [blacklistedChannels, setBlacklistedChannels] = useState('');
+  const [channelInput, setChannelInput] = useState('');
   const [uploadTime, setUploadTime] = useState('all');
 
   const [maxStars, setMaxStars] = useState(0);
@@ -50,7 +50,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     engine,
     maxViews,
     hideShorts,
-    blacklistedChannels,
+    blacklistedChannels: blockedChannels.join(','),
     uploadTime,
     maxStars,
     githubLanguage,
@@ -62,6 +62,23 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     minComments,
     hnDateRange
   });
+
+  const commitChannelInput = () => {
+    const name = channelInput.trim().replace(/,$/, '').trim();
+    if (name && onBlockChannel) {
+      onBlockChannel(name);
+      setChannelInput('');
+    }
+  };
+
+  const handleChannelInputKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      commitChannelInput();
+    } else if (e.key === 'Backspace' && channelInput === '' && blockedChannels.length > 0 && onUnblockChannel) {
+      onUnblockChannel(blockedChannels[blockedChannels.length - 1]);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -227,24 +244,37 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             <span>Hide Shorts</span>
           </label>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
-            <span style={{ color: '#57606a', whiteSpace: 'nowrap' }}>Blacklist Channels:</span>
-            <input
-              type="text"
-              placeholder="e.g. 5-Minute Crafts, T-Series"
-              value={blacklistedChannels}
-              onChange={(e) => setBlacklistedChannels(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.6rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem',
-                width: '100%'
-              }}
-            />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1, minWidth: '220px' }}>
+            <span style={{ color: '#57606a', whiteSpace: 'nowrap', fontSize: '0.85rem', fontWeight: 600 }}>🚫 Blocked Channels:</span>
+            <div className="channel-chip-input">
+              {blockedChannels.map((ch) => (
+                <span key={ch} className="channel-chip">
+                  {ch}
+                  <button
+                    type="button"
+                    className="channel-chip-remove"
+                    onClick={() => onUnblockChannel && onUnblockChannel(ch)}
+                    title={`Unblock ${ch}`}
+                  >✕</button>
+                </span>
+              ))}
+              <input
+                type="text"
+                className="channel-chip-text"
+                placeholder={blockedChannels.length === 0 ? 'Type channel name, press Enter…' : 'Add another…'}
+                value={channelInput}
+                onChange={(e) => setChannelInput(e.target.value)}
+                onKeyDown={handleChannelInputKeyDown}
+                onBlur={commitChannelInput}
+              />
+            </div>
+            {blockedChannels.length > 0 && (
+              <span style={{ fontSize: '0.72rem', color: '#57606a' }}>
+                {blockedChannels.length} channel{blockedChannels.length > 1 ? 's' : ''} blocked · Press Backspace to remove last
+              </span>
+            )}
           </div>
+
         </div>
       )}
 

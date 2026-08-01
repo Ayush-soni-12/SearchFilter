@@ -537,6 +537,109 @@ button {
   transform: scale(0.97);
 }
 
+/* Channel chip tag input */
+.channel-chip-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  min-height: 34px;
+  cursor: text;
+  transition: border-color 0.2s;
+}
+
+.channel-chip-input:focus-within {
+  border-color: var(--accent-color);
+}
+
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--avoid-bg);
+  color: var(--avoid-color);
+  border: 1px solid var(--avoid-color);
+  border-radius: 20px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: chip-pop 0.15s ease;
+}
+
+@keyframes chip-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.channel-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--avoid-color);
+  font-size: 0.7rem;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.channel-chip-remove:hover {
+  opacity: 1;
+}
+
+.channel-chip-text {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  min-width: 130px;
+  flex: 1;
+}
+
+.channel-chip-text::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Block channel button on result cards */
+.block-channel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.block-channel-btn:hover {
+  background: var(--avoid-bg);
+  border-color: var(--avoid-color);
+  color: var(--avoid-color);
+}
+
+.block-channel-btn.blocked {
+  background: var(--avoid-bg);
+  border-color: var(--avoid-color);
+  color: var(--avoid-color);
+  opacity: 0.65;
+  cursor: default;
+}
+
+
+
 .yt-meta-row {
   display: flex;
   gap: 0.5rem;

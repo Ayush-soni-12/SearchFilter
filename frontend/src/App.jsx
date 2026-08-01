@@ -23,6 +23,9 @@ function App() {
   const [nextContinuationToken, setNextContinuationToken] = useState(null);
   const [apiKey, setApiKey] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [blockedChannels, setBlockedChannels] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
+  });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -31,6 +34,25 @@ function App() {
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const blockChannel = (channelName) => {
+    if (!channelName || !channelName.trim()) return;
+    const name = channelName.trim();
+    setBlockedChannels(prev => {
+      if (prev.includes(name)) return prev;
+      const next = [...prev, name];
+      localStorage.setItem('blockedChannels', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const unblockChannel = (channelName) => {
+    setBlockedChannels(prev => {
+      const next = prev.filter(c => c !== channelName);
+      localStorage.setItem('blockedChannels', JSON.stringify(next));
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -294,7 +316,15 @@ function App() {
 
       <main>
         {activePage !== 'settings' && activePage !== 'bookmarks' && (
-          <SearchBar onSearch={handleSearch} initialQuery={query} isLoading={isLoading} history={history} />
+          <SearchBar
+            onSearch={handleSearch}
+            initialQuery={query}
+            isLoading={isLoading}
+            history={history}
+            blockedChannels={blockedChannels}
+            onBlockChannel={blockChannel}
+            onUnblockChannel={unblockChannel}
+          />
         )}
 
         {errorMsg && (
@@ -409,13 +439,15 @@ function App() {
                     )}
 
                     {visibleResults.map((result, i) => (
-                      <ResultCard 
-                        key={result.url + i} 
-                        result={result} 
+                      <ResultCard
+                        key={result.url + i}
+                        result={result}
                         currentPref={preferences[result.domain] || 'neutral'}
                         onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                         isBookmarked={isBookmarked(result.url)}
                         onBookmarkToggle={() => handleBookmarkToggle(result)}
+                        onBlockChannel={result.isYouTube ? blockChannel : undefined}
+                        blockedChannels={blockedChannels}
                       />
                     ))}
 
