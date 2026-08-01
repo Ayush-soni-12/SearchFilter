@@ -4,9 +4,11 @@ import { Clock, Bookmark } from 'lucide-react';
 export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [] }) {
   const [val, setVal] = useState(initialQuery);
   const [showHistory, setShowHistory] = useState(false);
+  const [activeHistoryIndex, setActiveHistoryIndex] = useState(-1);
   const [searchInBookmarks, setSearchInBookmarks] = useState(false);
   const [engine, setEngine] = useState('google');
   const wrapperRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -17,6 +19,15 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Scroll the highlighted item into view when navigating with the keyboard
+  useEffect(() => {
+    if (activeHistoryIndex < 0 || !dropdownRef.current) return;
+    const activeItem = dropdownRef.current.querySelectorAll('.history-item')[activeHistoryIndex];
+    if (activeItem) {
+      activeItem.scrollIntoView({ block: 'nearest' });
+    }
+  }, [activeHistoryIndex]);
 
   const [maxViews, setMaxViews] = useState(50000);
   const [hideShorts, setHideShorts] = useState(true);
@@ -56,6 +67,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     e.preventDefault();
     if (val.trim()) {
       setShowHistory(false);
+      setActiveHistoryIndex(-1);
       onSearch(val, getSearchPayload());
     }
   };
@@ -63,15 +75,36 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const handleHistoryClick = (query) => {
     setVal(query);
     setShowHistory(false);
+    setActiveHistoryIndex(-1);
     onSearch(query, getSearchPayload());
   };
+
+  const filteredHistory = history.filter(item =>
+    !val.trim() || item.query.toLowerCase().includes(val.toLowerCase())
+  );
 
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       setShowHistory(false);
+      setActiveHistoryIndex(-1);
     } else if (e.ctrlKey && (e.key === ' ' || e.code === 'Space')) {
       e.preventDefault();
       setShowHistory(true);
+    } else if (showHistory && filteredHistory.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveHistoryIndex(prev =>
+          prev < filteredHistory.length - 1 ? prev + 1 : 0
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveHistoryIndex(prev =>
+          prev > 0 ? prev - 1 : filteredHistory.length - 1
+        );
+      } else if (e.key === 'Enter' && activeHistoryIndex >= 0) {
+        e.preventDefault();
+        handleHistoryClick(filteredHistory[activeHistoryIndex].query);
+      }
     }
   };
 
@@ -457,35 +490,38 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             style={{ width: '100%' }}
             placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'bing' ? 'Bing' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
             value={val}
-            onChange={(e) => setVal(e.target.value)}
+            onChange={(e) => { setVal(e.target.value); setActiveHistoryIndex(-1); }}
             onFocus={() => setShowHistory(true)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
           
-          {showHistory && history.length > 0 && !isLoading && (
-            <div className="history-dropdown animate-slide-up">
+          {showHistory && filteredHistory.length > 0 && !isLoading && (
+            <div className="history-dropdown animate-slide-up" ref={dropdownRef}>
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '0.4rem 1rem',
                 fontSize: '0.75rem',
-                color: '#737373',
-                borderBottom: '1px solid #eaeaea',
-                background: '#fafafa'
+                color: 'var(--text-secondary)',
+                borderBottom: '1px solid var(--border-color)',
+                background: 'var(--surface-color)'
               }}>
                 <span>Search History</span>
-                <span>
-                  <kbd style={{ background: '#ffffff', padding: '2px 5px', borderRadius: '4px', border: '1px solid #e5e5e5', fontFamily: 'monospace' }}>Esc</kbd> hide • <kbd style={{ background: '#ffffff', padding: '2px 5px', borderRadius: '4px', border: '1px solid #e5e5e5', fontFamily: 'monospace' }}>Ctrl+Space</kbd> show
+                <span style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                  <kbd className="history-kbd">↑↓</kbd> navigate •
+                  <kbd className="history-kbd">Enter</kbd> select •
+                  <kbd className="history-kbd">Esc</kbd> close
                 </span>
               </div>
-              {history.map((item, idx) => (
-                <button 
-                  key={idx} 
+              {filteredHistory.map((item, idx) => (
+                <button
+                  key={idx}
                   type="button"
-                  className="history-item"
+                  className={`history-item${activeHistoryIndex === idx ? ' keyboard-active' : ''}`}
                   onClick={() => handleHistoryClick(item.query)}
+                  onMouseEnter={() => setActiveHistoryIndex(idx)}
                 >
                   <Clock size={15} />
                   <span className="history-text">{item.query}</span>
