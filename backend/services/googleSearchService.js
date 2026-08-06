@@ -14,7 +14,19 @@ export class GoogleSearchService extends SearchProvider {
     const startPage = (pageBatch - 1) * PAGES_PER_BATCH;
     const endPage = startPage + PAGES_PER_BATCH;
 
-    console.log(`Starting Google Search for: "${query}" (batch ${pageBatch}, pages ${startPage + 1}-${endPage})`);
+    const cleanWebParam = options.cleanWeb ? '&udm=14' : '';
+    let searchQuery = query;
+    if (Array.isArray(options.excludeDomains) && options.excludeDomains.length > 0) {
+      const exclusions = options.excludeDomains
+        .map(d => `-site:${d.trim()}`)
+        .filter(d => !searchQuery.includes(d))
+        .join(' ');
+      if (exclusions) {
+        searchQuery = `${searchQuery} ${exclusions}`;
+      }
+    }
+
+    console.log(`Starting Google Search for: "${searchQuery}" (batch ${pageBatch}, pages ${startPage + 1}-${endPage}, cleanWeb: ${!!options.cleanWeb})`);
     
     // Launch persistent context (Headful, so user can solve CAPTCHAs if needed)
     const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
@@ -28,7 +40,7 @@ export class GoogleSearchService extends SearchProvider {
       let allRawResults = [];
 
       for (let pageNum = startPage; pageNum < endPage; pageNum++) {
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&start=${pageNum * 10}`;
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&start=${pageNum * 10}${cleanWebParam}`;
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
         // Wait up to 60 seconds (allows time for CAPTCHA solving if it appears on any page)
