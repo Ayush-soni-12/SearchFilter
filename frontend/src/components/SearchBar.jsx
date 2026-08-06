@@ -38,6 +38,10 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const [channelInput, setChannelInput] = useState('');
   const [uploadTime, setUploadTime] = useState('all');
 
+  const [cleanWeb, setCleanWeb] = useState(true);
+  const [antiSeo, setAntiSeo] = useState(true);
+  const [showFilterInfo, setShowFilterInfo] = useState(false);
+
   const [maxStars, setMaxStars] = useState(0);
   const [githubLanguage, setGithubLanguage] = useState('all');
   const [blacklistedOrgs, setBlacklistedOrgs] = useState('');
@@ -52,6 +56,8 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   const getSearchPayload = () => ({
     searchInBookmarks,
     engine,
+    cleanWeb,
+    antiSeo,
     maxViews,
     hideShorts,
     blacklistedChannels: blockedChannels.join(','),
@@ -66,6 +72,33 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     minComments,
     hnDateRange
   });
+
+  const insertOperator = (op) => {
+    if (op === 'exact') {
+      if (val.trim() && !val.startsWith('"') && !val.endsWith('"')) {
+        setVal(`"${val.trim()}"`);
+      } else if (!val.trim()) {
+        setVal('""');
+      }
+    } else if (op === 'site') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'site:');
+    } else if (op === 'filetype') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'filetype:pdf');
+    } else if (op === 'intitle') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'intitle:');
+    } else if (op === 'inurl') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'inurl:');
+    } else if (op === 'exclude') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + '-');
+    } else if (op === 'after') {
+      const currentYear = new Date().getFullYear();
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + `after:${currentYear - 1}`);
+    } else if (op === 'or') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'OR ');
+    } else if (op === 'related') {
+      setVal(prev => prev + (prev.endsWith(' ') || !prev ? '' : ' ') + 'related:');
+    }
+  };
 
   const commitChannelInput = () => {
     const name = channelInput.trim().replace(/,$/, '').trim();
@@ -179,6 +212,167 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
         </div>
       )}
 
+      {/* Google Advanced Search & Clean Web Filter Bar */}
+      {!searchInBookmarks && engine === 'google' && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+          padding: '0.75rem 1rem',
+          background: '#f6f8fa',
+          border: '1px solid #d0d7de',
+          borderRadius: '12px',
+          fontSize: '0.85rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            width: '100%'
+          }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#24292e', fontWeight: 600 }}>
+              <input
+                type="checkbox"
+                checked={cleanWeb}
+                onChange={(e) => setCleanWeb(e.target.checked)}
+                style={{ accentColor: '#0969da' }}
+              />
+              <span>⚡ Clean Web Mode (udm=14)</span>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#24292e', fontWeight: 600 }}>
+              <input
+                type="checkbox"
+                checked={antiSeo}
+                onChange={(e) => setAntiSeo(e.target.checked)}
+                style={{ accentColor: '#0969da' }}
+              />
+              <span>🛡️ Anti-SEO Clickbait Filter</span>
+            </label>
+
+            <button
+              type="button"
+              onClick={() => setShowFilterInfo(!showFilterInfo)}
+              style={{
+                background: showFilterInfo ? '#ddf4ff' : '#ffffff',
+                border: '1px solid #54aeff',
+                color: '#0969da',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                padding: '0.2rem 0.6rem',
+                borderRadius: '99px',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}
+            >
+              <span>ℹ️</span> {showFilterInfo ? 'Hide Guide' : 'How to use?'}
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginLeft: 'auto' }}>
+              <span style={{ fontSize: '0.82rem', color: '#24292e', fontWeight: 600 }}>Operators:</span>
+              <select
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) {
+                    insertOperator(e.target.value);
+                  }
+                }}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #d0d7de',
+                  color: '#0969da',
+                  fontWeight: 600,
+                  padding: '0.3rem 0.65rem',
+                  borderRadius: '8px',
+                  fontSize: '0.83rem',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="" disabled>⚡ Insert Operator...</option>
+                <option value="exact">"Exact Match" — Exact word string</option>
+                <option value="site">site: — Restrict to domain</option>
+                <option value="filetype">filetype:pdf — Find PDF documents</option>
+                <option value="intitle">intitle: — Title tag match</option>
+                <option value="inurl">inurl: — URL path match</option>
+                <option value="after">after:2025 — Year range filter</option>
+                <option value="or">OR — Either term A or B</option>
+                <option value="exclude">-exclude — Exclude word/domain</option>
+                <option value="related">related: — Find similar sites</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Expandable How to Use Guide Box */}
+          {showFilterInfo && (
+            <div className="animate-slide-up" style={{
+              background: '#ffffff',
+              border: '1px solid #d0d7de',
+              borderRadius: '10px',
+              padding: '1rem 1.25rem',
+              fontSize: '0.83rem',
+              color: '#24292e',
+              lineHeight: 1.6
+            }}>
+              <div style={{ fontWeight: 700, color: '#0969da', marginBottom: '0.6rem', fontSize: '0.92rem' }}>
+                💡 Google Search Filters & Advanced Operator Guide:
+              </div>
+
+              <div style={{ marginBottom: '0.85rem' }}>
+                <div style={{ fontWeight: 600, color: '#24292e', marginBottom: '0.2rem' }}>1. Clean & Anti-SEO Mode:</div>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+                  <li><strong>⚡ Clean Web Mode (`udm=14`):</strong> Requests Google's pure Web Search view. Strips out AI Overviews, sponsored product ads, and widget bloat.</li>
+                  <li><strong>🛡️ Anti-SEO Clickbait Filter:</strong> Automatically scans & hides clickbait listicles (e.g. <em>"Top 10..."</em>, <em>"Cheat sheet"</em>, <em>"Complete Guide"</em>, <em>"Step-by-Step"</em>, and SEO year-stuffing).</li>
+                </ul>
+              </div>
+
+              <div>
+                <div style={{ fontWeight: 600, color: '#24292e', marginBottom: '0.35rem' }}>2. Advanced Search Operators Reference:</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.5rem' }}>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>"Exact Match"</code> — Searches exact phrase word-for-word.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>"react state management"</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>site:</code> — Restricts search strictly to a domain.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>react site:github.com</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>filetype:pdf</code> — Searches for raw PDF files or manuals.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>python manual filetype:pdf</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>intitle:</code> — Term must appear in the HTML page title.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>intitle:architecture</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>inurl:</code> — Term must appear in the URL path.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>inurl:docs async</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>after:2025</code> — Restricts results to recent content.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>vite 6 after:2025</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>OR</code> — Matches either term A or term B.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>react OR vue</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>-exclude</code> — Excludes a word or website.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>recipes -pinterest -site:quora.com</code></span>
+                  </div>
+                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
+                    <code>related:</code> — Finds sites similar to a domain.<br/>
+                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>related:github.com</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* YouTube Specific Filter Bar (Clean Vercel Theme) */}
       {!searchInBookmarks && engine === 'youtube' && (
