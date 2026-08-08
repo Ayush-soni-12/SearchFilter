@@ -1,11 +1,33 @@
 import { storageService } from './storageService.js';
 
 export const preferenceEngine = {
-  async rankResults(rawResults) {
+  async rankResults(rawResults, options = {}) {
     const preferences = await storageService.getPreferences();
     const totalResults = rawResults.length;
 
-    const rankedResults = rawResults.map((result, index) => {
+    // Expanded clickbait & SEO spam patterns
+    const CLICKBAIT_PATTERN = /\b(top \d+|best \d+|\d+ (best|top|reasons|ways|things|secrets|tricks|tips|hacks|tools|examples|steps|rules|apps|sites)|ultimate guide|complete guide|step[- ]by[- ]step|everything you need to know|must read|you won't believe|simple trick|secret trick|life hack|foolproof|proven (method|way)|game changer|best practices for beginners|easy tutorial|cheat[- ]?sheet|why you (should|need)|reasons (to|why)|don't miss|unlocked|tested and reviewed|in 20\d\d)\b/i;
+
+    let filteredResults = rawResults;
+
+    // Filter out blacklisted domains
+    if (Array.isArray(options.blacklistedDomains) && options.blacklistedDomains.length > 0) {
+      const blSet = new Set(options.blacklistedDomains.map(d => d.toLowerCase().trim()));
+      filteredResults = filteredResults.filter(r => {
+        const domain = (r.domain || '').toLowerCase();
+        return !blSet.has(domain);
+      });
+    }
+
+    // Filter out SEO clickbait titles if antiSeo option is enabled
+    if (options.antiSeo) {
+      filteredResults = filteredResults.filter(r => {
+        const title = r.title || '';
+        return !CLICKBAIT_PATTERN.test(title);
+      });
+    }
+
+    const rankedResults = filteredResults.map((result, index) => {
       const positionScore = totalResults - index;
       let preferenceScore = 0;
       

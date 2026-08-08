@@ -937,3 +937,27 @@ button {
     height: 180px;
   }
 }
+
+/* Quick Operator Pills Styling */
+.operator-pill-btn {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: monospace;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.operator-pill-btn:hover {
+  background: #0969da;
+  color: #ffffff;
+  border-color: #0969da;
+  transform: translateY(-1px);
+}
+
+.operator-pill-btn:active {
+  transform: scale(0.96);
+}

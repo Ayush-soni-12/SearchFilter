@@ -23,6 +23,9 @@ export const api = {
     if (options.hnDateRange) url += `&hnDateRange=${encodeURIComponent(options.hnDateRange)}`;
     if (options.continuationToken) url += `&continuationToken=${encodeURIComponent(options.continuationToken)}`;
     if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
+    if (options.cleanWeb !== undefined) url += `&cleanWeb=${encodeURIComponent(options.cleanWeb)}`;
+    if (options.antiSeo !== undefined) url += `&antiSeo=${encodeURIComponent(options.antiSeo)}`;
+    if (options.blacklistedDomains) url += `&blacklistedDomains=${encodeURIComponent(options.blacklistedDomains)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');

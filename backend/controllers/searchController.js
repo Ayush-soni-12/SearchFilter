@@ -25,7 +25,10 @@ export const handleSearch = async (req, res) => {
     minComments,
     hnDateRange,
     continuationToken,
-    apiKey
+    apiKey,
+    cleanWeb,
+    antiSeo,
+    blacklistedDomains
   } = req.query;
 
   if (!query) {
@@ -58,6 +61,10 @@ export const handleSearch = async (req, res) => {
     }
 
     const selectedEngine = engine || 'google';
+    const parsedCleanWeb = cleanWeb === 'true';
+    const parsedAntiSeo = antiSeo === 'true';
+    const parsedBlacklistedDomains = blacklistedDomains ? String(blacklistedDomains).split(',').map(s => s.trim()).filter(Boolean) : [];
+
     const parsedMaxViews = maxViews !== undefined ? parseInt(maxViews, 10) : 50000;
     const parsedHideShorts = hideShorts === 'true';
     const parsedBlacklist = blacklistedChannels ? String(blacklistedChannels).split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -77,6 +84,9 @@ export const handleSearch = async (req, res) => {
 
     const cacheOptions = {
       engine: selectedEngine,
+      cleanWeb: parsedCleanWeb,
+      antiSeo: parsedAntiSeo,
+      blacklistedDomains: parsedBlacklistedDomains,
       maxViews: parsedMaxViews,
       hideShorts: parsedHideShorts,
       blacklistedChannels: parsedBlacklist,
@@ -106,6 +116,9 @@ export const handleSearch = async (req, res) => {
 
     const provider = searchProviderFactory.getProvider(selectedEngine);
     const searchResponse = await provider.search(query, {
+      cleanWeb: parsedCleanWeb,
+      antiSeo: parsedAntiSeo,
+      excludeDomains: parsedBlacklistedDomains,
       maxViews: parsedMaxViews,
       hideShorts: parsedHideShorts,
       blacklistedChannels: parsedBlacklist,
@@ -136,7 +149,10 @@ export const handleSearch = async (req, res) => {
       returnedApiKey = searchResponse.apiKey || null;
     }
 
-    const rankedResults = await preferenceEngine.rankResults(rawResults);
+    const rankedResults = await preferenceEngine.rankResults(rawResults, {
+      antiSeo: parsedAntiSeo,
+      blacklistedDomains: parsedBlacklistedDomains
+    });
     
     // Only save initial search results to cache, not sub-continuation pages
     if (!continuationToken) {
