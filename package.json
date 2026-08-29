@@ -1,0 +1,26 @@
+{
+  "name": "searchfilter",
+  "version": "1.0.0",
+  "description": "A privacy-first, local-only search engine re-ranker and knowledge bookmarking tool. SearchFilter sits between you and Google, allowing you to permanently downrank spam domains, boost high-quality sites you actually want to read, and save useful links locally.",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "npm run dev --prefix frontend",
+    "backend": "npm run dev --prefix backend",
+    "dev": "concurrently -n \"FRONTEND,BACKEND\" -c \"cyan,yellow\" \"npm run frontend\" \"npm run backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aggrawal-ankur/SearchFilter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aggrawal-ankur/SearchFilter/issues"
+  },
+  "homepage": "https://github.com/aggrawal-ankur/SearchFilter#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
