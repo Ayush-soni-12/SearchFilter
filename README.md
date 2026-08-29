@@ -20,9 +20,12 @@ A privacy-first, local-only search engine re-ranker and knowledge bookmarking to
 Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
 ### 2. Clone and Install
-Clone the repository and install dependencies for both backend and frontend:
+Clone the repository and install all dependencies:
 
 ```bash
+# Install root dependencies (concurrently)
+npm install
+
 # Install backend dependencies
 cd backend
 npm install
@@ -33,20 +36,14 @@ npx playwright install chromium
 # Install frontend dependencies
 cd ../frontend
 npm install
+
+cd ..
 ```
 
 ### 3. Start the Application
-Open two terminal windows:
+Run both the frontend and backend servers at once using a single command from the project root:
 
-**Terminal 1 (Backend):**
 ```bash
-cd backend
-npm run dev
-```
-
-**Terminal 2 (Frontend):**
-```bash
-cd frontend
 npm run dev
 ```
 

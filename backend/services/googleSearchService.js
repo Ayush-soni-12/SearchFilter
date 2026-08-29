@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SearchProvider } from './searchProvider.js';
+import { BraveSearchService } from './braveSearchService.js';
 import { URL } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,13 +29,25 @@ export class GoogleSearchService extends SearchProvider {
 
     console.log(`Starting Google Search for: "${searchQuery}" (batch ${pageBatch}, pages ${startPage + 1}-${endPage}, cleanWeb: ${!!options.cleanWeb})`);
     
-    // Launch persistent context (Headful, so user can solve CAPTCHAs if needed)
+    // Launch persistent context with stealth options (real user-agent & chrome flags)
     const context = await chromium.launchPersistentContext(USER_DATA_DIR, {
       headless: false,
-      viewport: null, // Let it use default window size
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ],
+      viewport: null,
     });
 
     const page = await context.newPage();
+    // Mask navigator.webdriver
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined,
+      });
+    });
     
     try {
       let allRawResults = [];
@@ -43,30 +56,34 @@ export class GoogleSearchService extends SearchProvider {
         const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}&start=${pageNum * 10}${cleanWebParam}`;
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
 
-        // Wait up to 60 seconds (allows time for CAPTCHA solving if it appears on any page)
-        await page.waitForSelector('#search', { timeout: 60000 });
+        // Wait up to 60 seconds for page to load or search container to appear
+        try {
+          await page.waitForSelector('#search, div#rso, h3', { timeout: 15000 });
+        } catch (e) {
+          console.warn('Selector timeout, attempting extraction anyway...');
+        }
 
         // Extract results from this page
         const pageResults = await page.$$eval('h3', (elements) => {
           return elements.map(h3 => {
-            const linkEl = h3.closest('a') || h3.parentElement;
+            const linkEl = h3.closest('a') || h3.parentElement?.closest('a');
             if (!linkEl || !linkEl.href) return null;
 
-            const title = h3.innerText;
+            const title = h3.innerText || h3.textContent;
             const url = linkEl.href;
             
             if (!url.startsWith('http') || url.includes('google.com') || url.includes('google.co.in')) return null;
 
-            const container = h3.closest('.g, .MjjYud, div[data-sokoban-container]') || h3.closest('div').parentElement;
+            const container = h3.closest('.g, .MjjYud, div[data-sokoban-container], div.Vkpfxw') || h3.closest('div').parentElement;
             
             let snippet = '';
             if (container) {
-              const snippetEl = container.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .yXK7lf, .MUxGbd');
+              const snippetEl = container.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .yXK7lf, .MUxGbd, .StKSlc');
               if (snippetEl) snippet = snippetEl.innerText;
             }
 
             return { title, url, snippet };
-          }).filter(item => item !== null && item.title.trim() !== '');
+          }).filter(item => item !== null && item.title && item.title.trim() !== '');
         });
 
         allRawResults = allRawResults.concat(pageResults);
@@ -97,7 +114,11 @@ export class GoogleSearchService extends SearchProvider {
 
       console.log(`Google Search batch ${pageBatch} found ${enrichedResults.length} results.`);
       if (enrichedResults.length === 0) {
-        console.warn('Warning: 0 results found. Google may have changed their HTML structure or a CAPTCHA blocked the search.');
+        console.warn('Warning: 0 Google results found (IP blocked or CAPTCHA). Closing Google context and falling back to Brave Search automatically...');
+        await context.close();
+        const braveService = new BraveSearchService();
+        const fallbackRes = await braveService.search(query, options);
+        return fallbackRes || { results: [], nextContinuationToken: null };
       }
 
       // Max 5 batches (up to 10 Google pages / 100 results)
