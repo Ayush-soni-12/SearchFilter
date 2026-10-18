@@ -35,6 +35,7 @@ Last updated: 2026-10-18
 | Action Button | `.search-button`: `border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.88rem; font-weight: 600` |
 | Engine Switcher | `.engine-bar`: Compact pill buttons with clean active states (`border-radius: 6px; font-size: 0.8rem`) |
 | Filter Drawers | `.filter-drawer`: Clean panel adapting to active theme with explicit `1px solid var(--border-color)` |
+| Keyboard Shortcuts | `Press / to search`: Global key listener focuses search bar and places cursor at end.<br>`Esc`: Blurs / leaves focus from search bar and dismisses history dropdown. |
 
 ---
 

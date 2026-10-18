@@ -903,7 +903,9 @@ button {
   background: var(--surface-color);
   padding: 0.85rem 1.15rem;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto 1.5rem auto;
   border: 1px solid var(--border-color);
   box-shadow: var(--card-shadow);
   color: var(--text-primary);
