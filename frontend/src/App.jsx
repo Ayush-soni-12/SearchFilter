@@ -26,6 +26,18 @@ function App() {
   const [blockedChannels, setBlockedChannels] = useState(() => {
     try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
   });
+  const [visitedUrls, setVisitedUrls] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('visitedResults') || '[]'); } catch { return []; }
+  });
+
+  const handleVisitedToggle = (url) => {
+    if (!url) return;
+    setVisitedUrls(prev => {
+      const next = prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url];
+      localStorage.setItem('visitedResults', JSON.stringify(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -393,7 +405,7 @@ function App() {
         {!isLoading && activePage === 'results' && !cacheNotification && (
           <div className="animate-slide-up">
             {isFromBookmarks && (
-              <div className="cache-banner">
+              <div className="cache-banner animate-slide-up">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <Bookmark size={18} style={{ color: 'var(--accent-color)' }} />
                   <div>
@@ -404,7 +416,7 @@ function App() {
             )}
 
             {activeCache && (
-              <div className="cache-banner">
+              <div className="cache-banner animate-slide-up">
                 <div>
                   <strong>Viewing Cached Results</strong>
                   {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
@@ -446,6 +458,8 @@ function App() {
                                 onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                                 isBookmarked={isBookmarked(result.url)}
                                 onBookmarkToggle={() => handleBookmarkToggle(result)}
+                                isVisited={visitedUrls.includes(result.url)}
+                                onVisitedToggle={() => handleVisitedToggle(result.url)}
                               />
                             ))}
                           </div>
@@ -462,6 +476,8 @@ function App() {
                           onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                           isBookmarked={isBookmarked(result.url)}
                           onBookmarkToggle={() => handleBookmarkToggle(result)}
+                          isVisited={visitedUrls.includes(result.url)}
+                          onVisitedToggle={() => handleVisitedToggle(result.url)}
                           onBlockChannel={result.isYouTube ? blockChannel : undefined}
                           blockedChannels={blockedChannels}
                         />
@@ -518,6 +534,8 @@ function App() {
                       onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                       isBookmarked={true}
                       onBookmarkToggle={() => handleRemoveBookmark(result.url)}
+                      isVisited={visitedUrls.includes(result.url)}
+                      onVisitedToggle={() => handleVisitedToggle(result.url)}
                     />
                   ))}
                 </div>

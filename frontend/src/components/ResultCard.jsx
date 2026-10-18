@@ -1,35 +1,56 @@
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, Check } from 'lucide-react';
 
-export default function ResultCard({ result, currentPref, onPreferenceChange, isBookmarked, onBookmarkToggle, onBlockChannel, blockedChannels = [] }) {
+export default function ResultCard({
+  result,
+  currentPref,
+  onPreferenceChange,
+  isBookmarked,
+  onBookmarkToggle,
+  isVisited,
+  onVisitedToggle,
+  onBlockChannel,
+  blockedChannels = []
+}) {
   if (result.engine === 'hackernews' || result.isHackerNews) {
     const formattedDate = result.createdAt
       ? new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : null;
 
     return (
-      <div className="result-card vercel-card animate-slide-up">
+      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
         <div>
           <div className="result-header">
-            <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
-              <h3 className="result-title">{result.title}</h3>
-            </a>
-            <div className="yt-actions">
+            <div className="result-header-main">
+              <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
+                <h3 className="result-title">{result.title}</h3>
+              </a>
+            </div>
+            <div className="result-header-actions">
               {onBookmarkToggle && (
                 <button 
-                  className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                  type="button"
+                  className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
                   onClick={onBookmarkToggle}
                   title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
                 >
                   {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                  <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
-              <a href={result.hnUrl || result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
-                <span>HN</span>
-                <ExternalLink size={13} />
-              </a>
-              {result.url && result.url !== result.hnUrl && (
-                <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
-                  <span>Visit</span>
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
+                >
+                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
+                </button>
+              )}
+              {result.hnUrl && (
+                <a href={result.hnUrl} target="_blank" rel="noopener noreferrer" className="open-btn">
+                  <span>HN</span>
                   <ExternalLink size={13} />
                 </a>
               )}
@@ -73,12 +94,12 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
 
   if (result.isGitHub) {
     return (
-      <div className="result-card vercel-card animate-slide-up">
+      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
         <div>
           <div className="result-header">
-            <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
+            <div className="result-header-main" style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
               {result.ownerAvatar && (
-                <a href={result.url} target="_blank" rel="noopener noreferrer" tabIndex="-1">
+                <a href={result.url} target="_blank" rel="noopener noreferrer" tabIndex="-1" style={{ flexShrink: 0 }}>
                   <img 
                     src={result.ownerAvatar} 
                     alt={result.repoOwner || 'GitHub Owner'}
@@ -86,24 +107,35 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
                   />
                 </a>
               )}
-              <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
-                <h3 className="result-title">{result.title}</h3>
-              </a>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
+                  <h3 className="result-title">{result.title}</h3>
+                </a>
+              </div>
             </div>
-            <div className="yt-actions">
+            <div className="result-header-actions">
               {onBookmarkToggle && (
                 <button 
-                  className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                  type="button"
+                  className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
                   onClick={onBookmarkToggle}
                   title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
                 >
                   {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                  <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
-              <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
-                <span>Repo</span>
-                <ExternalLink size={13} />
-              </a>
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
+                >
+                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -141,7 +173,7 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
 
   if (result.isYouTube) {
     return (
-      <div className="result-card vercel-card animate-slide-up">
+      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
         <div className="yt-card-content">
           <div>
             {/* Thumbnail preview with image outline overlay */}
@@ -190,11 +222,24 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
             <div className="yt-actions">
               {onBookmarkToggle && (
                 <button
-                  className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                  type="button"
+                  className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
                   onClick={onBookmarkToggle}
                   title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
                 >
                   {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                  <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+                </button>
+              )}
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
+                >
+                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
                 </button>
               )}
               {onBlockChannel && result.channelName && (() => {
@@ -226,31 +271,40 @@ export default function ResultCard({ result, currentPref, onPreferenceChange, is
   }
 
   return (
-    <div className="result-card vercel-card animate-slide-up">
+    <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
       <div>
         <div className="result-header">
-          <div>
+          <div className="result-header-main">
             <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
               <h3 className="result-title">{result.title}</h3>
             </a>
             <div className="result-domain">
-              {result.domain}
+              <span>{result.domain}</span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+          <div className="result-header-actions">
             {onBookmarkToggle && (
               <button 
-                className={`action-icon-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                type="button"
+                className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
                 onClick={onBookmarkToggle}
                 title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
               >
                 {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                <span>{isBookmarked ? 'Saved' : 'Save'}</span>
               </button>
             )}
-            <a href={result.url} target="_blank" rel="noopener noreferrer" className="open-btn">
-              <span>Open</span>
-              <ExternalLink size={13} />
-            </a>
+            {onVisitedToggle && (
+              <button
+                type="button"
+                className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                onClick={onVisitedToggle}
+                title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
+              >
+                <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
+                <span>Visited</span>
+              </button>
+            )}
           </div>
         </div>
         

@@ -35,6 +35,8 @@ Last updated: 2026-10-18
 | Action Button | `.search-button`: `border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.88rem; font-weight: 600` |
 | Engine Switcher | `.engine-bar`: Compact pill buttons with clean active states (`border-radius: 6px; font-size: 0.8rem`) |
 | Filter Drawers | `.filter-drawer`: Clean panel adapting to active theme with explicit `1px solid var(--border-color)` |
+| Cache Banner | `.cache-banner`: `max-width: 760px; margin: 0 auto 1.5rem auto; width: 100%` (aligned with `.filter-drawer` width) |
+| Keyboard Shortcuts | `Press / to search`: Global key listener focuses search bar and places cursor at end.<br>`Esc`: Blurs / leaves focus from search bar and dismisses history dropdown. |
 
 ---
 
@@ -51,3 +53,6 @@ Last updated: 2026-10-18
 | Text Clamping | `.result-snippet`, `.yt-snippet`: 3-line clamp for uniform, balanced card heights across each row |
 | YouTube Cards | Clean thumbnail on top with duration badge and play hover effect, metadata row, snippet, and actions pinned to bottom |
 | HN & GitHub Cards | Clean title header, owner avatar/author badges, stars/points pills (`.meta-badge`), and score footer |
+| Card Header Layout | `.result-header-main`: Left-aligned title (`flex: 1; min-width: 0`), clickable directly to destination.<br>`.result-header-actions`: Vertical column (`flex-direction: column`) on the right containing `.bookmark-btn` and `.visited-btn` without redundant "Open" button. |
+| Visited & Used Action | `.visited-btn`: Toggle button with `Visited` label, green active state, and `localStorage` persistence allowing users to manually track used results |
+| Bookmark Action | `.bookmark-btn`: Toggle button (`Save` -> `Saved` with blue active state) allowing users to bookmark results |

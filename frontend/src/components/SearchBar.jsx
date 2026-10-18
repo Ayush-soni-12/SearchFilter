@@ -13,6 +13,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   };
   const wrapperRef = useRef(null);
   const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -22,6 +23,33 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Global "press / to search" shortcut like Google search
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const activeEl = document.activeElement;
+        const tagName = activeEl?.tagName?.toLowerCase();
+        const isEditable =
+          tagName === 'input' ||
+          tagName === 'textarea' ||
+          tagName === 'select' ||
+          activeEl?.isContentEditable;
+
+        if (isEditable) return;
+
+        if (inputRef.current && !inputRef.current.disabled) {
+          e.preventDefault();
+          inputRef.current.focus();
+          const len = inputRef.current.value.length;
+          inputRef.current.setSelectionRange(len, len);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
   // Scroll the highlighted item into view when navigating with the keyboard
@@ -141,6 +169,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     if (e.key === 'Escape') {
       setShowHistory(false);
       setActiveHistoryIndex(-1);
+      inputRef.current?.blur();
     } else if (e.ctrlKey && (e.key === ' ' || e.code === 'Space')) {
       e.preventDefault();
       setShowHistory(true);
@@ -557,9 +586,10 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             <SearchIcon size={16} />
           </span>
           <input
+            ref={inputRef}
             type="text"
             className="search-input"
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'brave' ? 'Brave' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube' : 'GitHub'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks... (press / to search)" : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'brave' ? 'Brave' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube' : 'GitHub'}... (press / to search)`}
             value={val}
             onChange={(e) => { setVal(e.target.value); setActiveHistoryIndex(-1); }}
             onFocus={() => setShowHistory(true)}
