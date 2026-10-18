@@ -300,21 +300,28 @@ function App() {
           <button 
             className="open-btn" 
             onClick={() => setActivePage(activePage === 'bookmarks' ? (results.length > 0 ? 'results' : 'home') : 'bookmarks')}
-            style={{
-              background: activePage === 'bookmarks' ? 'rgba(59, 130, 246, 0.25)' : undefined,
-              borderColor: activePage === 'bookmarks' ? 'rgba(59, 130, 246, 0.6)' : undefined,
-              color: activePage === 'bookmarks' ? '#60a5fa' : undefined
-            }}
+            style={activePage === 'bookmarks' ? {
+              background: 'var(--accent-color)',
+              borderColor: 'var(--accent-color)',
+              color: 'var(--bg-color)',
+              fontWeight: 600
+            } : {}}
           >
-            <Bookmark size={18} />
+            <Bookmark size={16} />
             <span>Bookmarks</span>
           </button>
           <button 
             className="open-btn" 
             onClick={() => setActivePage(activePage === 'settings' ? (results.length > 0 ? 'results' : 'home') : 'settings')}
+            style={activePage === 'settings' ? {
+              background: 'var(--accent-color)',
+              borderColor: 'var(--accent-color)',
+              color: 'var(--bg-color)',
+              fontWeight: 600
+            } : {}}
           >
-            <Settings size={18} />
-            {activePage === 'settings' ? 'Close Settings' : 'Settings'}
+            <Settings size={16} />
+            <span>{activePage === 'settings' ? 'Close' : 'Settings'}</span>
           </button>
         </div>
       </nav>
@@ -386,31 +393,33 @@ function App() {
         {!isLoading && activePage === 'results' && !cacheNotification && (
           <div className="animate-slide-up">
             {isFromBookmarks && (
-              <div className="cache-banner" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.5)' }}>
-                <Bookmark size={20} style={{ color: '#60a5fa' }} />
-                <div>
-                  <strong>Searching Bookmarks Only</strong> — Showing results matching your local bookmarks.
+              <div className="cache-banner">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <Bookmark size={18} style={{ color: 'var(--accent-color)' }} />
+                  <div>
+                    <strong>Searching Bookmarks Only</strong> — Showing results matching your local bookmarks.
+                  </div>
                 </div>
               </div>
             )}
 
             {activeCache && (
-              <div className="cache-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid rgba(59, 130, 246, 0.5)' }}>
+              <div className="cache-banner">
                 <div>
                   <strong>Viewing Cached Results</strong>
                   {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
                   {activeCache.permanent && <span style={{ marginLeft: '10px', color: '#4ade80' }}>(Pinned)</span>}
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  {!activeCache.permanent && <button className="secondary-btn" onClick={handlePin} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>📌 Pin</button>}
-                  {activeCache.isStale && !activeCache.permanent && <button className="secondary-btn" onClick={handleRenew} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>🔄 Renew</button>}
-                  <button className="secondary-btn" onClick={handleDelete} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.5)' }}>🗑 Delete</button>
+                <div style={{ display: 'flex', gap: '0.4rem' }}>
+                  {!activeCache.permanent && <button className="secondary-btn" onClick={handlePin} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>📌 Pin</button>}
+                  {activeCache.isStale && !activeCache.permanent && <button className="secondary-btn" onClick={handleRenew} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>🔄 Renew</button>}
+                  <button className="secondary-btn" onClick={handleDelete} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', color: '#f87171' }}>🗑 Delete</button>
                 </div>
               </div>
             )}
 
             {results.length === 0 ? (
-              <p>No results found.</p>
+              <p style={{ color: 'var(--text-secondary)' }}>No results found.</p>
             ) : (
               (() => {
                 const visibleResults = results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid');
@@ -419,7 +428,7 @@ function App() {
                 return (
                   <>
                     {hiddenResults.length > 0 && (
-                      <div className="hidden-results-container" style={{ marginBottom: '1.5rem' }}>
+                      <div className="hidden-results-container">
                         <button 
                           className="toggle-hidden-btn"
                           onClick={() => setShowHidden(!showHidden)}
@@ -428,7 +437,7 @@ function App() {
                         </button>
                         
                         {showHidden && (
-                          <div className="hidden-results-list animate-slide-up" style={{ marginTop: '1rem', opacity: 0.8 }}>
+                          <div className="results-grid animate-slide-up" style={{ marginTop: '1.25rem', opacity: 0.85 }}>
                             {hiddenResults.map((result, i) => (
                               <ResultCard 
                                 key={result.url + i} 
@@ -444,43 +453,41 @@ function App() {
                       </div>
                     )}
 
-                    {visibleResults.map((result, i) => (
-                      <ResultCard
-                        key={result.url + i}
-                        result={result}
-                        currentPref={preferences[result.domain] || 'neutral'}
-                        onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
-                        isBookmarked={isBookmarked(result.url)}
-                        onBookmarkToggle={() => handleBookmarkToggle(result)}
-                        onBlockChannel={result.isYouTube ? blockChannel : undefined}
-                        blockedChannels={blockedChannels}
-                      />
-                    ))}
+                    <div className="results-grid">
+                      {visibleResults.map((result, i) => (
+                        <ResultCard
+                          key={result.url + i}
+                          result={result}
+                          currentPref={preferences[result.domain] || 'neutral'}
+                          onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                          isBookmarked={isBookmarked(result.url)}
+                          onBookmarkToggle={() => handleBookmarkToggle(result)}
+                          onBlockChannel={result.isYouTube ? blockChannel : undefined}
+                          blockedChannels={blockedChannels}
+                        />
+                      ))}
+                    </div>
 
                     {/* Pagination & Infinite Scroll Controls */}
                     {isLoadingMore && (
                       <div className="loader animate-slide-up" style={{ padding: '1.5rem 0', margin: '1rem 0' }}>
-                        <SearchIcon size={32} className="animate-pulse" style={{ color: '#ef4444' }} />
-                        <p style={{ fontSize: '0.95rem', color: '#94a3b8' }}>Fetching more filtered YouTube videos...</p>
+                        <SearchIcon size={28} className="animate-pulse" style={{ color: 'var(--accent-color)' }} />
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Fetching more filtered results...</p>
                       </div>
                     )}
 
                     {!isLoadingMore && nextContinuationToken && (
-                      <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
+                      <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '1.5rem' }}>
                         <button 
                           className="secondary-btn" 
                           onClick={handleLoadMore}
                           style={{
-                            padding: '0.75rem 2rem',
-                            borderRadius: '99px',
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            borderColor: 'rgba(239, 68, 68, 0.4)',
-                            color: '#f87171',
-                            fontWeight: '600',
-                            cursor: 'pointer'
+                            padding: '0.65rem 1.75rem',
+                            borderRadius: '8px',
+                            fontWeight: '600'
                           }}
                         >
-                          🎬 Load More Filtered Videos
+                          Load More Results
                         </button>
                       </div>
                     )}
@@ -500,9 +507,9 @@ function App() {
             
             <div>
               {getFlatBookmarks().length === 0 ? (
-                <p>No bookmarks saved yet. Search and bookmark useful results!</p>
+                <p style={{ color: 'var(--text-secondary)' }}>No bookmarks saved yet. Search and bookmark useful results!</p>
               ) : (
-                <div>
+                <div className="results-grid" style={{ marginTop: '1.25rem' }}>
                   {getFlatBookmarks().map((result, i) => (
                     <ResultCard 
                       key={result.url + i} 

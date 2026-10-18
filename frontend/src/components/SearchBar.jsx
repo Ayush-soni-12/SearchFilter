@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Clock, Bookmark } from 'lucide-react';
+import { Clock, Bookmark, Search as SearchIcon } from 'lucide-react';
 
 export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel, onEngineChange }) {
   const [val, setVal] = useState(initialQuery);
@@ -163,10 +163,10 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', marginBottom: '2rem' }}>
+    <div className="search-bar-section">
       {!searchInBookmarks && (
-        <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginRight: '0.35rem', fontWeight: 500 }}>Engine:</span>
+        <div className="engine-bar">
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginRight: '0.25rem', fontWeight: 500 }}>Engine:</span>
           <button
             type="button"
             className={`engine-btn${engine === 'google' ? ' active' : ''}`}
@@ -200,30 +200,21 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             className={`engine-btn${engine === 'youtube' ? ' active' : ''}`}
             onClick={() => handleEngineChange('youtube')}
           >
-            ▶️ YouTube (Hidden Gems)
+            ▶️ YouTube (Gems)
           </button>
           <button
             type="button"
             className={`engine-btn${engine === 'github' ? ' active' : ''}`}
             onClick={() => handleEngineChange('github')}
           >
-            🐙 GitHub (Hidden Gems)
+            🐙 GitHub (Gems)
           </button>
         </div>
       )}
 
       {/* Google Advanced Search & Clean Web Filter Bar */}
       {!searchInBookmarks && engine === 'google' && (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-          padding: '0.75rem 1rem',
-          background: '#f6f8fa',
-          border: '1px solid #d0d7de',
-          borderRadius: '12px',
-          fontSize: '0.85rem'
-        }}>
+        <div className="filter-drawer animate-slide-up" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
           <div style={{
             display: 'flex',
             gap: '1rem',
@@ -231,48 +222,41 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             flexWrap: 'wrap',
             width: '100%'
           }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#24292e', fontWeight: 600 }}>
+            <label className="filter-label">
               <input
                 type="checkbox"
                 checked={cleanWeb}
                 onChange={(e) => setCleanWeb(e.target.checked)}
-                style={{ accentColor: '#0969da' }}
+                style={{ accentColor: 'var(--accent-color)' }}
               />
-              <span>⚡ Clean Web Mode (udm=14)</span>
+              <span>⚡ Clean Web (udm=14)</span>
             </label>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#24292e', fontWeight: 600 }}>
+            <label className="filter-label">
               <input
                 type="checkbox"
                 checked={antiSeo}
                 onChange={(e) => setAntiSeo(e.target.checked)}
-                style={{ accentColor: '#0969da' }}
+                style={{ accentColor: 'var(--accent-color)' }}
               />
-              <span>🛡️ Anti-SEO Clickbait Filter</span>
+              <span>🛡️ Anti-SEO Filter</span>
             </label>
 
             <button
               type="button"
               onClick={() => setShowFilterInfo(!showFilterInfo)}
+              className="open-btn"
               style={{
-                background: showFilterInfo ? '#ddf4ff' : '#ffffff',
-                border: '1px solid #54aeff',
-                color: '#0969da',
                 fontSize: '0.78rem',
-                fontWeight: 600,
-                padding: '0.2rem 0.6rem',
-                borderRadius: '99px',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.3rem'
+                padding: '0.2rem 0.55rem',
+                borderRadius: '6px'
               }}
             >
-              <span>ℹ️</span> {showFilterInfo ? 'Hide Guide' : 'How to use?'}
+              <span>ℹ️</span> {showFilterInfo ? 'Hide Guide' : 'Operators Guide'}
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginLeft: 'auto' }}>
-              <span style={{ fontSize: '0.82rem', color: '#24292e', fontWeight: 600 }}>Operators:</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Operators:</span>
               <select
                 value=""
                 onChange={(e) => {
@@ -280,16 +264,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                     insertOperator(e.target.value);
                   }
                 }}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #d0d7de',
-                  color: '#0969da',
-                  fontWeight: 600,
-                  padding: '0.3rem 0.65rem',
-                  borderRadius: '8px',
-                  fontSize: '0.83rem',
-                  cursor: 'pointer'
-                }}
+                className="filter-select"
               >
                 <option value="" disabled>⚡ Insert Operator...</option>
                 <option value="exact">"Exact Match" — Exact word string</option>
@@ -307,65 +282,43 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
 
           {/* Expandable How to Use Guide Box */}
           {showFilterInfo && (
-            <div className="animate-slide-up" style={{
-              background: '#ffffff',
-              border: '1px solid #d0d7de',
-              borderRadius: '10px',
-              padding: '1rem 1.25rem',
-              fontSize: '0.83rem',
-              color: '#24292e',
-              lineHeight: 1.6
-            }}>
-              <div style={{ fontWeight: 700, color: '#0969da', marginBottom: '0.6rem', fontSize: '0.92rem' }}>
-                💡 Google Search Filters & Advanced Operator Guide:
+            <div className="filter-guide-box animate-slide-up" style={{ marginTop: '0.4rem' }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem', fontSize: '0.88rem' }}>
+                💡 Google Search Filters & Advanced Operators:
               </div>
 
-              <div style={{ marginBottom: '0.85rem' }}>
-                <div style={{ fontWeight: 600, color: '#24292e', marginBottom: '0.2rem' }}>1. Clean & Anti-SEO Mode:</div>
+              <div style={{ marginBottom: '0.65rem' }}>
                 <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
-                  <li><strong>⚡ Clean Web Mode (`udm=14`):</strong> Requests Google's pure Web Search view. Strips out AI Overviews, sponsored product ads, and widget bloat.</li>
-                  <li><strong>🛡️ Anti-SEO Clickbait Filter:</strong> Automatically scans & hides clickbait listicles (e.g. <em>"Top 10..."</em>, <em>"Cheat sheet"</em>, <em>"Complete Guide"</em>, <em>"Step-by-Step"</em>, and SEO year-stuffing).</li>
+                  <li><strong>⚡ Clean Web Mode (`udm=14`):</strong> Google's direct web search view. Strips out AI Overviews, sponsored products, and widget clutter.</li>
+                  <li><strong>🛡️ Anti-SEO Clickbait Filter:</strong> Scans & hides clickbait listicles and SEO filler (<em>"Top 10..."</em>, <em>"Cheat sheet"</em>, <em>"Complete Guide"</em>).</li>
                 </ul>
               </div>
 
               <div>
-                <div style={{ fontWeight: 600, color: '#24292e', marginBottom: '0.35rem' }}>2. Advanced Search Operators Reference:</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.5rem' }}>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>"Exact Match"</code> — Searches exact phrase word-for-word.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>"react state management"</code></span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.45rem' }}>
+                  <div className="guide-item">
+                    <code>"Exact Match"</code> — Exact phrase match.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>"react state"</code></span>
                   </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>site:</code> — Restricts search strictly to a domain.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>react site:github.com</code></span>
+                  <div className="guide-item">
+                    <code>site:</code> — Restricts to a domain.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>site:github.com</code></span>
                   </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>filetype:pdf</code> — Searches for raw PDF files or manuals.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>python manual filetype:pdf</code></span>
+                  <div className="guide-item">
+                    <code>filetype:pdf</code> — Searches PDF files.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>manual filetype:pdf</code></span>
                   </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>intitle:</code> — Term must appear in the HTML page title.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>intitle:architecture</code></span>
+                  <div className="guide-item">
+                    <code>intitle:</code> — Title tag match.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>intitle:architecture</code></span>
                   </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>inurl:</code> — Term must appear in the URL path.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>inurl:docs async</code></span>
+                  <div className="guide-item">
+                    <code>inurl:</code> — URL path match.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>inurl:docs</code></span>
                   </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>after:2025</code> — Restricts results to recent content.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>vite 6 after:2025</code></span>
-                  </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>OR</code> — Matches either term A or term B.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>react OR vue</code></span>
-                  </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>-exclude</code> — Excludes a word or website.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>recipes -pinterest -site:quora.com</code></span>
-                  </div>
-                  <div style={{ background: '#f6f8fa', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid #eaeaea' }}>
-                    <code>related:</code> — Finds sites similar to a domain.<br/>
-                    <span style={{ color: '#57606a', fontSize: '0.78rem' }}>Example: <code>related:github.com</code></span>
+                  <div className="guide-item">
+                    <code>-exclude</code> — Exclude word/domain.<br/>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}><code>-site:quora.com</code></span>
                   </div>
                 </div>
               </div>
@@ -374,54 +327,30 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
         </div>
       )}
 
-      {/* YouTube Specific Filter Bar (Clean Vercel Theme) */}
+      {/* YouTube Specific Filter Bar */}
       {!searchInBookmarks && engine === 'youtube' && (
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          padding: '0.75rem 1rem',
-          background: '#f6f8fa',
-          border: '1px solid #d0d7de',
-          borderRadius: '12px',
-          fontSize: '0.85rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Max Views:</span>
+        <div className="filter-drawer animate-slide-up">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Max Views:</span>
             <select
               value={maxViews}
               onChange={(e) => setMaxViews(Number(e.target.value))}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value={10000}>Under 10,000 views (Ultra Small)</option>
-              <option value={50000}>Under 50,000 views (Hidden Gems)</option>
-              <option value={100000}>Under 100,000 views (Under-the-radar)</option>
-              <option value={500000}>Under 500,000 views</option>
+              <option value={10000}>Under 10k views (Ultra Small)</option>
+              <option value={50000}>Under 50k views (Hidden Gems)</option>
+              <option value={100000}>Under 100k views (Under-the-radar)</option>
+              <option value={500000}>Under 500k views</option>
               <option value={0}>No view limit (All videos)</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Upload Date:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Upload:</span>
             <select
               value={uploadTime}
               onChange={(e) => setUploadTime(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
               <option value="all">Anytime</option>
               <option value="hour">Past Hour</option>
@@ -432,19 +361,19 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             </select>
           </div>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#57606a' }}>
+          <label className="filter-label">
             <input
               type="checkbox"
               checked={hideShorts}
               onChange={(e) => setHideShorts(e.target.checked)}
-              style={{ accentColor: '#24292e' }}
+              style={{ accentColor: 'var(--accent-color)' }}
             />
             <span>Hide Shorts</span>
           </label>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1, minWidth: '220px' }}>
-            <span style={{ color: '#57606a', whiteSpace: 'nowrap', fontSize: '0.85rem', fontWeight: 600 }}>🚫 Blocked Channels:</span>
-            <div className="channel-chip-input">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flex: 1, minWidth: '200px' }}>
+            <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '0.8rem', fontWeight: 500 }}>🚫 Blocked:</span>
+            <div className="channel-chip-input" style={{ flex: 1 }}>
               {blockedChannels.map((ch) => (
                 <span key={ch} className="channel-chip">
                   {ch}
@@ -459,51 +388,28 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
               <input
                 type="text"
                 className="channel-chip-text"
-                placeholder={blockedChannels.length === 0 ? 'Type channel name, press Enter…' : 'Add another…'}
+                placeholder={blockedChannels.length === 0 ? 'Block channel + Enter…' : 'Add…'}
                 value={channelInput}
                 onChange={(e) => setChannelInput(e.target.value)}
                 onKeyDown={handleChannelInputKeyDown}
                 onBlur={commitChannelInput}
               />
             </div>
-            {blockedChannels.length > 0 && (
-              <span style={{ fontSize: '0.72rem', color: '#57606a' }}>
-                {blockedChannels.length} channel{blockedChannels.length > 1 ? 's' : ''} blocked · Press Backspace to remove last
-              </span>
-            )}
           </div>
-
         </div>
       )}
 
-      {/* Hacker News Specific Filter Bar (Clean Vercel Theme) */}
+      {/* Hacker News Specific Filter Bar */}
       {!searchInBookmarks && (engine === 'hackernews' || engine === 'hn') && (
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          padding: '0.75rem 1rem',
-          background: '#f6f8fa',
-          border: '1px solid #d0d7de',
-          borderRadius: '12px',
-          fontSize: '0.85rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Type:</span>
+        <div className="filter-drawer animate-slide-up">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Type:</span>
             <select
               value={hnType}
               onChange={(e) => setHnType(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value="story">Stories / Articles</option>
+              <option value="story">Stories</option>
               <option value="ask_hn">Ask HN</option>
               <option value="show_hn">Show HN</option>
               <option value="poll">Polls</option>
@@ -512,81 +418,53 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Sort By:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Sort:</span>
             <select
               value={hnSort}
               onChange={(e) => setHnSort(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
               <option value="relevance">Relevance</option>
               <option value="date">Latest Date</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Min Points:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Min Points:</span>
             <select
               value={minPoints}
               onChange={(e) => setMinPoints(Number(e.target.value))}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value={0}>Any Points</option>
-              <option value={10}>10+ Points</option>
-              <option value={50}>50+ Points</option>
-              <option value={100}>100+ Points</option>
-              <option value={500}>500+ Points</option>
+              <option value={0}>Any</option>
+              <option value={10}>10+</option>
+              <option value={50}>50+</option>
+              <option value={100}>100+</option>
+              <option value={500}>500+</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Min Comments:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Min Comments:</span>
             <select
               value={minComments}
               onChange={(e) => setMinComments(Number(e.target.value))}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value={0}>Any Comments</option>
-              <option value={5}>5+ Comments</option>
-              <option value={20}>20+ Comments</option>
-              <option value={50}>50+ Comments</option>
+              <option value={0}>Any</option>
+              <option value={5}>5+</option>
+              <option value={20}>20+</option>
+              <option value={50}>50+</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Date Range:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Range:</span>
             <select
               value={hnDateRange}
               onChange={(e) => setHnDateRange(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
               <option value="all">All Time</option>
               <option value="24h">Past 24 Hours</option>
@@ -598,56 +476,32 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
         </div>
       )}
 
-      {/* GitHub Specific Filter Bar (Vercel Clean Theme) */}
+      {/* GitHub Specific Filter Bar */}
       {!searchInBookmarks && engine === 'github' && (
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          padding: '0.75rem 1rem',
-          background: '#f6f8fa',
-          border: '1px solid #d0d7de',
-          borderRadius: '12px',
-          fontSize: '0.85rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Max Stars:</span>
+        <div className="filter-drawer animate-slide-up">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Max Stars:</span>
             <select
               value={maxStars}
               onChange={(e) => setMaxStars(Number(e.target.value))}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value={0}>No star limit (All repos / Top stars)</option>
-              <option value={100}>Under 100 stars (Ultra Small)</option>
-              <option value={500}>Under 500 stars (Hidden Gems)</option>
-              <option value={1000}>Under 1,000 stars (Under-the-radar)</option>
-              <option value={5000}>Under 5,000 stars</option>
+              <option value={0}>No limit (All)</option>
+              <option value={100}>&lt; 100 stars (Ultra Small)</option>
+              <option value={500}>&lt; 500 stars (Hidden Gems)</option>
+              <option value={1000}>&lt; 1,000 stars (Under-the-radar)</option>
+              <option value={5000}>&lt; 5,000 stars</option>
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Language:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Lang:</span>
             <select
               value={githubLanguage}
               onChange={(e) => setGithubLanguage(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
-              <option value="all">All Languages</option>
+              <option value="all">All</option>
               <option value="javascript">JavaScript</option>
               <option value="typescript">TypeScript</option>
               <option value="python">Python</option>
@@ -658,65 +512,54 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
             </select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: '#24292e', fontWeight: 600 }}>Activity:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: '0.8rem' }}>Pushed:</span>
             <select
               value={uploadTime}
               onChange={(e) => setUploadTime(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem'
-              }}
+              className="filter-select"
             >
               <option value="all">Anytime</option>
-              <option value="month">Pushed in Past Month</option>
-              <option value="6months">Pushed in Past 6 Months</option>
-              <option value="year">Pushed in Past Year</option>
+              <option value="month">Past Month</option>
+              <option value="6months">Past 6 Months</option>
+              <option value="year">Past Year</option>
             </select>
           </div>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', color: '#57606a' }}>
+          <label className="filter-label">
             <input
               type="checkbox"
               checked={excludeStudyNotes}
               onChange={(e) => setExcludeStudyNotes(e.target.checked)}
-              style={{ accentColor: '#24292e' }}
+              style={{ accentColor: 'var(--accent-color)' }}
             />
-            <span>Exclude Lists/Notes</span>
+            <span>Exclude Notes</span>
           </label>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '200px' }}>
-            <span style={{ color: '#57606a', whiteSpace: 'nowrap' }}>Blacklist Orgs:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flex: 1, minWidth: '170px' }}>
+            <span style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontSize: '0.8rem', fontWeight: 500 }}>Blacklist:</span>
             <input
               type="text"
-              placeholder="e.g. spam-org, test-user"
+              placeholder="e.g. spam-org"
               value={blacklistedOrgs}
               onChange={(e) => setBlacklistedOrgs(e.target.value)}
-              style={{
-                background: '#ffffff',
-                border: '1px solid #e5e5e5',
-                color: '#111111',
-                padding: '0.25rem 0.6rem',
-                borderRadius: '6px',
-                fontSize: '0.85rem',
-                width: '100%'
-              }}
+              className="filter-input"
+              style={{ width: '100%' }}
             />
           </div>
         </div>
       )}
 
-      <form className="search-container" style={{ marginBottom: 0 }} onSubmit={handleSubmit}>
+      {/* Sleek Minimalist Search Form */}
+      <form className="search-container" onSubmit={handleSubmit}>
         <div className="search-wrapper" ref={wrapperRef}>
+          <span className="search-icon-inside">
+            <SearchIcon size={16} />
+          </span>
           <input
             type="text"
             className="search-input"
-            style={{ width: '100%' }}
-            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'brave' ? 'Brave' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube (Hidden Gems)' : 'GitHub (Hidden Gems)'}...`}
+            placeholder={searchInBookmarks ? "Search your saved bookmarks..." : `Search ${engine === 'google' ? 'Google' : engine === 'duckduckgo' ? 'DuckDuckGo' : engine === 'brave' ? 'Brave' : engine === 'hackernews' ? 'Hacker News' : engine === 'youtube' ? 'YouTube' : 'GitHub'}...`}
             value={val}
             onChange={(e) => { setVal(e.target.value); setActiveHistoryIndex(-1); }}
             onFocus={() => setShowHistory(true)}
@@ -730,14 +573,14 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '0.4rem 1rem',
+                padding: '0.4rem 0.85rem',
                 fontSize: '0.75rem',
                 color: 'var(--text-secondary)',
                 borderBottom: '1px solid var(--border-color)',
                 background: 'var(--surface-color)'
               }}>
                 <span>Search History</span>
-                <span style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <span style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
                   <kbd className="history-kbd">↑↓</kbd> navigate •
                   <kbd className="history-kbd">Enter</kbd> select •
                   <kbd className="history-kbd">Esc</kbd> close
@@ -751,7 +594,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                   onClick={() => handleHistoryClick(item.query)}
                   onMouseEnter={() => setActiveHistoryIndex(idx)}
                 >
-                  <Clock size={15} />
+                  <Clock size={14} />
                   <span className="history-text">{item.query}</span>
                 </button>
               ))}
@@ -763,27 +606,25 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           type="submit" 
           className="search-button"
           disabled={isLoading || !val.trim()}
-          style={(engine === 'hackernews' || engine === 'youtube' || engine === 'github') ? { background: '#24292e', borderColor: '#24292e', color: '#ffffff' } : {}}
         >
           {isLoading ? 'Searching...' : 'Search'}
         </button>
       </form>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '0.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
         <button
           type="button"
           className="open-btn"
           onClick={() => setSearchInBookmarks(!searchInBookmarks)}
-          style={{
-            fontSize: '0.82rem',
-            padding: '0.35rem 0.8rem',
-            background: searchInBookmarks ? '#111111' : '#ffffff',
-            borderColor: searchInBookmarks ? '#111111' : '#eaeaea',
-            color: searchInBookmarks ? '#ffffff' : '#666666'
-          }}
+          style={searchInBookmarks ? {
+            background: 'var(--accent-color)',
+            borderColor: 'var(--accent-color)',
+            color: 'var(--bg-color)',
+            fontWeight: 600
+          } : {}}
         >
           <Bookmark size={14} />
-          <span>{searchInBookmarks ? 'Searching Bookmarks Only (ON)' : 'Search in Bookmarks Only'}</span>
+          <span>{searchInBookmarks ? 'Searching Bookmarks Only (Active)' : 'Search in Bookmarks Only'}</span>
         </button>
       </div>
     </div>
