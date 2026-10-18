@@ -1,102 +1,53 @@
 ## UI Registry — SearchFilter
 
 ### Base Theme System & Light/Dark Mode
-File: `frontend/src/index.css`, `frontend/src/App.jsx`
-Last updated: 2026-07-29
+Files: [index.css](file:///home/username_anna/Desktop/SearchFilter/frontend/src/index.css), [App.jsx](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx)  
+Last updated: 2026-10-18
 
-| Property         | Light Mode (`:root`) | Dark Mode (`[data-theme="dark"]`) |
-| ---------------- | -------------------- | --------------------------------- |
-| Canvas Background| `#fafafa` (`radial-gradient #ffffff -> #fafafa`) | `#050505` (`radial-gradient #121212 -> #050505`) |
-| Surface / Cards  | `#ffffff` | `#0a0a0a` |
-| Primary Text     | `#111111` (Charcoal) | `#ededed` (Off-white) |
-| Secondary Text   | `#666666` | `#888888` |
-| Border Color     | `#eaeaea` | `rgba(255, 255, 255, 0.08)` |
-| Card Hover Border| `#cccccc` | `rgba(255, 255, 255, 0.18)` |
-| Card Shadow      | `0 2px 8px rgba(0, 0, 0, 0.03)` | `0 4px 20px rgba(0, 0, 0, 0.4)` |
-| Accent Action    | `#111111` | `#ededed` |
+| Property | Light Mode (`:root`) | Dark Mode (`[data-theme="dark"]`) |
+| --- | --- | --- |
+| Canvas Background | `#f8fafc` (`radial-gradient #ffffff -> #f1f5f9`) | `#090a0f` (`radial-gradient #131722 -> #090a0f`) |
+| Surface / Cards | `#ffffff` | `#12151e` |
+| Primary Text | `#0f172a` (Deep Slate) | `#f8fafc` (Off-white) |
+| Secondary Text | `#64748b` (Slate-500) | `#94a3b8` (Slate-400) |
+| Border Color (Explicit) | `#cbd5e1` (Slate-300 crisp boundary) | `#262a36` (Clearly visible charcoal border) |
+| Card Hover Border | `#64748b` | `#475569` |
+| Card Shadow | `0 1px 3px rgba(15, 23, 42, 0.05)` | `0 4px 16px rgba(0, 0, 0, 0.4)` |
+| Filter Drawers Background | `#f8fafc` (`var(--filter-bg)`) | `#10131b` (`var(--filter-bg)`) |
+| Accent Action | `#0f172a` | `#f8fafc` |
 
 **Pattern notes:**
-- The app uses dynamic CSS variables that switch automatically when `data-theme="dark"` is set on `document.documentElement`.
+- The app uses semantic dynamic CSS variables that switch automatically when `data-theme="dark"` is set on `document.documentElement`.
 - Navbar includes a persistent theme toggle button saved in `localStorage`.
+- All hardcoded hex codes (`#f6f8fa`, `#24292e`, `#d0d7de`) have been eliminated from JSX in favor of CSS variables, ensuring seamless, zero-glare dark/light mode switching.
 
 ---
 
-### Vercel Aesthetic Result Card Component (`.vercel-card`)
-File: `frontend/src/components/ResultCard.jsx`, `frontend/src/index.css`  
-Last updated: 2026-07-29 (Inspired by `jakubkrehel/better-ui` & `leonxlnx/minimalist-ui`)
+### Minimalist Search Bar Profile (`.search-bar-section`)
+Files: [SearchBar.jsx](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/SearchBar.jsx), [index.css](file:///home/username_anna/Desktop/SearchFilter/frontend/src/index.css)  
+Last updated: 2026-10-18
 
-| Property | Class / Value |
+| Property | Value / Class |
 | --- | --- |
-| Container | `.vercel-card`: `background: var(--card-bg)`, `border: 1px solid var(--card-border)`, `border-radius: 12px` |
-| Concentric Radii | Outer card `12px` ➔ Thumbnail `8px` ➔ Badges `4px-6px` |
-| Image Outline | Thumbnail overlay: `outline: 1px solid var(--img-outline); outline-offset: -1px` |
-| Hover State | `border-color: var(--card-hover-border)`, `transform: translateY(-2px)`, `box-shadow: var(--card-hover-shadow)` |
-| Title Typography | `color: var(--text-primary)`, `1.05rem`, `letter-spacing: -0.01em`, hover highlight `#ef4444` / `#2563eb` |
-| Tabular Numbers | Duration & view counts use `font-variant-numeric: tabular-nums` |
-| Watch Action CTA | `.watch-btn`: `background: rgba(239, 68, 68, 0.12)`, `border: 1px solid rgba(239, 68, 68, 0.35)`, `color: #ef4444`, active `scale(0.97)` |
-| Preference Badges| `.pref-btn`: prefer (`var(--prefer-bg)`), neutral (`var(--neutral-bg)`), avoid (`var(--avoid-bg)`) |
-
-**Pattern notes:**
-- Follows concentric border radius principles (`outer = inner + padding`).
-- Thumbnail outlines automatically adapt (`rgba(0,0,0,0.1)` in light mode, `rgba(255,255,255,0.1)` in dark mode).
-- Micro-interactions include hover scale on thumbnails (`scale(1.04)`), play button overlay fade-in, and tactile press scaling (`scale(0.97)`).
+| Container | `.search-bar-section`: `max-width: 760px; margin: 0 auto 2rem auto; width: 100%` |
+| Input Geometry | `.search-input`: `border-radius: 8px; padding: 0.65rem 1rem 0.65rem 2.4rem; font-size: 0.92rem` |
+| Integrated Icon | `.search-icon-inside`: Subtle search icon placed inside the left padding of the input |
+| Action Button | `.search-button`: `border-radius: 8px; padding: 0.65rem 1.25rem; font-size: 0.88rem; font-weight: 600` |
+| Engine Switcher | `.engine-bar`: Compact pill buttons with clean active states (`border-radius: 6px; font-size: 0.8rem`) |
+| Filter Drawers | `.filter-drawer`: Clean panel adapting to active theme with explicit `1px solid var(--border-color)` |
 
 ---
 
-### SearchBar & Filter Control Bar
-File: `frontend/src/components/SearchBar.jsx`, `frontend/src/index.css`
-Last updated: 2026-07-29
+### Multi-Card Results Grid (`.results-grid`)
+Files: [App.jsx](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx), [ResultCard.jsx](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/ResultCard.jsx), [index.css](file:///home/username_anna/Desktop/SearchFilter/frontend/src/index.css)  
+Last updated: 2026-10-18
 
-| Property | Class / Value |
+| Property | Value / Class |
 | --- | --- |
-| Search Input | `.search-input`: `border-radius: 99px`, `background: var(--input-bg)`, `border: 1px solid var(--border-color)` |
-| Engine Toggles | `.open-btn`: Active (`background: var(--accent-color)`, `color: var(--bg-color)`) / Inactive (`var(--btn-secondary-bg)`) |
-| YouTube Filter Bar | `background: #f6f8fa`, `border: 1px solid #d0d7de`, `border-radius: 12px` |
-| History Dropdown | `.history-dropdown`: `background: var(--dropdown-bg)`, `<kbd>` shortcuts (`font-family: monospace`) |
-
-**Pattern notes:**
-- Engine controls use full pill geometry (`99px`).
-- Search history shortcuts format keystrokes in `<kbd>` tags.
-
----
-
-### GitHub Engine Toolbar & Repository Cards
-File: `frontend/src/components/SearchBar.jsx`, `frontend/src/components/ResultCard.jsx`
-Last updated: 2026-07-29
-
-| Property | Class / Value |
-| --- | --- |
-| GitHub Engine Button | `.open-btn`: Active (`background: #24292e`, `color: #ffffff`, `border-color: #24292e`) / Inactive (`#f6f8fa`, `#24292e`) |
-| GitHub Filter Bar | `background: #f6f8fa`, `border: 1px solid #d0d7de`, `border-radius: 12px`, `font-size: 0.85rem` |
-| GitHub Star Dropdown | `Max Stars`: `< 100` (Ultra Small), `< 500` (Hidden Gems), `< 1,000` (Under-the-radar), `< 5,000` |
-| GitHub Language Filter| `Language`: JavaScript, TypeScript, Python, Rust, Go, C++, Java, All |
-| GitHub Repo Card | Avatar thumbnail (`44px`, `border-radius: 10px`), Title (`owner/repo`), Star/Fork/Language pill tags |
-| Quality Score Badge | `Quality Score: XX` formatted in `font-family: monospace` |
-
-**Pattern notes:**
-- Reuses exact Vercel card concentric radii and pastel background structure as YouTube and Google result cards.
-- Star, Fork, and Language pill tags use GitHub neutral pastel tokens (`#f6f8fa`, `#ddf4ff`, `#0969da`).
-
----
-
-### Hacker News Engine Toolbar & Submission Cards
-File: `frontend/src/components/SearchBar.jsx`, `frontend/src/components/ResultCard.jsx`
-Last updated: 2026-07-30
-
-| Property | Class / Value |
-| --- | --- |
-| HN Engine Button | `.open-btn`: Active (`background: #24292e`, `color: #ffffff`, `border-color: #24292e`) / Inactive (`#f6f8fa`, `#24292e`) |
-| HN Filter Bar | `background: #f6f8fa`, `border: 1px solid #d0d7de`, `border-radius: 12px`, `font-size: 0.85rem` |
-| HN Type Filter | `Type`: Stories (`story`), Ask HN (`ask_hn`), Show HN (`show_hn`), Polls (`poll`), Comments (`comment`), All (`all`) |
-| HN Numeric Filters | `Min Points`: 0, 10+, 50+, 100+, 500+ \| `Min Comments`: 0, 5+, 20+, 50+ |
-| HN Date Filter | `Date Range`: All Time, Past 24 Hours, Past Week, Past Month, Past Year |
-| Search Submit CTA | `background: #24292e`, `border-color: #24292e`, `color: #ffffff` |
-| HN Card Design | `.vercel-card`: `border-radius: 12px`, `border: 1px solid var(--card-border)` |
-| HN Discussion CTA | `.open-btn`: `background: var(--btn-secondary-bg)`, `border-color: var(--border-color)`, `color: var(--text-primary)` |
-| HN Metadata Tags | Points (`#f6f8fa`, `#24292e`), Comments (`#f6f8fa`, `#57606a`), Author (`#f6f8fa`, `#57606a`), Post Type (`#ddf4ff`, `#0969da`) |
-
-**Pattern notes:**
-- Converted to match the standardized Vercel clean theme palette (`#24292e`, `#f6f8fa`, `#d0d7de`) used across GitHub and YouTube.
-- Provides two distinct CTAs (**HN Discussion** and **Visit Site**) formatted with concentric border radii and subtle hover interactions.
-
-
+| Grid Layout | `.results-grid`: `display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.15rem; width: 100%` |
+| App Container | `.app-container`: `max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem` |
+| Cards in Window | Shows **4 to 6 result cards** simultaneously in the viewport without requiring continuous scrolling |
+| Card Geometry | `.vercel-card`: `display: flex; flex-direction: column; justify-content: space-between; height: 100%; border: 1px solid var(--card-border); border-radius: 10px` |
+| Text Clamping | `.result-snippet`, `.yt-snippet`: 3-line clamp for uniform, balanced card heights across each row |
+| YouTube Cards | Clean thumbnail on top with duration badge and play hover effect, metadata row, snippet, and actions pinned to bottom |
+| HN & GitHub Cards | Clean title header, owner avatar/author badges, stars/points pills (`.meta-badge`), and score footer |
