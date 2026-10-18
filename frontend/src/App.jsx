@@ -393,7 +393,7 @@ function App() {
         {!isLoading && activePage === 'results' && !cacheNotification && (
           <div className="animate-slide-up">
             {isFromBookmarks && (
-              <div className="cache-banner">
+              <div className="cache-banner animate-slide-up">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <Bookmark size={18} style={{ color: 'var(--accent-color)' }} />
                   <div>
@@ -404,7 +404,7 @@ function App() {
             )}
 
             {activeCache && (
-              <div className="cache-banner">
+              <div className="cache-banner animate-slide-up">
                 <div>
                   <strong>Viewing Cached Results</strong>
                   {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
