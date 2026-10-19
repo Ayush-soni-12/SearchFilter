@@ -24,6 +24,7 @@ function App() {
   const [nextContinuationToken, setNextContinuationToken] = useState(null);
   const [apiKey, setApiKey] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentCacheId, setCurrentCacheId] = useState(null);
   const [blockedChannels, setBlockedChannels] = useState(() => {
     try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
   });
@@ -143,6 +144,7 @@ function App() {
         }
         setNextContinuationToken(data.nextContinuationToken || null);
         if (data.apiKey) setApiKey(data.apiKey);
+        if (data.cacheId) setCurrentCacheId(data.cacheId);
       } catch (error) {
         console.error('Continuation search error:', error);
       } finally {
@@ -167,6 +169,9 @@ function App() {
     setNextContinuationToken(null);
     setApiKey(null);
     setIsLoadingMore(false);
+    if (!options.isContinuation && !options.useCacheId) {
+      setCurrentCacheId(null);
+    }
     
     try {
       const searchOptions = { ...lastOptions, ...options, engine: engineToUse };
@@ -181,6 +186,8 @@ function App() {
       setResults(data.results || []);
       setNextContinuationToken(data.nextContinuationToken || null);
       if (data.apiKey) setApiKey(data.apiKey);
+      if (data.cacheId) setCurrentCacheId(data.cacheId);
+      else if (options.useCacheId) setCurrentCacheId(options.useCacheId);
       setIsFromBookmarks(!!data.fromBookmarks);
       if (options.useCacheId && cacheNotification) {
         setActiveCache(cacheNotification);
@@ -203,7 +210,8 @@ function App() {
       ...lastOptions,
       isContinuation: true,
       continuationToken: nextContinuationToken,
-      apiKey: apiKey
+      apiKey: apiKey,
+      cacheId: currentCacheId
     });
   };
 
@@ -220,14 +228,22 @@ function App() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey]);
+  }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey, currentCacheId]);
 
   const proceedWithCache = () => {
     handleSearch(query, { ...lastOptions, useCacheId: cacheNotification.id, engine: activeEngine });
     setCacheNotification(null);
   };
 
-  const forceSearchAnyway = () => {
+  const forceSearchAnyway = async () => {
+    if (cacheNotification?.id) {
+      try {
+        await api.deleteCache(cacheNotification.id);
+      } catch (err) {
+        console.warn('Failed to delete old cache on search anyway:', err);
+      }
+    }
+    setCurrentCacheId(null);
     handleSearch(query, { ...lastOptions, forceSearch: true, engine: activeEngine });
     setCacheNotification(null);
   };

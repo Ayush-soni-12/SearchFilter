@@ -8,6 +8,7 @@ export const handleSearch = async (req, res) => {
     query,
     forceSearch,
     useCacheId,
+    cacheId,
     searchInBookmarks,
     engine,
     maxViews,
@@ -50,11 +51,17 @@ export const handleSearch = async (req, res) => {
     }
 
     if (useCacheId) {
-      const cachedResults = await cacheService.getCache(useCacheId);
-      if (cachedResults) {
+      const cached = await cacheService.getCache(useCacheId);
+      if (cached) {
+        const cachedResults = Array.isArray(cached) ? cached : (cached.results || []);
+        const nextContinuationToken = Array.isArray(cached) ? null : (cached.nextContinuationToken || null);
+        const apiKey = Array.isArray(cached) ? null : (cached.apiKey || null);
         return res.json({
           query,
           results: cachedResults,
+          nextContinuationToken,
+          apiKey,
+          cacheId: useCacheId,
           fromCache: true
         });
       }
@@ -102,6 +109,13 @@ export const handleSearch = async (req, res) => {
       minComments: parsedMinComments,
       hnDateRange: parsedHnDateRange
     };
+
+    if (forceSearch === 'true') {
+      const match = await cacheService.findMatch(query, cacheOptions);
+      if (match.available && match.cacheInfo?.id) {
+        await cacheService.deleteCache(match.cacheInfo.id);
+      }
+    }
 
     // If fetching next page via continuationToken, skip cache match check
     if (!continuationToken && forceSearch !== 'true') {
@@ -154,10 +168,13 @@ export const handleSearch = async (req, res) => {
       blacklistedDomains: parsedBlacklistedDomains
     });
     
-    // Only save initial search results to cache, not sub-continuation pages
+    let currentCacheId = cacheId || null;
+
     if (!continuationToken) {
-      await cacheService.saveCache(query, rankedResults, {
+      currentCacheId = await cacheService.saveCache(query, rankedResults, {
         engine: selectedEngine,
+        nextContinuationToken,
+        apiKey: returnedApiKey,
         filters: {
           maxViews: parsedMaxViews,
           hideShorts: parsedHideShorts,
@@ -175,6 +192,22 @@ export const handleSearch = async (req, res) => {
           hnDateRange: parsedHnDateRange
         }
       });
+    } else {
+      // Continuation page search: append to existing cache so it accumulates all URLs
+      let targetCacheId = currentCacheId;
+      if (!targetCacheId) {
+        const match = await cacheService.findMatch(query, cacheOptions);
+        if (match.available && match.cacheInfo?.id) {
+          targetCacheId = match.cacheInfo.id;
+        }
+      }
+      if (targetCacheId) {
+        await cacheService.appendCache(targetCacheId, rankedResults, {
+          nextContinuationToken,
+          apiKey: returnedApiKey
+        });
+        currentCacheId = targetCacheId;
+      }
     }
 
     res.json({
@@ -182,7 +215,8 @@ export const handleSearch = async (req, res) => {
       engine: selectedEngine,
       results: rankedResults,
       nextContinuationToken,
-      apiKey: returnedApiKey
+      apiKey: returnedApiKey,
+      cacheId: currentCacheId
     });
   } catch (error) {
     console.error('Search error:', error);

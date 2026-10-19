@@ -77,7 +77,8 @@
                      ├── check [cacheService.js] (hit -> return cached)
                      ├── [searchProviderFactory.js] -> queries selected engine service
                      ├── passes results to [preferenceEngine.js] (boost/filter)
-                     ├── saves to [cacheService.js] & records in [history.json]
+                     ├── saves/appends to [cacheService.js] (accumulates paged URLs; destroys old on forceSearch)
+                     ├── records query in [history.json]
                      └── returns JSON results to [App.jsx] -> renders [ResultCard.jsx]
 ```
 

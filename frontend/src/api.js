@@ -26,6 +26,7 @@ export const api = {
     if (options.cleanWeb !== undefined) url += `&cleanWeb=${encodeURIComponent(options.cleanWeb)}`;
     if (options.antiSeo !== undefined) url += `&antiSeo=${encodeURIComponent(options.antiSeo)}`;
     if (options.blacklistedDomains) url += `&blacklistedDomains=${encodeURIComponent(options.blacklistedDomains)}`;
+    if (options.cacheId) url += `&cacheId=${encodeURIComponent(options.cacheId)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');

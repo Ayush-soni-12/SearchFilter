@@ -16,5 +16,6 @@
   "https://linuxcommandlibrary.com/man/kvm": "bad",
   "https://www.redhat.com/en/topics/virtualization/what-is-KVM": "bad",
   "https://www.linuxjournal.com/article/9764": "good",
-  "https://www.serverspan.com/en/blog/kvm-explained-a-deep-dive-into-kernel-based-virtual-machine-technology": "good"
+  "https://www.serverspan.com/en/blog/kvm-explained-a-deep-dive-into-kernel-based-virtual-machine-technology": "good",
+  "https://www.domainindia.com/client/knowledgebase/453/An-In-Depth-Guide-to-Implementing-Kernel-based-Virtual-Machine-KVM-on-Linux.html": "bad"
 }
