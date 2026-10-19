@@ -741,6 +741,161 @@ button {
   opacity: 1;
 }
 
+/* Results Header & Rating Filter Bar */
+.results-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding: 0.25rem 0;
+}
+
+.results-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.rating-filter-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--filter-bg);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  gap: 3px;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.32rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.filter-pill:hover {
+  color: var(--text-primary);
+  background: var(--neutral-bg);
+}
+
+.filter-pill .pill-count {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--btn-secondary-bg);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border-color);
+  transition: all 0.18s ease;
+}
+
+/* Filter Pill Active States */
+.filter-pill.active {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-weight: 600;
+  border-color: var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.filter-pill.active .pill-count {
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border-color: transparent;
+}
+
+.filter-pill.good:hover {
+  color: #16a34a;
+}
+[data-theme="dark"] .filter-pill.good:hover {
+  color: #4ade80;
+}
+
+.filter-pill.good.active {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #16a34a;
+}
+[data-theme="dark"] .filter-pill.good.active {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.55);
+  color: #4ade80;
+}
+.filter-pill.good.active .pill-count {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.filter-pill.bad:hover {
+  color: #dc2626;
+}
+[data-theme="dark"] .filter-pill.bad:hover {
+  color: #f87171;
+}
+
+.filter-pill.bad.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #dc2626;
+}
+[data-theme="dark"] .filter-pill.bad.active {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.55);
+  color: #f87171;
+}
+.filter-pill.bad.active .pill-count {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.filter-pill.unvisited.active {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-primary);
+}
+
+.filter-pill:active {
+  transform: scale(0.96);
+}
+
+/* Empty Filter State */
+.empty-filter-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  margin: 1.5rem 0;
+}
+
 /* YouTube Video Card in Multi-Card Grid */
 .yt-card-content {
   display: flex;
