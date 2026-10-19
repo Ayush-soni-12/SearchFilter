@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -15,6 +15,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showHidden, setShowHidden] = useState(false);
+  const [ratingFilter, setRatingFilter] = useState('all'); // 'all' | 'good' | 'bad' | 'unvisited'
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
@@ -26,15 +27,29 @@ function App() {
   const [blockedChannels, setBlockedChannels] = useState(() => {
     try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
   });
-  const [visitedUrls, setVisitedUrls] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('visitedResults') || '[]'); } catch { return []; }
+  const [resourceRatings, setResourceRatings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('resourceRatings');
+      if (stored) return JSON.parse(stored);
+      const legacy = JSON.parse(localStorage.getItem('visitedResults') || '[]');
+      const initial = {};
+      legacy.forEach(url => { initial[url] = 'good'; });
+      return initial;
+    } catch {
+      return {};
+    }
   });
 
-  const handleVisitedToggle = (url) => {
+  const handleRatingChange = (url, rating) => {
     if (!url) return;
-    setVisitedUrls(prev => {
-      const next = prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url];
-      localStorage.setItem('visitedResults', JSON.stringify(next));
+    setResourceRatings(prev => {
+      const next = { ...prev };
+      if (!rating || next[url] === rating) {
+        delete next[url];
+      } else {
+        next[url] = rating;
+      }
+      localStorage.setItem('resourceRatings', JSON.stringify(next));
       return next;
     });
   };
@@ -122,6 +137,7 @@ function App() {
     setErrorMsg('');
     setActivePage('results');
     setShowHidden(false);
+    setRatingFilter('all');
     setIsFromBookmarks(false);
     setNextContinuationToken(null);
     setApiKey(null);
@@ -437,8 +453,75 @@ function App() {
                 const visibleResults = results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid');
                 const hiddenResults = results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid');
                 
+                const goodCount = visibleResults.filter(r => resourceRatings[r.url] === 'good').length;
+                const badCount = visibleResults.filter(r => resourceRatings[r.url] === 'bad').length;
+                const unvisitedCount = visibleResults.filter(r => !resourceRatings[r.url]).length;
+
+                const displayedResults = visibleResults.filter(r => {
+                  if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
+                  if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
+                  if (ratingFilter === 'unvisited') return !resourceRatings[r.url];
+                  return true;
+                });
+
                 return (
                   <>
+                    <div className="results-header-bar">
+                      <div className="results-count-badge">
+                        Showing {displayedResults.length} of {visibleResults.length} results
+                        {ratingFilter !== 'all' && (
+                          <span className="active-filter-tag">
+                            Filtered by: {ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="rating-filter-group" role="tablist" aria-label="Filter results by rating">
+                        <button
+                          type="button"
+                          className={`filter-pill ${ratingFilter === 'all' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter('all')}
+                          title="Show all results"
+                        >
+                          <span>All</span>
+                          <span className="pill-count">{visibleResults.length}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`filter-pill good ${ratingFilter === 'good' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'good' ? 'all' : 'good')}
+                          title="Show only Good results (hides bad & not visited)"
+                        >
+                          <ThumbsUp size={12} strokeWidth={ratingFilter === 'good' ? 2.5 : 1.8} fill={ratingFilter === 'good' ? 'currentColor' : 'none'} />
+                          <span>Good</span>
+                          <span className="pill-count">{goodCount}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`filter-pill bad ${ratingFilter === 'bad' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'bad' ? 'all' : 'bad')}
+                          title="Show only Bad results (hides good & not visited)"
+                        >
+                          <ThumbsDown size={12} strokeWidth={ratingFilter === 'bad' ? 2.5 : 1.8} fill={ratingFilter === 'bad' ? 'currentColor' : 'none'} />
+                          <span>Bad</span>
+                          <span className="pill-count">{badCount}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`filter-pill unvisited ${ratingFilter === 'unvisited' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'unvisited' ? 'all' : 'unvisited')}
+                          title="Show only resources not visited yet (hides good & bad)"
+                        >
+                          <EyeOff size={12} />
+                          <span>Not Visited</span>
+                          <span className="pill-count">{unvisitedCount}</span>
+                        </button>
+                      </div>
+                    </div>
+
                     {hiddenResults.length > 0 && (
                       <div className="hidden-results-container">
                         <button 
@@ -458,8 +541,8 @@ function App() {
                                 onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                                 isBookmarked={isBookmarked(result.url)}
                                 onBookmarkToggle={() => handleBookmarkToggle(result)}
-                                isVisited={visitedUrls.includes(result.url)}
-                                onVisitedToggle={() => handleVisitedToggle(result.url)}
+                                rating={resourceRatings[result.url] || null}
+                                onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                               />
                             ))}
                           </div>
@@ -467,22 +550,37 @@ function App() {
                       </div>
                     )}
 
-                    <div className="results-grid">
-                      {visibleResults.map((result, i) => (
-                        <ResultCard
-                          key={result.url + i}
-                          result={result}
-                          currentPref={preferences[result.domain] || 'neutral'}
-                          onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
-                          isBookmarked={isBookmarked(result.url)}
-                          onBookmarkToggle={() => handleBookmarkToggle(result)}
-                          isVisited={visitedUrls.includes(result.url)}
-                          onVisitedToggle={() => handleVisitedToggle(result.url)}
-                          onBlockChannel={result.isYouTube ? blockChannel : undefined}
-                          blockedChannels={blockedChannels}
-                        />
-                      ))}
-                    </div>
+                    {displayedResults.length === 0 ? (
+                      <div className="empty-filter-state animate-slide-up">
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                          No results found matching the <strong>"{ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter}"</strong> filter.
+                        </p>
+                        <button 
+                          className="secondary-btn" 
+                          onClick={() => setRatingFilter('all')}
+                          style={{ marginTop: '0.85rem', padding: '0.45rem 1rem', borderRadius: '6px' }}
+                        >
+                          Reset Filter (Show all {visibleResults.length} results)
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="results-grid">
+                        {displayedResults.map((result, i) => (
+                          <ResultCard
+                            key={result.url + i}
+                            result={result}
+                            currentPref={preferences[result.domain] || 'neutral'}
+                            onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
+                            isBookmarked={isBookmarked(result.url)}
+                            onBookmarkToggle={() => handleBookmarkToggle(result)}
+                            rating={resourceRatings[result.url] || null}
+                            onRatingChange={(rating) => handleRatingChange(result.url, rating)}
+                            onBlockChannel={result.isYouTube ? blockChannel : undefined}
+                            blockedChannels={blockedChannels}
+                          />
+                        ))}
+                      </div>
+                    )}
 
                     {/* Pagination & Infinite Scroll Controls */}
                     {isLoadingMore && (
@@ -534,8 +632,8 @@ function App() {
                       onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                       isBookmarked={true}
                       onBookmarkToggle={() => handleRemoveBookmark(result.url)}
-                      isVisited={visitedUrls.includes(result.url)}
-                      onVisitedToggle={() => handleVisitedToggle(result.url)}
+                      rating={resourceRatings[result.url] || null}
+                      onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                     />
                   ))}
                 </div>

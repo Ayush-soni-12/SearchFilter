@@ -1,4 +1,4 @@
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, Check } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 export default function ResultCard({
   result,
@@ -6,18 +6,20 @@ export default function ResultCard({
   onPreferenceChange,
   isBookmarked,
   onBookmarkToggle,
-  isVisited,
-  onVisitedToggle,
+  rating,
+  onRatingChange,
   onBlockChannel,
   blockedChannels = []
 }) {
+  const ratingClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : '';
+
   if (result.engine === 'hackernews' || result.isHackerNews) {
     const formattedDate = result.createdAt
       ? new Date(result.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       : null;
 
     return (
-      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
+      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
         <div>
           <div className="result-header">
             <div className="result-header-main">
@@ -37,16 +39,27 @@ export default function ResultCard({
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
-              {onVisitedToggle && (
-                <button
-                  type="button"
-                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
-                  onClick={onVisitedToggle}
-                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
-                >
-                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
-                  <span>Visited</span>
-                </button>
+              {onRatingChange && (
+                <div className="rating-btn-group">
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn like-btn ${rating === 'good' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'good' ? null : 'good')}
+                    title={rating === 'good' ? 'Good resource (click to remove)' : 'Rate as good resource'}
+                  >
+                    <ThumbsUp size={13} strokeWidth={rating === 'good' ? 2.5 : 1.8} fill={rating === 'good' ? 'currentColor' : 'none'} />
+                    <span>Good</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn dislike-btn ${rating === 'bad' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'bad' ? null : 'bad')}
+                    title={rating === 'bad' ? 'Bad resource (click to remove)' : 'Rate as bad resource'}
+                  >
+                    <ThumbsDown size={13} strokeWidth={rating === 'bad' ? 2.5 : 1.8} fill={rating === 'bad' ? 'currentColor' : 'none'} />
+                    <span>Bad</span>
+                  </button>
+                </div>
               )}
               {result.hnUrl && (
                 <a href={result.hnUrl} target="_blank" rel="noopener noreferrer" className="open-btn">
@@ -94,7 +107,7 @@ export default function ResultCard({
 
   if (result.isGitHub) {
     return (
-      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
+      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
         <div>
           <div className="result-header">
             <div className="result-header-main" style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
@@ -125,16 +138,27 @@ export default function ResultCard({
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
-              {onVisitedToggle && (
-                <button
-                  type="button"
-                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
-                  onClick={onVisitedToggle}
-                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
-                >
-                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
-                  <span>Visited</span>
-                </button>
+              {onRatingChange && (
+                <div className="rating-btn-group">
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn like-btn ${rating === 'good' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'good' ? null : 'good')}
+                    title={rating === 'good' ? 'Good resource (click to remove)' : 'Rate as good resource'}
+                  >
+                    <ThumbsUp size={13} strokeWidth={rating === 'good' ? 2.5 : 1.8} fill={rating === 'good' ? 'currentColor' : 'none'} />
+                    <span>Good</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn dislike-btn ${rating === 'bad' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'bad' ? null : 'bad')}
+                    title={rating === 'bad' ? 'Bad resource (click to remove)' : 'Rate as bad resource'}
+                  >
+                    <ThumbsDown size={13} strokeWidth={rating === 'bad' ? 2.5 : 1.8} fill={rating === 'bad' ? 'currentColor' : 'none'} />
+                    <span>Bad</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -173,7 +197,7 @@ export default function ResultCard({
 
   if (result.isYouTube) {
     return (
-      <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
+      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
         <div className="yt-card-content">
           <div>
             {/* Thumbnail preview with image outline overlay */}
@@ -231,16 +255,27 @@ export default function ResultCard({
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
-              {onVisitedToggle && (
-                <button
-                  type="button"
-                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
-                  onClick={onVisitedToggle}
-                  title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
-                >
-                  <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
-                  <span>Visited</span>
-                </button>
+              {onRatingChange && (
+                <div className="rating-btn-group" style={{ width: 'auto' }}>
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn like-btn ${rating === 'good' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'good' ? null : 'good')}
+                    title={rating === 'good' ? 'Good resource (click to remove)' : 'Rate as good resource'}
+                  >
+                    <ThumbsUp size={13} strokeWidth={rating === 'good' ? 2.5 : 1.8} fill={rating === 'good' ? 'currentColor' : 'none'} />
+                    <span>Good</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`action-btn rating-btn dislike-btn ${rating === 'bad' ? 'active' : ''}`}
+                    onClick={() => onRatingChange(rating === 'bad' ? null : 'bad')}
+                    title={rating === 'bad' ? 'Bad resource (click to remove)' : 'Rate as bad resource'}
+                  >
+                    <ThumbsDown size={13} strokeWidth={rating === 'bad' ? 2.5 : 1.8} fill={rating === 'bad' ? 'currentColor' : 'none'} />
+                    <span>Bad</span>
+                  </button>
+                </div>
               )}
               {onBlockChannel && result.channelName && (() => {
                 const isBlocked = blockedChannels.includes(result.channelName);
@@ -271,7 +306,7 @@ export default function ResultCard({
   }
 
   return (
-    <div className={`result-card vercel-card animate-slide-up${isVisited ? ' is-visited' : ''}`}>
+    <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
       <div>
         <div className="result-header">
           <div className="result-header-main">
@@ -294,16 +329,27 @@ export default function ResultCard({
                 <span>{isBookmarked ? 'Saved' : 'Save'}</span>
               </button>
             )}
-            {onVisitedToggle && (
-              <button
-                type="button"
-                className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
-                onClick={onVisitedToggle}
-                title={isVisited ? 'Visited & used (click to uncheck)' : 'Mark as visited & used'}
-              >
-                <Check size={14} strokeWidth={isVisited ? 2.5 : 1.8} />
-                <span>Visited</span>
-              </button>
+            {onRatingChange && (
+              <div className="rating-btn-group">
+                <button
+                  type="button"
+                  className={`action-btn rating-btn like-btn ${rating === 'good' ? 'active' : ''}`}
+                  onClick={() => onRatingChange(rating === 'good' ? null : 'good')}
+                  title={rating === 'good' ? 'Good resource (click to remove)' : 'Rate as good resource'}
+                >
+                  <ThumbsUp size={13} strokeWidth={rating === 'good' ? 2.5 : 1.8} fill={rating === 'good' ? 'currentColor' : 'none'} />
+                  <span>Good</span>
+                </button>
+                <button
+                  type="button"
+                  className={`action-btn rating-btn dislike-btn ${rating === 'bad' ? 'active' : ''}`}
+                  onClick={() => onRatingChange(rating === 'bad' ? null : 'bad')}
+                  title={rating === 'bad' ? 'Bad resource (click to remove)' : 'Rate as bad resource'}
+                >
+                  <ThumbsDown size={13} strokeWidth={rating === 'bad' ? 2.5 : 1.8} fill={rating === 'bad' ? 'currentColor' : 'none'} />
+                  <span>Bad</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
