@@ -26,6 +26,8 @@
   - `GET/POST/DELETE /api/history`: Recent search history management.
 - [`backend/routes/bookmarksRoutes.js`](file:///home/username_anna/Desktop/SearchFilter/backend/routes/bookmarksRoutes.js) → [`backend/controllers/bookmarksController.js`](file:///home/username_anna/Desktop/SearchFilter/backend/controllers/bookmarksController.js):
   - `GET/POST/DELETE /api/bookmarks`: Saved result bookmarks.
+- [`backend/routes/ratingsRoutes.js`](file:///home/username_anna/Desktop/SearchFilter/backend/routes/ratingsRoutes.js) → [`backend/controllers/ratingsController.js`](file:///home/username_anna/Desktop/SearchFilter/backend/controllers/ratingsController.js):
+  - `GET/POST /api/ratings`, `POST /api/ratings/sync`: Good/Bad resource rating persistence (`ratings.json`).
 
 ### Services (`/backend/services`)
 - [`searchProviderFactory.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/searchProviderFactory.js): Factory returning provider instance by name (`google`, `duckduckgo`, `brave`, `github`, `hn`, `youtube`).
@@ -38,7 +40,7 @@
   - [`youtubeSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/youtubeSearchService.js): YouTube search with durations and metadata.
 - **Support Services**:
   - [`cacheService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/cacheService.js): File-based query caching in `backend/searchCache/`.
-  - [`storageService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/storageService.js): Local JSON persistence (`history.json`, `bookmarks.json`, `preferences.json`).
+  - [`storageService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/storageService.js): Local JSON persistence (`history.json`, `bookmarks.json`, `preferences.json`, `ratings.json`).
   - [`preferenceEngine.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/preferenceEngine.js): Re-ranks and filters search results against user preferences.
 
 ---
@@ -79,9 +81,10 @@
                      └── returns JSON results to [App.jsx] -> renders [ResultCard.jsx]
 ```
 
-### Preference & Bookmark Flow
+### Preference, Bookmark & Rating Flow
 - User actions in `SearchBar.jsx` or `ResultCard.jsx` trigger calls in `api.js`.
-- Updates persist to `backend/bookmarks.json` or `backend/preferences.json` via `storageService.js`.
+- Updates persist to `backend/bookmarks.json`, `backend/preferences.json`, or `backend/ratings.json` via `storageService.js`.
+- Ratings use a hybrid offline-first flow: optimistic instant update to `localStorage` + background async sync to `ratings.json`.
 
 ---
 

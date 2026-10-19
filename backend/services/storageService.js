@@ -7,6 +7,7 @@ const PREFERENCES_FILE = path.join(__dirname, '../preferences.json');
 const HISTORY_FILE = path.join(__dirname, '../history.json');
 
 const BOOKMARKS_FILE = path.join(__dirname, '../bookmarks.json');
+const RATINGS_FILE = path.join(__dirname, '../ratings.json');
 
 const readJsonFile = async (filePath, defaultData) => {
   try {
@@ -124,6 +125,35 @@ export const storageService = {
       }
     }
     return results;
+  },
+
+  getRatings: async () => readJsonFile(RATINGS_FILE, {}),
+  setRating: async ({ url, rating }) => {
+    if (!url) return await readJsonFile(RATINGS_FILE, {});
+    const ratings = await readJsonFile(RATINGS_FILE, {});
+    if (!rating) {
+      delete ratings[url];
+    } else {
+      ratings[url] = rating;
+    }
+    await writeJsonFile(RATINGS_FILE, ratings);
+    return ratings;
+  },
+  syncRatings: async (ratingsMap = {}) => {
+    const ratings = await readJsonFile(RATINGS_FILE, {});
+    let modified = false;
+    for (const [url, rating] of Object.entries(ratingsMap)) {
+      if (url && (rating === 'good' || rating === 'bad')) {
+        if (!ratings[url]) {
+          ratings[url] = rating;
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      await writeJsonFile(RATINGS_FILE, ratings);
+    }
+    return ratings;
   }
 };
 

@@ -42,15 +42,23 @@ function App() {
 
   const handleRatingChange = (url, rating) => {
     if (!url) return;
+    const targetRating = (!rating || resourceRatings[url] === rating) ? null : rating;
+
+    // 1. Instant optimistic update in React state + localStorage (0ms)
     setResourceRatings(prev => {
       const next = { ...prev };
-      if (!rating || next[url] === rating) {
+      if (!targetRating) {
         delete next[url];
       } else {
-        next[url] = rating;
+        next[url] = targetRating;
       }
       localStorage.setItem('resourceRatings', JSON.stringify(next));
       return next;
+    });
+
+    // 2. Background sync to backend disk storage
+    api.setRating(url, targetRating).catch(err => {
+      console.warn('Failed to sync rating to server:', err);
     });
   };
 
@@ -87,6 +95,23 @@ function App() {
     api.getPreferences().then(setPreferences).catch(console.error);
     api.getHistory(activeEngine).then(setHistory).catch(console.error);
     api.getBookmarks().then(setBookmarks).catch(console.error);
+
+    // Initial ratings sync: fetch backend ratings and merge with local ratings
+    api.getRatings().then(serverRatings => {
+      setResourceRatings(prev => {
+        const merged = { ...serverRatings, ...prev };
+        localStorage.setItem('resourceRatings', JSON.stringify(merged));
+        
+        // If client had local ratings that server didn't have yet, sync them up
+        const needsSync = Object.keys(prev).some(url => !serverRatings[url]);
+        if (needsSync) {
+          api.syncRatings(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server ratings, using local ratings:', err);
+    });
   }, []);
 
   // Re-fetch history whenever the active engine changes

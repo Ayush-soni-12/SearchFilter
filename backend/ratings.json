@@ -1,0 +1,20 @@
+{
+  "https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine": "good",
+  "https://www.virtuwa.com/en/blog/what-is-kvm-hypervisor": "good",
+  "https://www.pandastack.ai/blog/kvm-explained-for-developers/": "good",
+  "https://docs.kernel.org/virt/kvm/api.html": "bad",
+  "https://techexplorer42.medium.com/going-through-linux-kvm-kernel-base-virtual-machine-d15b5dbf10f4": "good",
+  "https://docs.kernel.org/virt/index.html": "bad",
+  "https://documentation.suse.com/sles/12-SP5/html/SLES-all/cha-kvm-intro.html": "bad",
+  "https://medium.com/@boutnaru/the-linux-concept-journey-kvm-kernel-based-virtual-machine-48ae7b2e89e3": "bad",
+  "https://stackoverflow.com/questions/77954323/what-is-dev-kvm-device-in-kvm-virtualization": "bad",
+  "https://linux-kvm.org/page/Main_Page": "bad",
+  "https://docs.kernel.org/virt/kvm/index.html": "bad",
+  "https://www.kernel.org/doc/ols/2007/ols2007v1-pages-225-230.pdf": "good",
+  "https://www.kernel.org/doc/html/v6.3/virt/kvm/api.html": "bad",
+  "https://en.wikipedia.org/wiki/Kernel-based_virtual_machine": "good",
+  "https://linuxcommandlibrary.com/man/kvm": "bad",
+  "https://www.redhat.com/en/topics/virtualization/what-is-KVM": "bad",
+  "https://www.linuxjournal.com/article/9764": "good",
+  "https://www.serverspan.com/en/blog/kvm-explained-a-deep-dive-into-kernel-based-virtual-machine-technology": "good"
+}
