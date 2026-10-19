@@ -60,7 +60,7 @@
   - Search history dropdown with quick-clear and re-query.
 - [`ResultCard.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/ResultCard.jsx):
   - Polymorphic card renderer tailored by result type (Web, YouTube video with duration, GitHub repo with stars/languages, Hacker News story with points).
-  - Bookmark toggle (`Save`/`Saved`) and Visited toggle (`Visited`).
+  - Bookmark toggle (`Save`/`Saved`) and Good/Bad resource rating buttons (`👍 Good`/`👎 Bad`) with card border feedback.
 
 ---
 

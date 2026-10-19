@@ -26,15 +26,29 @@ function App() {
   const [blockedChannels, setBlockedChannels] = useState(() => {
     try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
   });
-  const [visitedUrls, setVisitedUrls] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('visitedResults') || '[]'); } catch { return []; }
+  const [resourceRatings, setResourceRatings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('resourceRatings');
+      if (stored) return JSON.parse(stored);
+      const legacy = JSON.parse(localStorage.getItem('visitedResults') || '[]');
+      const initial = {};
+      legacy.forEach(url => { initial[url] = 'good'; });
+      return initial;
+    } catch {
+      return {};
+    }
   });
 
-  const handleVisitedToggle = (url) => {
+  const handleRatingChange = (url, rating) => {
     if (!url) return;
-    setVisitedUrls(prev => {
-      const next = prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url];
-      localStorage.setItem('visitedResults', JSON.stringify(next));
+    setResourceRatings(prev => {
+      const next = { ...prev };
+      if (!rating || next[url] === rating) {
+        delete next[url];
+      } else {
+        next[url] = rating;
+      }
+      localStorage.setItem('resourceRatings', JSON.stringify(next));
       return next;
     });
   };
@@ -458,8 +472,8 @@ function App() {
                                 onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                                 isBookmarked={isBookmarked(result.url)}
                                 onBookmarkToggle={() => handleBookmarkToggle(result)}
-                                isVisited={visitedUrls.includes(result.url)}
-                                onVisitedToggle={() => handleVisitedToggle(result.url)}
+                                rating={resourceRatings[result.url] || null}
+                                onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                               />
                             ))}
                           </div>
@@ -476,8 +490,8 @@ function App() {
                           onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                           isBookmarked={isBookmarked(result.url)}
                           onBookmarkToggle={() => handleBookmarkToggle(result)}
-                          isVisited={visitedUrls.includes(result.url)}
-                          onVisitedToggle={() => handleVisitedToggle(result.url)}
+                          rating={resourceRatings[result.url] || null}
+                          onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                           onBlockChannel={result.isYouTube ? blockChannel : undefined}
                           blockedChannels={blockedChannels}
                         />
@@ -534,8 +548,8 @@ function App() {
                       onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                       isBookmarked={true}
                       onBookmarkToggle={() => handleRemoveBookmark(result.url)}
-                      isVisited={visitedUrls.includes(result.url)}
-                      onVisitedToggle={() => handleVisitedToggle(result.url)}
+                      rating={resourceRatings[result.url] || null}
+                      onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                     />
                   ))}
                 </div>
