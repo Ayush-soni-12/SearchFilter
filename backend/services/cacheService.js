@@ -287,7 +287,13 @@ export const cacheService = {
       const now = Date.now();
       const cachePath = path.join(CACHE_DIR, `${id}.json`);
       
-      await fs.writeFile(cachePath, JSON.stringify(results, null, 2), 'utf-8');
+      const payload = {
+        results: Array.isArray(results) ? results : [],
+        nextContinuationToken: options.nextContinuationToken || null,
+        apiKey: options.apiKey || null
+      };
+
+      await fs.writeFile(cachePath, JSON.stringify(payload, null, 2), 'utf-8');
       
       const index = await readIndex();
       index[id] = {
@@ -304,6 +310,50 @@ export const cacheService = {
     } catch (err) {
       console.warn('Cache save warning (continuing search without throwing):', err.message);
       return null;
+    }
+  },
+
+  appendCache: async (id, newResults, options = {}) => {
+    try {
+      if (!id) return false;
+      await ensureCacheDir();
+      const cachePath = path.join(CACHE_DIR, `${id}.json`);
+      let existingData;
+      try {
+        const raw = await fs.readFile(cachePath, 'utf-8');
+        existingData = JSON.parse(raw);
+      } catch {
+        return false;
+      }
+
+      let existingResults = [];
+      if (Array.isArray(existingData)) {
+        existingResults = existingData;
+      } else if (existingData && Array.isArray(existingData.results)) {
+        existingResults = existingData.results;
+      }
+
+      // Deduplicate by URL
+      const seenUrls = new Set(existingResults.map(r => r.url));
+      const appended = [...existingResults];
+      for (const item of (newResults || [])) {
+        if (item && item.url && !seenUrls.has(item.url)) {
+          seenUrls.add(item.url);
+          appended.push(item);
+        }
+      }
+
+      const payload = {
+        results: appended,
+        nextContinuationToken: options.nextContinuationToken !== undefined ? options.nextContinuationToken : (existingData.nextContinuationToken || null),
+        apiKey: options.apiKey || (existingData && existingData.apiKey) || null
+      };
+
+      await fs.writeFile(cachePath, JSON.stringify(payload, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.warn('Cache append warning (continuing search without throwing):', err.message);
+      return false;
     }
   },
 

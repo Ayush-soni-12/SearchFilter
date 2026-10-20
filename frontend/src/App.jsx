@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -24,6 +24,7 @@ function App() {
   const [nextContinuationToken, setNextContinuationToken] = useState(null);
   const [apiKey, setApiKey] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [currentCacheId, setCurrentCacheId] = useState(null);
   const [blockedChannels, setBlockedChannels] = useState(() => {
     try { return JSON.parse(localStorage.getItem('blockedChannels') || '[]'); } catch { return []; }
   });
@@ -42,15 +43,23 @@ function App() {
 
   const handleRatingChange = (url, rating) => {
     if (!url) return;
+    const targetRating = (!rating || resourceRatings[url] === rating) ? null : rating;
+
+    // 1. Instant optimistic update in React state + localStorage (0ms)
     setResourceRatings(prev => {
       const next = { ...prev };
-      if (!rating || next[url] === rating) {
+      if (!targetRating) {
         delete next[url];
       } else {
-        next[url] = rating;
+        next[url] = targetRating;
       }
       localStorage.setItem('resourceRatings', JSON.stringify(next));
       return next;
+    });
+
+    // 2. Background sync to backend disk storage
+    api.setRating(url, targetRating).catch(err => {
+      console.warn('Failed to sync rating to server:', err);
     });
   };
 
@@ -87,6 +96,23 @@ function App() {
     api.getPreferences().then(setPreferences).catch(console.error);
     api.getHistory(activeEngine).then(setHistory).catch(console.error);
     api.getBookmarks().then(setBookmarks).catch(console.error);
+
+    // Initial ratings sync: fetch backend ratings and merge with local ratings
+    api.getRatings().then(serverRatings => {
+      setResourceRatings(prev => {
+        const merged = { ...serverRatings, ...prev };
+        localStorage.setItem('resourceRatings', JSON.stringify(merged));
+        
+        // If client had local ratings that server didn't have yet, sync them up
+        const needsSync = Object.keys(prev).some(url => !serverRatings[url]);
+        if (needsSync) {
+          api.syncRatings(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server ratings, using local ratings:', err);
+    });
   }, []);
 
   // Re-fetch history whenever the active engine changes
@@ -118,6 +144,7 @@ function App() {
         }
         setNextContinuationToken(data.nextContinuationToken || null);
         if (data.apiKey) setApiKey(data.apiKey);
+        if (data.cacheId) setCurrentCacheId(data.cacheId);
       } catch (error) {
         console.error('Continuation search error:', error);
       } finally {
@@ -142,6 +169,9 @@ function App() {
     setNextContinuationToken(null);
     setApiKey(null);
     setIsLoadingMore(false);
+    if (!options.isContinuation && !options.useCacheId) {
+      setCurrentCacheId(null);
+    }
     
     try {
       const searchOptions = { ...lastOptions, ...options, engine: engineToUse };
@@ -156,6 +186,8 @@ function App() {
       setResults(data.results || []);
       setNextContinuationToken(data.nextContinuationToken || null);
       if (data.apiKey) setApiKey(data.apiKey);
+      if (data.cacheId) setCurrentCacheId(data.cacheId);
+      else if (options.useCacheId) setCurrentCacheId(options.useCacheId);
       setIsFromBookmarks(!!data.fromBookmarks);
       if (options.useCacheId && cacheNotification) {
         setActiveCache(cacheNotification);
@@ -178,31 +210,25 @@ function App() {
       ...lastOptions,
       isContinuation: true,
       continuationToken: nextContinuationToken,
-      apiKey: apiKey
+      apiKey: apiKey,
+      cacheId: currentCacheId
     });
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (activePage !== 'results' || !nextContinuationToken || isLoadingMore || isLoading) return;
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.offsetHeight - 600;
-      if (scrollPosition >= threshold) {
-        handleLoadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey]);
 
   const proceedWithCache = () => {
     handleSearch(query, { ...lastOptions, useCacheId: cacheNotification.id, engine: activeEngine });
     setCacheNotification(null);
   };
 
-  const forceSearchAnyway = () => {
+  const forceSearchAnyway = async () => {
+    if (cacheNotification?.id) {
+      try {
+        await api.deleteCache(cacheNotification.id);
+      } catch (err) {
+        console.warn('Failed to delete old cache on search anyway:', err);
+      }
+    }
+    setCurrentCacheId(null);
     handleSearch(query, { ...lastOptions, forceSearch: true, engine: activeEngine });
     setCacheNotification(null);
   };
@@ -591,18 +617,24 @@ function App() {
                     )}
 
                     {!isLoadingMore && nextContinuationToken && (
-                      <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '1.5rem' }}>
+                      <div className="load-more-prompt animate-slide-up">
+                        <p className="load-more-prompt-text">
+                          You've reached the end of these results. Would you like to fetch more?
+                        </p>
                         <button 
-                          className="secondary-btn" 
+                          type="button"
+                          className="primary-btn load-more-btn" 
                           onClick={handleLoadMore}
-                          style={{
-                            padding: '0.65rem 1.75rem',
-                            borderRadius: '8px',
-                            fontWeight: '600'
-                          }}
                         >
-                          Load More Results
+                          <ArrowDown size={15} />
+                          <span>Yes, Fetch More Results</span>
                         </button>
+                      </div>
+                    )}
+
+                    {!isLoadingMore && !nextContinuationToken && displayedResults.length > 0 && (
+                      <div className="end-of-results-notice animate-slide-up">
+                        <span>End of results</span>
                       </div>
                     )}
                   </>

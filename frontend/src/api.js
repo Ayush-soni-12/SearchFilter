@@ -26,6 +26,7 @@ export const api = {
     if (options.cleanWeb !== undefined) url += `&cleanWeb=${encodeURIComponent(options.cleanWeb)}`;
     if (options.antiSeo !== undefined) url += `&antiSeo=${encodeURIComponent(options.antiSeo)}`;
     if (options.blacklistedDomains) url += `&blacklistedDomains=${encodeURIComponent(options.blacklistedDomains)}`;
+    if (options.cacheId) url += `&cacheId=${encodeURIComponent(options.cacheId)}`;
     
     const res = await fetch(url);
     if (!res.ok) throw new Error('Search failed');
@@ -89,6 +90,29 @@ export const api = {
       body: JSON.stringify({ url })
     });
     if (!res.ok) throw new Error('Failed to remove bookmark');
+    return res.json();
+  },
+  getRatings: async () => {
+    const res = await fetch(`${API_BASE}/ratings`);
+    if (!res.ok) throw new Error('Failed to get ratings');
+    return res.json();
+  },
+  setRating: async (url, rating) => {
+    const res = await fetch(`${API_BASE}/ratings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, rating })
+    });
+    if (!res.ok) throw new Error('Failed to set rating');
+    return res.json();
+  },
+  syncRatings: async (ratings) => {
+    const res = await fetch(`${API_BASE}/ratings/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ratings })
+    });
+    if (!res.ok) throw new Error('Failed to sync ratings');
     return res.json();
   }
 };

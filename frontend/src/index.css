@@ -896,6 +896,62 @@ button {
   margin: 1.5rem 0;
 }
 
+/* Load More Confirmation Prompt */
+.load-more-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.75rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-width: 480px;
+  margin: 2.5rem auto 1.5rem auto;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.load-more-prompt-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.load-more-btn:hover {
+  transform: translateY(-1px);
+}
+
+.load-more-btn:active {
+  transform: scale(0.98);
+}
+
+.end-of-results-notice {
+  text-align: center;
+  padding: 2.5rem 0 1rem 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
 /* YouTube Video Card in Multi-Card Grid */
 .yt-card-content {
   display: flex;
