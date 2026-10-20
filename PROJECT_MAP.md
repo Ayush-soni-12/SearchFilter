@@ -9,6 +9,7 @@
 - **Backend**: Node.js + Express (ES Modules) running on `http://localhost:4001`.
 - **Frontend**: React 18 + Vite running on `http://localhost:5173`.
 - **Styling**: Vanilla CSS with CSS variables (`index.css`), light/dark themes (`data-theme`).
+- **Active Specification**: [`noise_reduction_architecture_plan.md`](file:///home/username_anna/Desktop/SearchFilter/noise_reduction_architecture_plan.md) — 5-phase plan for paywall shields, primary source engines, pre-flight content screeners, and anti-echo chamber deduplication.
 
 ---
 
