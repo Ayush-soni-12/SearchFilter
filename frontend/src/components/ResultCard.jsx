@@ -1,4 +1,4 @@
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock } from 'lucide-react';
 
 export default function ResultCard({
   result,
@@ -8,6 +8,8 @@ export default function ResultCard({
   onBookmarkToggle,
   rating,
   onRatingChange,
+  isPaywalledByUser = false,
+  onTogglePaywall,
   onBlockChannel,
   blockedChannels = []
 }) {
@@ -313,22 +315,43 @@ export default function ResultCard({
             <a href={result.url} target="_blank" rel="noopener noreferrer" className="yt-title-link">
               <h3 className="result-title">{result.title}</h3>
             </a>
-            <div className="result-domain">
+            <div className="result-domain" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.45rem' }}>
               <span>{result.domain}</span>
+              {isPaywalledByUser && (
+                <span 
+                  className="paywall-badge manual" 
+                  title="You flagged this resource as paywalled"
+                >
+                  <Lock size={11} />
+                  <span>Paywalled</span>
+                </span>
+              )}
             </div>
           </div>
           <div className="result-header-actions">
-            {onBookmarkToggle && (
-              <button 
-                type="button"
-                className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
-                onClick={onBookmarkToggle}
-                title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
-              >
-                {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
-                <span>{isBookmarked ? 'Saved' : 'Save'}</span>
-              </button>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              {onBookmarkToggle && (
+                <button 
+                  type="button"
+                  className={`action-btn bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
+                  onClick={onBookmarkToggle}
+                  title={isBookmarked ? 'Remove Bookmark' : 'Bookmark result'}
+                >
+                  {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                  <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+                </button>
+              )}
+              {onTogglePaywall && (
+                <button
+                  type="button"
+                  className={`action-icon-mini-btn paywall-toggle-btn ${isPaywalledByUser ? 'active' : ''}`}
+                  onClick={onTogglePaywall}
+                  title={isPaywalledByUser ? 'Flagged as paywalled (click to unflag)' : 'Flag this link as paywalled'}
+                >
+                  <Lock size={12} strokeWidth={isPaywalledByUser ? 2.5 : 1.8} fill={isPaywalledByUser ? 'currentColor' : 'none'} />
+                </button>
+              )}
+            </div>
             {onRatingChange && (
               <div className="rating-btn-group">
                 <button

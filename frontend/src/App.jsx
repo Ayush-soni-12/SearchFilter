@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -63,6 +63,38 @@ function App() {
     });
   };
 
+  const [userPaywalls, setUserPaywalls] = useState(() => {
+    try {
+      const stored = localStorage.getItem('userPaywalls');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleTogglePaywall = (url) => {
+    if (!url) return;
+    const isCurrentlyPaywalled = !!userPaywalls[url];
+    const newStatus = !isCurrentlyPaywalled;
+
+    // 1. Instant optimistic update (0ms)
+    setUserPaywalls(prev => {
+      const next = { ...prev };
+      if (newStatus) {
+        next[url] = true;
+      } else {
+        delete next[url];
+      }
+      localStorage.setItem('userPaywalls', JSON.stringify(next));
+      return next;
+    });
+
+    // 2. Background sync to server
+    api.setPaywall(url, newStatus).catch(err => {
+      console.warn('Failed to sync paywall flag to server:', err);
+    });
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -112,6 +144,21 @@ function App() {
       });
     }).catch(err => {
       console.warn('Could not fetch server ratings, using local ratings:', err);
+    });
+
+    // Initial paywalls sync: fetch backend paywalls and merge with local
+    api.getPaywalls().then(serverPaywalls => {
+      setUserPaywalls(prev => {
+        const merged = { ...serverPaywalls, ...prev };
+        localStorage.setItem('userPaywalls', JSON.stringify(merged));
+        const needsSync = Object.keys(prev).some(url => !serverPaywalls[url]);
+        if (needsSync) {
+          api.syncPaywalls(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server paywalls, using local paywalls:', err);
     });
   }, []);
 
@@ -569,6 +616,8 @@ function App() {
                                 onBookmarkToggle={() => handleBookmarkToggle(result)}
                                 rating={resourceRatings[result.url] || null}
                                 onRatingChange={(rating) => handleRatingChange(result.url, rating)}
+                                isPaywalledByUser={!!userPaywalls[result.url]}
+                                onTogglePaywall={() => handleTogglePaywall(result.url)}
                               />
                             ))}
                           </div>
@@ -601,6 +650,8 @@ function App() {
                             onBookmarkToggle={() => handleBookmarkToggle(result)}
                             rating={resourceRatings[result.url] || null}
                             onRatingChange={(rating) => handleRatingChange(result.url, rating)}
+                            isPaywalledByUser={!!userPaywalls[result.url]}
+                            onTogglePaywall={() => handleTogglePaywall(result.url)}
                             onBlockChannel={result.isYouTube ? blockChannel : undefined}
                             blockedChannels={blockedChannels}
                           />

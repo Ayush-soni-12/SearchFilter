@@ -882,6 +882,69 @@ button {
   color: var(--text-primary);
 }
 
+/* Paywall Badge on Result Cards (User Flagged) */
+.paywall-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.paywall-badge.manual {
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #d97706;
+}
+[data-theme="dark"] .paywall-badge.manual {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.55);
+  color: #fbbf24;
+}
+
+/* Action Icon Mini Button (e.g. small Paywall Flag) */
+.action-icon-mini-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.action-icon-mini-btn:hover {
+  background: var(--neutral-bg);
+  color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.action-icon-mini-btn.active {
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #d97706;
+}
+
+[data-theme="dark"] .action-icon-mini-btn.active {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+}
+
+.action-icon-mini-btn:active {
+  transform: scale(0.92);
+}
+
 .filter-pill:active {
   transform: scale(0.96);
 }

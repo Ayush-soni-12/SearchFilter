@@ -58,3 +58,5 @@ Last updated: 2026-10-18
 | Bookmark Action | `.bookmark-btn`: Toggle button (`Save` -> `Saved` with blue active state) allowing users to bookmark results |
 | Rating Filter Bar | `.results-header-bar` & `.rating-filter-group`: Exclusive 1-at-a-time filter pills (`All`, `Good`, `Bad`, `Not Visited`) with live count badges. Selecting one hides the rest. |
 | Pagination Prompt | `.load-more-prompt`: Manual confirmation card asking the user if they want more results before fetching. Eliminates unexpected automatic auto-scrolling fetches. |
+| Manual Paywall Flag | `.action-icon-mini-btn.paywall-toggle-btn`: Discreet 25px x 25px lock icon button in `.result-header-actions` next to Bookmark. Allows 1-click toggling of paywall status stored in `backend/paywalls.json` and synced optimistically. Flagged links display `.paywall-badge.manual` in amber next to the domain. |
+

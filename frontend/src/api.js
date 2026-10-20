@@ -114,5 +114,28 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to sync ratings');
     return res.json();
+  },
+  getPaywalls: async () => {
+    const res = await fetch(`${API_BASE}/paywalls`);
+    if (!res.ok) throw new Error('Failed to get paywalls');
+    return res.json();
+  },
+  setPaywall: async (url, isPaywalled) => {
+    const res = await fetch(`${API_BASE}/paywalls`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, isPaywalled })
+    });
+    if (!res.ok) throw new Error('Failed to set paywall flag');
+    return res.json();
+  },
+  syncPaywalls: async (paywalls) => {
+    const res = await fetch(`${API_BASE}/paywalls/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paywalls })
+    });
+    if (!res.ok) throw new Error('Failed to sync paywalls');
+    return res.json();
   }
 };

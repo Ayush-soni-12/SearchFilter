@@ -29,6 +29,8 @@
   - `GET/POST/DELETE /api/bookmarks`: Saved result bookmarks.
 - [`backend/routes/ratingsRoutes.js`](file:///home/username_anna/Desktop/SearchFilter/backend/routes/ratingsRoutes.js) → [`backend/controllers/ratingsController.js`](file:///home/username_anna/Desktop/SearchFilter/backend/controllers/ratingsController.js):
   - `GET/POST /api/ratings`, `POST /api/ratings/sync`: Good/Bad resource rating persistence (`ratings.json`).
+- [`backend/routes/paywallsRoutes.js`](file:///home/username_anna/Desktop/SearchFilter/backend/routes/paywallsRoutes.js) → [`backend/controllers/paywallsController.js`](file:///home/username_anna/Desktop/SearchFilter/backend/controllers/paywallsController.js):
+  - `GET/POST /api/paywalls`, `POST /api/paywalls/sync`: User-flagged paywall persistence (`paywalls.json`).
 
 ### Services (`/backend/services`)
 - [`searchProviderFactory.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/searchProviderFactory.js): Factory returning provider instance by name (`google`, `duckduckgo`, `brave`, `github`, `hn`, `youtube`).
@@ -41,7 +43,7 @@
   - [`youtubeSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/youtubeSearchService.js): YouTube search with durations and metadata.
 - **Support Services**:
   - [`cacheService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/cacheService.js): File-based query caching in `backend/searchCache/`.
-  - [`storageService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/storageService.js): Local JSON persistence (`history.json`, `bookmarks.json`, `preferences.json`, `ratings.json`).
+  - [`storageService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/storageService.js): Local JSON persistence (`history.json`, `bookmarks.json`, `preferences.json`, `ratings.json`, `paywalls.json`).
   - [`preferenceEngine.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/preferenceEngine.js): Re-ranks and filters search results against user preferences.
 
 ---
@@ -63,7 +65,7 @@
   - Search history dropdown with quick-clear and re-query.
 - [`ResultCard.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/ResultCard.jsx):
   - Polymorphic card renderer tailored by result type (Web, YouTube video with duration, GitHub repo with stars/languages, Hacker News story with points).
-  - Bookmark toggle (`Save`/`Saved`) and Good/Bad resource rating buttons (`👍 Good`/`👎 Bad`) with card border feedback.
+  - Bookmark toggle (`Save`/`Saved`), Good/Bad resource rating buttons (`👍 Good`/`👎 Bad`) with card border feedback, and discreet manual paywall toggle button (`<Lock size={12} />`).
 
 ---
 
