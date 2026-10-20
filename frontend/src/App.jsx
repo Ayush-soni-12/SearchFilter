@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -214,21 +214,6 @@ function App() {
       cacheId: currentCacheId
     });
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (activePage !== 'results' || !nextContinuationToken || isLoadingMore || isLoading) return;
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const threshold = document.documentElement.offsetHeight - 600;
-      if (scrollPosition >= threshold) {
-        handleLoadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePage, nextContinuationToken, isLoadingMore, isLoading, query, lastOptions, apiKey, currentCacheId]);
 
   const proceedWithCache = () => {
     handleSearch(query, { ...lastOptions, useCacheId: cacheNotification.id, engine: activeEngine });
@@ -632,18 +617,24 @@ function App() {
                     )}
 
                     {!isLoadingMore && nextContinuationToken && (
-                      <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '1.5rem' }}>
+                      <div className="load-more-prompt animate-slide-up">
+                        <p className="load-more-prompt-text">
+                          You've reached the end of these results. Would you like to fetch more?
+                        </p>
                         <button 
-                          className="secondary-btn" 
+                          type="button"
+                          className="primary-btn load-more-btn" 
                           onClick={handleLoadMore}
-                          style={{
-                            padding: '0.65rem 1.75rem',
-                            borderRadius: '8px',
-                            fontWeight: '600'
-                          }}
                         >
-                          Load More Results
+                          <ArrowDown size={15} />
+                          <span>Yes, Fetch More Results</span>
                         </button>
+                      </div>
+                    )}
+
+                    {!isLoadingMore && !nextContinuationToken && displayedResults.length > 0 && (
+                      <div className="end-of-results-notice animate-slide-up">
+                        <span>End of results</span>
                       </div>
                     )}
                   </>

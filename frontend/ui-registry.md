@@ -57,3 +57,4 @@ Last updated: 2026-10-18
 | Resource Rating Action | `.rating-btn-group`: Good / Bad (`.like-btn` / `.dislike-btn`) toggle buttons. Green/emerald active state for Good (`.is-good`), rose/red active state with slight card dimming for Bad (`.is-bad`). Implicitly indicates resource was visited and tested. Stored hybrid: instant optimistic update to `localStorage` + background persistence in `backend/ratings.json`. |
 | Bookmark Action | `.bookmark-btn`: Toggle button (`Save` -> `Saved` with blue active state) allowing users to bookmark results |
 | Rating Filter Bar | `.results-header-bar` & `.rating-filter-group`: Exclusive 1-at-a-time filter pills (`All`, `Good`, `Bad`, `Not Visited`) with live count badges. Selecting one hides the rest. |
+| Pagination Prompt | `.load-more-prompt`: Manual confirmation card asking the user if they want more results before fetching. Eliminates unexpected automatic auto-scrolling fetches. |
