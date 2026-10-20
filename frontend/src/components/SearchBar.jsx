@@ -68,6 +68,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
 
   const [cleanWeb, setCleanWeb] = useState(true);
   const [antiSeo, setAntiSeo] = useState(true);
+  const [deDuplicate, setDeDuplicate] = useState(true);
   const [showFilterInfo, setShowFilterInfo] = useState(false);
 
   const [maxStars, setMaxStars] = useState(0);
@@ -86,6 +87,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
     engine,
     cleanWeb,
     antiSeo,
+    deDuplicate,
     maxViews,
     hideShorts,
     blacklistedChannels: blockedChannels.join(','),
@@ -219,6 +221,14 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           </button>
           <button
             type="button"
+            className={`engine-btn primary-engine-btn${engine === 'primary' ? ' active' : ''}`}
+            onClick={() => handleEngineChange('primary')}
+            title="Authoritative systems documentation, Linux kernel, USENIX/arXiv research papers, and hardware specs"
+          >
+            📜 Primary Sources
+          </button>
+          <button
+            type="button"
             className={`engine-btn${engine === 'hackernews' ? ' active' : ''}`}
             onClick={() => handleEngineChange('hackernews')}
           >
@@ -238,6 +248,26 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           >
             🐙 GitHub (Gems)
           </button>
+        </div>
+      )}
+
+      {/* Primary Sources Advanced Info Bar */}
+      {!searchInBookmarks && engine === 'primary' && (
+        <div className="filter-drawer primary-filter-drawer animate-slide-up" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+          <div style={{
+            display: 'flex',
+            gap: '0.85rem',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            width: '100%',
+            fontSize: '0.83rem',
+            color: 'var(--text-secondary)'
+          }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#6366f1', fontWeight: 600 }}>
+              <span>📜 Authoritative Systems Index</span>
+            </span>
+            <span>• Scopes Linux Kernel (`docs.kernel.org`, `lwn.net`, `man7.org`), USENIX, arXiv preprints, and Hardware Specs (`intel.com`, `arm.com`).</span>
+          </div>
         </div>
       )}
 
@@ -269,6 +299,16 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
                 style={{ accentColor: 'var(--accent-color)' }}
               />
               <span>🛡️ Anti-SEO Filter</span>
+            </label>
+
+            <label className="filter-label" title="Cluster and collapse redundant copy-paste introductory overviews">
+              <input
+                type="checkbox"
+                checked={deDuplicate}
+                onChange={(e) => setDeDuplicate(e.target.checked)}
+                style={{ accentColor: 'var(--accent-color)' }}
+              />
+              <span>🧩 De-duplicate Echoes</span>
             </label>
 
             <button

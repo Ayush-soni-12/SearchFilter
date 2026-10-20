@@ -1,4 +1,5 @@
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock } from 'lucide-react';
+import { useState } from 'react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock, Award, FileText, Cpu, AlertTriangle, Layers, ChevronDown } from 'lucide-react';
 
 export default function ResultCard({
   result,
@@ -13,6 +14,7 @@ export default function ResultCard({
   onBlockChannel,
   blockedChannels = []
 }) {
+  const [isClusterExpanded, setIsClusterExpanded] = useState(false);
   const ratingClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : '';
 
   if (result.engine === 'hackernews' || result.isHackerNews) {
@@ -317,6 +319,46 @@ export default function ResultCard({
             </a>
             <div className="result-domain" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.45rem' }}>
               <span>{result.domain}</span>
+              {result.isPrimarySource && (
+                <span 
+                  className={`primary-source-badge ${(result.primaryCategory || '').toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+                  title={`Authoritative primary technical source: ${result.primaryCategory || 'Primary Source'}`}
+                >
+                  <Award size={11} />
+                  <span>{result.primaryCategory || 'Primary Source'}</span>
+                </span>
+              )}
+              {result.depthLevel === 'deep' && (
+                <span 
+                  className="depth-badge deep" 
+                  title="High Information Depth: Concrete architectural mechanisms, registers, or code structures detected"
+                >
+                  <Cpu size={11} />
+                  <span>Deep Mechanics</span>
+                </span>
+              )}
+              {result.isEchoChamber && (
+                <span 
+                  className="depth-badge shallow" 
+                  title="Echo Chamber Detected: Repetitive cliché phrases with zero low-level mechanisms"
+                >
+                  <AlertTriangle size={11} />
+                  <span>Cliché Heavy</span>
+                </span>
+              )}
+              {result.pdfUrl && (
+                <a 
+                  href={result.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="primary-pdf-badge"
+                  title="Direct open-access paper PDF"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FileText size={11} />
+                  <span>PDF</span>
+                </a>
+              )}
               {isPaywalledByUser && (
                 <span 
                   className="paywall-badge manual" 
@@ -377,7 +419,47 @@ export default function ResultCard({
           </div>
         </div>
         
+        {result.authors && (
+          <div className="paper-authors-meta">
+            <span>By {result.authors}</span>
+            {result.publishedYear && <span> • ({result.publishedYear})</span>}
+          </div>
+        )}
         <p className="result-snippet">{result.snippet}</p>
+
+        {result.collapsedVariants && result.collapsedVariants.length > 0 && (
+          <div className="cluster-container">
+            <button 
+              type="button" 
+              className={`cluster-toggle-btn ${isClusterExpanded ? 'expanded' : ''}`}
+              onClick={() => setIsClusterExpanded(!isClusterExpanded)}
+            >
+              <Layers size={13} />
+              <span>
+                {isClusterExpanded 
+                  ? `Hide ${result.collapsedVariants.length} similar introductory summaries`
+                  : `🔁 ${result.collapsedVariants.length} similar introductory summaries collapsed`}
+              </span>
+              <ChevronDown size={13} style={{ transform: isClusterExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+            </button>
+            
+            {isClusterExpanded && (
+              <div className="cluster-variants-list animate-slide-up">
+                {result.collapsedVariants.map((variant, idx) => (
+                  <div key={idx} className="cluster-variant-item">
+                    <div className="cluster-variant-header">
+                      <a href={variant.url} target="_blank" rel="noopener noreferrer" className="cluster-variant-link">
+                        {variant.title}
+                      </a>
+                      <span className="cluster-variant-domain">{variant.domain}</span>
+                    </div>
+                    {variant.snippet && <p className="cluster-variant-snippet">{variant.snippet}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       <div className="result-footer">

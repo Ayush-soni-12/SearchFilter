@@ -56,7 +56,12 @@ Last updated: 2026-10-18
 | Card Header Layout | `.result-header-main`: Left-aligned title (`flex: 1; min-width: 0`), clickable directly to destination.<br>`.result-header-actions`: Vertical column (`flex-direction: column`) on the right containing `.bookmark-btn` and `.rating-btn-group` without redundant "Open" button. |
 | Resource Rating Action | `.rating-btn-group`: Good / Bad (`.like-btn` / `.dislike-btn`) toggle buttons. Green/emerald active state for Good (`.is-good`), rose/red active state with slight card dimming for Bad (`.is-bad`). Implicitly indicates resource was visited and tested. Stored hybrid: instant optimistic update to `localStorage` + background persistence in `backend/ratings.json`. |
 | Bookmark Action | `.bookmark-btn`: Toggle button (`Save` -> `Saved` with blue active state) allowing users to bookmark results |
-| Rating Filter Bar | `.results-header-bar` & `.rating-filter-group`: Exclusive 1-at-a-time filter pills (`All`, `Good`, `Bad`, `Not Visited`) with live count badges. Selecting one hides the rest. |
+| Rating Filter Bar | `.results-header-bar` & `.rating-filter-group`: Exclusive 1-at-a-time filter pills (`All`, `Primary`, `Good`, `Bad`, `Not Visited`) with live count badges. The `Primary` pill dynamically surfaces when authoritative sources exist. |
 | Pagination Prompt | `.load-more-prompt`: Manual confirmation card asking the user if they want more results before fetching. Eliminates unexpected automatic auto-scrolling fetches. |
 | Manual Paywall Flag | `.action-icon-mini-btn.paywall-toggle-btn`: Discreet 25px x 25px lock icon button in `.result-header-actions` next to Bookmark. Allows 1-click toggling of paywall status stored in `backend/paywalls.json` and synced optimistically. Flagged links display `.paywall-badge.manual` in amber next to the domain. |
+| Primary Source Engine & Badges | `.engine-btn.primary-engine-btn`: Specialized search mode scoping Linux Kernel, USENIX/arXiv, and Hardware specs.<br>`.primary-source-badge`: Compact pill next to domain with category (`Linux Kernel` in sky blue, `Systems Research` in purple, `Hardware Spec` in orange).<br>`.primary-pdf-badge`: Emerald green badge for 1-click access to open-access paper PDFs. |
+| Information Depth Badges | `.depth-badge.deep`: Cyan pill (`⚡ Deep Mechanics`) indicating concrete registers, kernel structures, and low-level code tokens.<br>`.depth-badge.shallow`: Rose pill (`⚠️ Cliché Heavy`) flagging empty buzzwords and superficial fluff. |
+| Redundant Cluster Accordion | `.cluster-container` & `.cluster-toggle-btn`: Accordion at card bottom collapsing redundant 101 overviews under 1 representative card. Expands `.cluster-variants-list` with direct links and snippets without polluting the viewport. |
+
+
 

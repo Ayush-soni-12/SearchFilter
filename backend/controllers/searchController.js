@@ -29,6 +29,7 @@ export const handleSearch = async (req, res) => {
     apiKey,
     cleanWeb,
     antiSeo,
+    deDuplicate,
     blacklistedDomains
   } = req.query;
 
@@ -165,7 +166,8 @@ export const handleSearch = async (req, res) => {
 
     const rankedResults = await preferenceEngine.rankResults(rawResults, {
       antiSeo: parsedAntiSeo,
-      blacklistedDomains: parsedBlacklistedDomains
+      blacklistedDomains: parsedBlacklistedDomains,
+      deDuplicate: deDuplicate !== 'false'
     });
     
     let currentCacheId = cacheId || null;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -529,11 +529,13 @@ function App() {
                 const goodCount = visibleResults.filter(r => resourceRatings[r.url] === 'good').length;
                 const badCount = visibleResults.filter(r => resourceRatings[r.url] === 'bad').length;
                 const unvisitedCount = visibleResults.filter(r => !resourceRatings[r.url]).length;
+                const primaryCount = visibleResults.filter(r => r.isPrimarySource).length;
 
                 const displayedResults = visibleResults.filter(r => {
                   if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
                   if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
                   if (ratingFilter === 'unvisited') return !resourceRatings[r.url];
+                  if (ratingFilter === 'primary') return !!r.isPrimarySource;
                   return true;
                 });
 
@@ -544,7 +546,7 @@ function App() {
                         Showing {displayedResults.length} of {visibleResults.length} results
                         {ratingFilter !== 'all' && (
                           <span className="active-filter-tag">
-                            Filtered by: {ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter}
+                            Filtered by: {ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter}
                           </span>
                         )}
                       </div>
@@ -559,6 +561,19 @@ function App() {
                           <span>All</span>
                           <span className="pill-count">{visibleResults.length}</span>
                         </button>
+
+                        {primaryCount > 0 && (
+                          <button
+                            type="button"
+                            className={`filter-pill primary ${ratingFilter === 'primary' ? 'active' : ''}`}
+                            onClick={() => setRatingFilter(prev => prev === 'primary' ? 'all' : 'primary')}
+                            title="Show only authoritative primary sources (Linux kernel docs, USENIX, arXiv preprints, hardware specs)"
+                          >
+                            <Award size={12} strokeWidth={ratingFilter === 'primary' ? 2.5 : 1.8} />
+                            <span>Primary</span>
+                            <span className="pill-count">{primaryCount}</span>
+                          </button>
+                        )}
 
                         <button
                           type="button"

@@ -25,6 +25,7 @@ export const api = {
     if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
     if (options.cleanWeb !== undefined) url += `&cleanWeb=${encodeURIComponent(options.cleanWeb)}`;
     if (options.antiSeo !== undefined) url += `&antiSeo=${encodeURIComponent(options.antiSeo)}`;
+    if (options.deDuplicate !== undefined) url += `&deDuplicate=${encodeURIComponent(options.deDuplicate)}`;
     if (options.blacklistedDomains) url += `&blacklistedDomains=${encodeURIComponent(options.blacklistedDomains)}`;
     if (options.cacheId) url += `&cacheId=${encodeURIComponent(options.cacheId)}`;
     

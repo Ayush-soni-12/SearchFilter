@@ -33,18 +33,21 @@
   - `GET/POST /api/paywalls`, `POST /api/paywalls/sync`: User-flagged paywall persistence (`paywalls.json`).
 
 ### Services (`/backend/services`)
-- [`searchProviderFactory.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/searchProviderFactory.js): Factory returning provider instance by name (`google`, `duckduckgo`, `brave`, `github`, `hn`, `youtube`).
+- [`searchProviderFactory.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/searchProviderFactory.js): Factory returning provider instance by name (`google`, `duckduckgo`, `brave`, `primary`, `github`, `hn`, `youtube`).
 - **Engine Providers**:
   - [`googleSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/googleSearchService.js): Google Custom Search / scraping provider.
   - [`duckDuckGoSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/duckDuckGoSearchService.js): DuckDuckGo API / scraping provider.
   - [`braveSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/braveSearchService.js): Brave Search API provider.
+  - [`primarySourcesSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/primarySourcesSearchService.js): Dedicated primary sources provider interleaving arXiv research papers and scoped Linux kernel/systems web docs.
   - [`githubSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/githubSearchService.js): GitHub repository/code search.
   - [`hnSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/hnSearchService.js): Algolia Hacker News search API.
   - [`youtubeSearchService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/youtubeSearchService.js): YouTube search with durations and metadata.
 - **Support Services**:
   - [`cacheService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/cacheService.js): File-based query caching in `backend/searchCache/`.
   - [`storageService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/storageService.js): Local JSON persistence (`history.json`, `bookmarks.json`, `preferences.json`, `ratings.json`, `paywalls.json`).
-  - [`preferenceEngine.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/preferenceEngine.js): Re-ranks and filters search results against user preferences.
+  - [`primarySourcesService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/primarySourcesService.js): Authoritative domain profile registry (`Linux Kernel`, `Systems Research`, `Hardware Spec`, `Standards & RFCs`, `Academic Research`) and result annotation.
+  - [`echoChamberService.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/echoChamberService.js): Information Depth scoring (concrete low-level mechanisms vs empty buzzwords), cliché carbon-copy detection, and semantic clustering of redundant 101 overviews.
+  - [`preferenceEngine.js`](file:///home/username_anna/Desktop/SearchFilter/backend/services/preferenceEngine.js): Re-ranks and filters search results against user preferences, automatically boosting primary sources (+15 pts), rewarding deep mechanics (+10 pts), penalizing shallow fluff (-10 pts) and echo chambers (-15 pts), and grouping duplicate variants.
 
 ---
 
@@ -52,7 +55,7 @@
 
 ### Entry & Core
 - [`frontend/src/main.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/main.jsx): React root mounting into `index.html`.
-- [`frontend/src/App.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx): Main application container. Manages active engine, query state, filter drawer toggles, rating filter toggles (`All`, `Good`, `Bad`, `Not Visited`), user-confirmed pagination prompt, bookmarks/history modals, theme toggle, and results grid.
+- [`frontend/src/App.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx): Main application container. Manages active engine, query state, filter drawer toggles, rating filter toggles (`All`, `Primary`, `Good`, `Bad`, `Not Visited`), user-confirmed pagination prompt, bookmarks/history modals, theme toggle, and results grid.
 - [`frontend/src/api.js`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/api.js): Centralized API client functions (`search`, `fetchPreferences`, `savePreference`, `fetchBookmarks`, etc.).
 - [`frontend/src/index.css`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/index.css): Design tokens, theme variables (`--bg`, `--card-bg`, `--border-color`), layout styles, responsive media queries.
 - [`frontend/ui-registry.md`](file:///home/username_anna/Desktop/SearchFilter/frontend/ui-registry.md): Living design system specs, color tokens, and card geometry reference.
@@ -60,12 +63,12 @@
 ### Components (`/frontend/src/components`)
 - [`SearchBar.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/SearchBar.jsx):
   - Primary search input with shortcut listener (`/` to focus, `Esc` to blur).
-  - Search engine pill selector (`all`, `google`, `github`, `youtube`, `hn`, etc.).
-  - Expandable filter drawer (domain exclusions, date filters, safe search).
+  - Search engine pill selector (`all`, `google`, `duckduckgo`, `brave`, `primary`, `github`, `youtube`, `hn`).
+  - Expandable filter drawer (domain exclusions, date filters, safe search, primary sources index overview, de-duplicate echoes toggle).
   - Search history dropdown with quick-clear and re-query.
 - [`ResultCard.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/components/ResultCard.jsx):
   - Polymorphic card renderer tailored by result type (Web, YouTube video with duration, GitHub repo with stars/languages, Hacker News story with points).
-  - Bookmark toggle (`Save`/`Saved`), Good/Bad resource rating buttons (`👍 Good`/`👎 Bad`) with card border feedback, and discreet manual paywall toggle button (`<Lock size={12} />`).
+  - Bookmark toggle (`Save`/`Saved`), Good/Bad resource rating buttons (`👍 Good`/`👎 Bad`) with card border feedback, discreet manual paywall toggle button (`<Lock size={12} />`), authoritative `.primary-source-badge`, `.depth-badge` (`Deep Mechanics` / `Cliché Heavy`), direct research `.primary-pdf-badge`, paper author metadata, and expandable `.cluster-container` collapsing redundant 101 overviews.
 
 ---
 
