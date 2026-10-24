@@ -630,6 +630,52 @@ button {
   transform: scale(0.97);
 }
 
+/* Dedicated Visited Action Button */
+.visited-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 0.32rem 0.65rem;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.visited-btn:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: var(--text-primary);
+  background: var(--neutral-bg);
+}
+
+.visited-btn.visited {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #10b981;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .visited-btn.visited {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.55);
+  color: #34d399;
+}
+
+.visited-btn.visited:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.65);
+}
+
+.visited-btn:active {
+  transform: scale(0.97);
+}
+
 /* Rating (Good / Bad) Action Buttons */
 .rating-btn-group {
   display: flex;
@@ -720,6 +766,7 @@ button {
 
 .result-header-actions .action-btn,
 .result-header-actions .bookmark-btn,
+.result-header-actions .visited-btn,
 .result-header-actions .rating-btn,
 .result-header-actions .open-btn {
   justify-content: center;
@@ -873,6 +920,28 @@ button {
 }
 .filter-pill.bad.active .pill-count {
   background: #dc2626;
+  color: #ffffff;
+}
+
+.filter-pill.visited:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #10b981;
+}
+[data-theme="dark"] .filter-pill.visited:hover {
+  color: #34d399;
+}
+.filter-pill.visited.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+[data-theme="dark"] .filter-pill.visited.active {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.55);
+  color: #34d399;
+}
+.filter-pill.visited.active .pill-count {
+  background: #10b981;
   color: #ffffff;
 }
 

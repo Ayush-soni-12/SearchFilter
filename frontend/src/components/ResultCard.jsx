@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock, Award, FileText, Cpu, AlertTriangle, Layers, ChevronDown } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock, Award, FileText, Cpu, AlertTriangle, Layers, ChevronDown, Check } from 'lucide-react';
 
 export default function ResultCard({
   result,
@@ -7,6 +7,8 @@ export default function ResultCard({
   onPreferenceChange,
   isBookmarked,
   onBookmarkToggle,
+  isVisited = false,
+  onVisitedToggle,
   rating,
   onRatingChange,
   isPaywalledByUser = false,
@@ -15,7 +17,7 @@ export default function ResultCard({
   blockedChannels = []
 }) {
   const [isClusterExpanded, setIsClusterExpanded] = useState(false);
-  const ratingClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : '';
+  const cardClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : isVisited ? ' is-visited' : '';
 
   if (result.engine === 'hackernews' || result.isHackerNews) {
     const formattedDate = result.createdAt
@@ -23,7 +25,7 @@ export default function ResultCard({
       : null;
 
     return (
-      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
+      <div className={`result-card vercel-card animate-slide-up${cardClass}`}>
         <div>
           <div className="result-header">
             <div className="result-header-main">
@@ -41,6 +43,17 @@ export default function ResultCard({
                 >
                   {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+                </button>
+              )}
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited (click to unmark)' : 'Mark as visited'}
+                >
+                  <Check size={13} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
                 </button>
               )}
               {onRatingChange && (
@@ -111,7 +124,7 @@ export default function ResultCard({
 
   if (result.isGitHub) {
     return (
-      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
+      <div className={`result-card vercel-card animate-slide-up${cardClass}`}>
         <div>
           <div className="result-header">
             <div className="result-header-main" style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
@@ -140,6 +153,17 @@ export default function ResultCard({
                 >
                   {isBookmarked ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+                </button>
+              )}
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited (click to unmark)' : 'Mark as visited'}
+                >
+                  <Check size={13} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
                 </button>
               )}
               {onRatingChange && (
@@ -201,7 +225,7 @@ export default function ResultCard({
 
   if (result.isYouTube) {
     return (
-      <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
+      <div className={`result-card vercel-card animate-slide-up${cardClass}`}>
         <div className="yt-card-content">
           <div>
             {/* Thumbnail preview with image outline overlay */}
@@ -259,6 +283,17 @@ export default function ResultCard({
                   <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                 </button>
               )}
+              {onVisitedToggle && (
+                <button
+                  type="button"
+                  className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                  onClick={onVisitedToggle}
+                  title={isVisited ? 'Visited (click to unmark)' : 'Mark as visited'}
+                >
+                  <Check size={13} strokeWidth={isVisited ? 2.5 : 1.8} />
+                  <span>Visited</span>
+                </button>
+              )}
               {onRatingChange && (
                 <div className="rating-btn-group" style={{ width: 'auto' }}>
                   <button
@@ -310,7 +345,7 @@ export default function ResultCard({
   }
 
   return (
-    <div className={`result-card vercel-card animate-slide-up${ratingClass}`}>
+    <div className={`result-card vercel-card animate-slide-up${cardClass}`}>
       <div>
         <div className="result-header">
           <div className="result-header-main">
@@ -394,6 +429,17 @@ export default function ResultCard({
                 </button>
               )}
             </div>
+            {onVisitedToggle && (
+              <button
+                type="button"
+                className={`action-btn visited-btn ${isVisited ? 'visited' : ''}`}
+                onClick={onVisitedToggle}
+                title={isVisited ? 'Visited (click to unmark)' : 'Mark as visited'}
+              >
+                <Check size={13} strokeWidth={isVisited ? 2.5 : 1.8} />
+                <span>Visited</span>
+              </button>
+            )}
             {onRatingChange && (
               <div className="rating-btn-group">
                 <button

@@ -138,5 +138,28 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to sync paywalls');
     return res.json();
+  },
+  getVisited: async () => {
+    const res = await fetch(`${API_BASE}/visited`);
+    if (!res.ok) throw new Error('Failed to get visited results');
+    return res.json();
+  },
+  setVisited: async (url, isVisited) => {
+    const res = await fetch(`${API_BASE}/visited`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, isVisited })
+    });
+    if (!res.ok) throw new Error('Failed to set visited status');
+    return res.json();
+  },
+  syncVisited: async (visited) => {
+    const res = await fetch(`${API_BASE}/visited/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visited })
+    });
+    if (!res.ok) throw new Error('Failed to sync visited status');
+    return res.json();
   }
 };

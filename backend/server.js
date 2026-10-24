@@ -6,6 +6,7 @@ import historyRoutes from './routes/historyRoutes.js';
 import bookmarksRoutes from './routes/bookmarksRoutes.js';
 import ratingsRoutes from './routes/ratingsRoutes.js';
 import paywallsRoutes from './routes/paywallsRoutes.js';
+import visitedRoutes from './routes/visitedRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4001;
@@ -24,6 +25,7 @@ app.use('/api/history', historyRoutes);
 app.use('/api/bookmarks', bookmarksRoutes);
 app.use('/api/ratings', ratingsRoutes);
 app.use('/api/paywalls', paywallsRoutes);
+app.use('/api/visited', visitedRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'SearchFilter backend is running' });
