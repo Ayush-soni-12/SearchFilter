@@ -8,6 +8,8 @@ const HISTORY_FILE = path.join(__dirname, '../history.json');
 
 const BOOKMARKS_FILE = path.join(__dirname, '../bookmarks.json');
 const RATINGS_FILE = path.join(__dirname, '../ratings.json');
+const PAYWALLS_FILE = path.join(__dirname, '../paywalls.json');
+const VISITED_FILE = path.join(__dirname, '../visited.json');
 
 const readJsonFile = async (filePath, defaultData) => {
   try {
@@ -154,6 +156,70 @@ export const storageService = {
       await writeJsonFile(RATINGS_FILE, ratings);
     }
     return ratings;
+  },
+
+  getPaywalls: async () => readJsonFile(PAYWALLS_FILE, {}),
+  setPaywall: async ({ url, isPaywalled }) => {
+    if (!url) return await readJsonFile(PAYWALLS_FILE, {});
+    const paywalls = await readJsonFile(PAYWALLS_FILE, {});
+    if (!isPaywalled) {
+      delete paywalls[url];
+    } else {
+      paywalls[url] = true;
+    }
+    await writeJsonFile(PAYWALLS_FILE, paywalls);
+    return paywalls;
+  },
+  syncPaywalls: async (paywallsMap) => {
+    if (!paywallsMap || typeof paywallsMap !== 'object') {
+      return await readJsonFile(PAYWALLS_FILE, {});
+    }
+    const paywalls = await readJsonFile(PAYWALLS_FILE, {});
+    let modified = false;
+    for (const [url, val] of Object.entries(paywallsMap)) {
+      if (url && val) {
+        if (!paywalls[url]) {
+          paywalls[url] = true;
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      await writeJsonFile(PAYWALLS_FILE, paywalls);
+    }
+    return paywalls;
+  },
+
+  getVisited: async () => readJsonFile(VISITED_FILE, {}),
+  setVisited: async ({ url, isVisited }) => {
+    if (!url) return await readJsonFile(VISITED_FILE, {});
+    const visited = await readJsonFile(VISITED_FILE, {});
+    if (!isVisited) {
+      delete visited[url];
+    } else {
+      visited[url] = true;
+    }
+    await writeJsonFile(VISITED_FILE, visited);
+    return visited;
+  },
+  syncVisited: async (visitedMap) => {
+    if (!visitedMap || typeof visitedMap !== 'object') {
+      return await readJsonFile(VISITED_FILE, {});
+    }
+    const visited = await readJsonFile(VISITED_FILE, {});
+    let modified = false;
+    for (const [url, val] of Object.entries(visitedMap)) {
+      if (url && val) {
+        if (!visited[url]) {
+          visited[url] = true;
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      await writeJsonFile(VISITED_FILE, visited);
+    }
+    return visited;
   }
 };
 

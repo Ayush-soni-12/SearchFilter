@@ -87,6 +87,8 @@ export class DuckDuckGoSearchService extends SearchProvider {
           nextContinuationToken: String(page + 1)
         };
       }
+
+      return { results: [], nextContinuationToken: null };
     } catch (error) {
       console.warn('DuckDuckGo direct fetch failed/rate limited, using fallback:', error.message);
       return { results: [], nextContinuationToken: null };

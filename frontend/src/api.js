@@ -25,6 +25,7 @@ export const api = {
     if (options.apiKey) url += `&apiKey=${encodeURIComponent(options.apiKey)}`;
     if (options.cleanWeb !== undefined) url += `&cleanWeb=${encodeURIComponent(options.cleanWeb)}`;
     if (options.antiSeo !== undefined) url += `&antiSeo=${encodeURIComponent(options.antiSeo)}`;
+    if (options.deDuplicate !== undefined) url += `&deDuplicate=${encodeURIComponent(options.deDuplicate)}`;
     if (options.blacklistedDomains) url += `&blacklistedDomains=${encodeURIComponent(options.blacklistedDomains)}`;
     if (options.cacheId) url += `&cacheId=${encodeURIComponent(options.cacheId)}`;
     
@@ -113,6 +114,52 @@ export const api = {
       body: JSON.stringify({ ratings })
     });
     if (!res.ok) throw new Error('Failed to sync ratings');
+    return res.json();
+  },
+  getPaywalls: async () => {
+    const res = await fetch(`${API_BASE}/paywalls`);
+    if (!res.ok) throw new Error('Failed to get paywalls');
+    return res.json();
+  },
+  setPaywall: async (url, isPaywalled) => {
+    const res = await fetch(`${API_BASE}/paywalls`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, isPaywalled })
+    });
+    if (!res.ok) throw new Error('Failed to set paywall flag');
+    return res.json();
+  },
+  syncPaywalls: async (paywalls) => {
+    const res = await fetch(`${API_BASE}/paywalls/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paywalls })
+    });
+    if (!res.ok) throw new Error('Failed to sync paywalls');
+    return res.json();
+  },
+  getVisited: async () => {
+    const res = await fetch(`${API_BASE}/visited`);
+    if (!res.ok) throw new Error('Failed to get visited results');
+    return res.json();
+  },
+  setVisited: async (url, isVisited) => {
+    const res = await fetch(`${API_BASE}/visited`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, isVisited })
+    });
+    if (!res.ok) throw new Error('Failed to set visited status');
+    return res.json();
+  },
+  syncVisited: async (visited) => {
+    const res = await fetch(`${API_BASE}/visited/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visited })
+    });
+    if (!res.ok) throw new Error('Failed to sync visited status');
     return res.json();
   }
 };

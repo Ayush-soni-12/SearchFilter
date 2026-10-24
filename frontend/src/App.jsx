@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -15,7 +15,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showHidden, setShowHidden] = useState(false);
-  const [ratingFilter, setRatingFilter] = useState('all'); // 'all' | 'good' | 'bad' | 'unvisited'
+  const [ratingFilter, setRatingFilter] = useState('all'); // 'all' | 'visited' | 'unvisited' | 'good' | 'bad' | 'primary'
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
@@ -31,15 +31,56 @@ function App() {
   const [resourceRatings, setResourceRatings] = useState(() => {
     try {
       const stored = localStorage.getItem('resourceRatings');
-      if (stored) return JSON.parse(stored);
-      const legacy = JSON.parse(localStorage.getItem('visitedResults') || '[]');
-      const initial = {};
-      legacy.forEach(url => { initial[url] = 'good'; });
-      return initial;
+      return stored ? JSON.parse(stored) : {};
     } catch {
       return {};
     }
   });
+
+  const [visitedResults, setVisitedResults] = useState(() => {
+    try {
+      const stored = localStorage.getItem('visitedResults');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const map = {};
+          parsed.forEach(url => { map[url] = true; });
+          return map;
+        }
+        return parsed;
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  });
+
+  const isResultVisited = (url) => !!visitedResults[url] || !!resourceRatings[url];
+
+  const handleVisitedToggle = (url) => {
+    if (!url) return;
+    const isCurrentlyVisited = isResultVisited(url);
+    const newStatus = !isCurrentlyVisited;
+
+    setVisitedResults(prev => {
+      const next = { ...prev };
+      if (newStatus) {
+        next[url] = true;
+      } else {
+        delete next[url];
+      }
+      localStorage.setItem('visitedResults', JSON.stringify(next));
+      return next;
+    });
+
+    if (!newStatus && resourceRatings[url]) {
+      handleRatingChange(url, null);
+    }
+
+    api.setVisited(url, newStatus).catch(err => {
+      console.warn('Failed to sync visited status to server:', err);
+    });
+  };
 
   const handleRatingChange = (url, rating) => {
     if (!url) return;
@@ -57,9 +98,52 @@ function App() {
       return next;
     });
 
+    // Rating a resource also implies it has been visited
+    if (targetRating) {
+      setVisitedResults(prev => {
+        if (prev[url]) return prev;
+        const next = { ...prev, [url]: true };
+        localStorage.setItem('visitedResults', JSON.stringify(next));
+        api.setVisited(url, true).catch(() => {});
+        return next;
+      });
+    }
+
     // 2. Background sync to backend disk storage
     api.setRating(url, targetRating).catch(err => {
       console.warn('Failed to sync rating to server:', err);
+    });
+  };
+
+  const [userPaywalls, setUserPaywalls] = useState(() => {
+    try {
+      const stored = localStorage.getItem('userPaywalls');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleTogglePaywall = (url) => {
+    if (!url) return;
+    const isCurrentlyPaywalled = !!userPaywalls[url];
+    const newStatus = !isCurrentlyPaywalled;
+
+    // 1. Instant optimistic update (0ms)
+    setUserPaywalls(prev => {
+      const next = { ...prev };
+      if (newStatus) {
+        next[url] = true;
+      } else {
+        delete next[url];
+      }
+      localStorage.setItem('userPaywalls', JSON.stringify(next));
+      return next;
+    });
+
+    // 2. Background sync to server
+    api.setPaywall(url, newStatus).catch(err => {
+      console.warn('Failed to sync paywall flag to server:', err);
     });
   };
 
@@ -112,6 +196,36 @@ function App() {
       });
     }).catch(err => {
       console.warn('Could not fetch server ratings, using local ratings:', err);
+    });
+
+    // Initial paywalls sync: fetch backend paywalls and merge with local
+    api.getPaywalls().then(serverPaywalls => {
+      setUserPaywalls(prev => {
+        const merged = { ...serverPaywalls, ...prev };
+        localStorage.setItem('userPaywalls', JSON.stringify(merged));
+        const needsSync = Object.keys(prev).some(url => !serverPaywalls[url]);
+        if (needsSync) {
+          api.syncPaywalls(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server paywalls, using local paywalls:', err);
+    });
+
+    // Initial visited sync: fetch backend visited and merge with local visited
+    api.getVisited().then(serverVisited => {
+      setVisitedResults(prev => {
+        const merged = { ...serverVisited, ...prev };
+        localStorage.setItem('visitedResults', JSON.stringify(merged));
+        const needsSync = Object.keys(prev).some(url => !serverVisited[url]);
+        if (needsSync) {
+          api.syncVisited(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server visited, using local visited:', err);
     });
   }, []);
 
@@ -479,14 +593,18 @@ function App() {
                 const visibleResults = results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid');
                 const hiddenResults = results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid');
                 
+                const visitedCount = visibleResults.filter(r => isResultVisited(r.url)).length;
+                const unvisitedCount = visibleResults.filter(r => !isResultVisited(r.url)).length;
                 const goodCount = visibleResults.filter(r => resourceRatings[r.url] === 'good').length;
                 const badCount = visibleResults.filter(r => resourceRatings[r.url] === 'bad').length;
-                const unvisitedCount = visibleResults.filter(r => !resourceRatings[r.url]).length;
+                const primaryCount = visibleResults.filter(r => r.isPrimarySource).length;
 
                 const displayedResults = visibleResults.filter(r => {
+                  if (ratingFilter === 'visited') return isResultVisited(r.url);
+                  if (ratingFilter === 'unvisited') return !isResultVisited(r.url);
                   if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
                   if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
-                  if (ratingFilter === 'unvisited') return !resourceRatings[r.url];
+                  if (ratingFilter === 'primary') return !!r.isPrimarySource;
                   return true;
                 });
 
@@ -497,12 +615,12 @@ function App() {
                         Showing {displayedResults.length} of {visibleResults.length} results
                         {ratingFilter !== 'all' && (
                           <span className="active-filter-tag">
-                            Filtered by: {ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter}
+                            Filtered by: {ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : 'Bad'}
                           </span>
                         )}
                       </div>
 
-                      <div className="rating-filter-group" role="tablist" aria-label="Filter results by rating">
+                      <div className="rating-filter-group" role="tablist" aria-label="Filter results by rating and visit status">
                         <button
                           type="button"
                           className={`filter-pill ${ratingFilter === 'all' ? 'active' : ''}`}
@@ -513,11 +631,46 @@ function App() {
                           <span className="pill-count">{visibleResults.length}</span>
                         </button>
 
+                        {primaryCount > 0 && (
+                          <button
+                            type="button"
+                            className={`filter-pill primary ${ratingFilter === 'primary' ? 'active' : ''}`}
+                            onClick={() => setRatingFilter(prev => prev === 'primary' ? 'all' : 'primary')}
+                            title="Show only authoritative primary sources (Linux kernel docs, USENIX, arXiv preprints, hardware specs)"
+                          >
+                            <Award size={12} strokeWidth={ratingFilter === 'primary' ? 2.5 : 1.8} />
+                            <span>Primary</span>
+                            <span className="pill-count">{primaryCount}</span>
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          className={`filter-pill visited ${ratingFilter === 'visited' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'visited' ? 'all' : 'visited')}
+                          title="Show only Visited results (visited or rated)"
+                        >
+                          <Check size={12} strokeWidth={ratingFilter === 'visited' ? 2.5 : 1.8} />
+                          <span>Visited</span>
+                          <span className="pill-count">{visitedCount}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`filter-pill unvisited ${ratingFilter === 'unvisited' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'unvisited' ? 'all' : 'unvisited')}
+                          title="Show only resources not visited yet"
+                        >
+                          <EyeOff size={12} />
+                          <span>Not Visited</span>
+                          <span className="pill-count">{unvisitedCount}</span>
+                        </button>
+
                         <button
                           type="button"
                           className={`filter-pill good ${ratingFilter === 'good' ? 'active' : ''}`}
                           onClick={() => setRatingFilter(prev => prev === 'good' ? 'all' : 'good')}
-                          title="Show only Good results (hides bad & not visited)"
+                          title="Show only Good results"
                         >
                           <ThumbsUp size={12} strokeWidth={ratingFilter === 'good' ? 2.5 : 1.8} fill={ratingFilter === 'good' ? 'currentColor' : 'none'} />
                           <span>Good</span>
@@ -528,22 +681,11 @@ function App() {
                           type="button"
                           className={`filter-pill bad ${ratingFilter === 'bad' ? 'active' : ''}`}
                           onClick={() => setRatingFilter(prev => prev === 'bad' ? 'all' : 'bad')}
-                          title="Show only Bad results (hides good & not visited)"
+                          title="Show only Bad results"
                         >
                           <ThumbsDown size={12} strokeWidth={ratingFilter === 'bad' ? 2.5 : 1.8} fill={ratingFilter === 'bad' ? 'currentColor' : 'none'} />
                           <span>Bad</span>
                           <span className="pill-count">{badCount}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`filter-pill unvisited ${ratingFilter === 'unvisited' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter(prev => prev === 'unvisited' ? 'all' : 'unvisited')}
-                          title="Show only resources not visited yet (hides good & bad)"
-                        >
-                          <EyeOff size={12} />
-                          <span>Not Visited</span>
-                          <span className="pill-count">{unvisitedCount}</span>
                         </button>
                       </div>
                     </div>
@@ -567,8 +709,12 @@ function App() {
                                 onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                                 isBookmarked={isBookmarked(result.url)}
                                 onBookmarkToggle={() => handleBookmarkToggle(result)}
+                                isVisited={isResultVisited(result.url)}
+                                onVisitedToggle={() => handleVisitedToggle(result.url)}
                                 rating={resourceRatings[result.url] || null}
                                 onRatingChange={(rating) => handleRatingChange(result.url, rating)}
+                                isPaywalledByUser={!!userPaywalls[result.url]}
+                                onTogglePaywall={() => handleTogglePaywall(result.url)}
                               />
                             ))}
                           </div>
@@ -579,7 +725,7 @@ function App() {
                     {displayedResults.length === 0 ? (
                       <div className="empty-filter-state animate-slide-up">
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                          No results found matching the <strong>"{ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter}"</strong> filter.
+                          No results found matching the <strong>"{ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter}"</strong> filter.
                         </p>
                         <button 
                           className="secondary-btn" 
@@ -599,8 +745,12 @@ function App() {
                             onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                             isBookmarked={isBookmarked(result.url)}
                             onBookmarkToggle={() => handleBookmarkToggle(result)}
+                            isVisited={isResultVisited(result.url)}
+                            onVisitedToggle={() => handleVisitedToggle(result.url)}
                             rating={resourceRatings[result.url] || null}
                             onRatingChange={(rating) => handleRatingChange(result.url, rating)}
+                            isPaywalledByUser={!!userPaywalls[result.url]}
+                            onTogglePaywall={() => handleTogglePaywall(result.url)}
                             onBlockChannel={result.isYouTube ? blockChannel : undefined}
                             blockedChannels={blockedChannels}
                           />
@@ -664,6 +814,8 @@ function App() {
                       onPreferenceChange={(status) => handlePreferenceChange(result.domain, status)}
                       isBookmarked={true}
                       onBookmarkToggle={() => handleRemoveBookmark(result.url)}
+                      isVisited={isResultVisited(result.url)}
+                      onVisitedToggle={() => handleVisitedToggle(result.url)}
                       rating={resourceRatings[result.url] || null}
                       onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                     />
