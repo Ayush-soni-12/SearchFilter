@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check, Ban } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check, Ban, Database, RotateCw, Pin, ChevronDown } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -18,6 +18,8 @@ function App() {
   const [ratingFilter, setRatingFilter] = useState('all'); // 'all' | 'visited' | 'unvisited' | 'good' | 'bad' | 'primary'
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
+  const [showCacheMenu, setShowCacheMenu] = useState(false);
+  const cacheMenuRef = useRef(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
   const [activeEngine, setActiveEngine] = useState('google');
   const [lastOptions, setLastOptions] = useState({});
@@ -219,6 +221,18 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (cacheMenuRef.current && !cacheMenuRef.current.contains(event.target)) {
+        setShowCacheMenu(false);
+      }
+    }
+    if (showCacheMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showCacheMenu]);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -533,6 +547,73 @@ function App() {
     return list;
   };
 
+  const cacheButtonSlot = activeCache ? (
+    <div className="cache-btn-container" ref={cacheMenuRef}>
+      <button
+        type="button"
+        className={`cache-pill-btn ${activeCache.permanent ? 'pinned' : ''} ${activeCache.isStale ? 'stale' : ''} ${showCacheMenu ? 'active' : ''}`}
+        onClick={() => setShowCacheMenu(prev => !prev)}
+        title="Viewing Cached Results — Click for cache actions"
+        aria-expanded={showCacheMenu}
+        aria-haspopup="true"
+      >
+        <Database size={13} className="cache-icon" />
+        <span className="cache-btn-title">Cached</span>
+        {activeCache.permanent && <span className="cache-mini-tag pinned">📌 Pinned</span>}
+        {activeCache.isStale && <span className="cache-mini-tag stale">⚠️ Stale</span>}
+        <ChevronDown size={12} className={`cache-chevron ${showCacheMenu ? 'open' : ''}`} />
+      </button>
+
+      {showCacheMenu && (
+        <div className="cache-popover-menu animate-slide-up" role="menu">
+          <div className="cache-popover-header">
+            <span className="cache-popover-title">Viewing Cached Results</span>
+            {activeCache.permanent ? (
+              <span className="cache-popover-tag pinned">Pinned</span>
+            ) : activeCache.isStale ? (
+              <span className="cache-popover-tag stale">Stale</span>
+            ) : (
+              <span className="cache-popover-tag fresh">Fresh</span>
+            )}
+          </div>
+          <div className="cache-popover-actions">
+            {!activeCache.permanent && (
+              <button
+                type="button"
+                className="cache-popover-item"
+                onClick={() => { handlePin(); setShowCacheMenu(false); }}
+                role="menuitem"
+              >
+                <Pin size={13} />
+                <span>Pin Cache Permanently</span>
+              </button>
+            )}
+            {activeCache.isStale && !activeCache.permanent && (
+              <button
+                type="button"
+                className="cache-popover-item"
+                onClick={() => { handleRenew(); setShowCacheMenu(false); }}
+                role="menuitem"
+              >
+                <RotateCw size={13} />
+                <span>Renew Results</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="cache-popover-item danger"
+              onClick={() => { handleDelete(); setShowCacheMenu(false); }}
+              role="menuitem"
+            >
+              <Trash2 size={13} />
+              <span>Delete Cache</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  ) : null;
+
   return (
     <div className="app-container">
       <nav className="navbar">
@@ -590,6 +671,7 @@ function App() {
                 onBlockChannel={blockChannel}
                 onUnblockChannel={unblockChannel}
                 onEngineChange={setActiveEngine}
+                extraSlot={cacheButtonSlot}
               />
             </div>
 
@@ -597,13 +679,6 @@ function App() {
               <aside className="top-right-filter-card animate-slide-up" aria-label="Filters">
                 <div className="top-filter-header">
                   <span className="top-filter-title">Filters</span>
-                  <span className="top-filter-count">
-                    {displayedResults.length === visibleResults.length ? (
-                      `${visibleResults.length}`
-                    ) : (
-                      <><strong className="count-active">{displayedResults.length}</strong><span className="count-slash">/</span>{visibleResults.length}</>
-                    )}
-                  </span>
                 </div>
 
                 <nav className="top-filter-list" role="tablist" aria-label="Filter results">
@@ -779,21 +854,6 @@ function App() {
                   <div>
                     <strong>Searching Bookmarks Only</strong> — Showing results matching your local bookmarks.
                   </div>
-                </div>
-              </div>
-            )}
-
-            {activeCache && (
-              <div className="cache-banner animate-slide-up">
-                <div>
-                  <strong>Viewing Cached Results</strong>
-                  {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
-                  {activeCache.permanent && <span style={{ marginLeft: '10px', color: '#4ade80' }}>(Pinned)</span>}
-                </div>
-                <div style={{ display: 'flex', gap: '0.4rem' }}>
-                  {!activeCache.permanent && <button className="secondary-btn" onClick={handlePin} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>📌 Pin</button>}
-                  {activeCache.isStale && !activeCache.permanent && <button className="secondary-btn" onClick={handleRenew} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>🔄 Renew</button>}
-                  <button className="secondary-btn" onClick={handleDelete} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', color: '#f87171' }}>🗑 Delete</button>
                 </div>
               </div>
             )}

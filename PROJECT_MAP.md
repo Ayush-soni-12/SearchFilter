@@ -59,7 +59,7 @@
 
 ### Entry & Core
 - [`frontend/src/main.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/main.jsx): React root mounting into `index.html`.
-- [`frontend/src/App.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx): Main application container. Manages active engine, query state, filter drawer toggles, top-right vertical filter card beside the search bar (`All`, `Primary`, `Visited`, `Not Visited`, `Good`, `Bad`, `Not Relevant`), user-confirmed pagination prompt, bookmarks/history modals, theme toggle, and results grid.
+- [`frontend/src/App.jsx`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/App.jsx): Main application container. Manages active engine, query state, filter drawer toggles, rating, visit & relevance filter toggles (`All`, `Primary`, `Visited`, `Not Visited`, `Good`, `Bad`, `Not Relevant`), compact cache pill button with action popover (`Pin`, `Renew`, `Delete`), user-confirmed pagination prompt, bookmarks/history modals, theme toggle, and results grid.
 - [`frontend/src/api.js`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/api.js): Centralized API client functions (`search`, `fetchPreferences`, `savePreference`, `fetchBookmarks`, `getVisited`, `setVisited`, `getNotRelevant`, `setNotRelevant`, etc.).
 - [`frontend/src/index.css`](file:///home/username_anna/Desktop/SearchFilter/frontend/src/index.css): Design tokens, theme variables (`--bg`, `--card-bg`, `--border-color`), layout styles, responsive media queries.
 - [`frontend/ui-registry.md`](file:///home/username_anna/Desktop/SearchFilter/frontend/ui-registry.md): Living design system specs, color tokens, and card geometry reference.

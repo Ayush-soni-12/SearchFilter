@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Clock, Bookmark, Search as SearchIcon } from 'lucide-react';
 
-export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel, onEngineChange }) {
+export default function SearchBar({ onSearch, initialQuery = '', isLoading, history = [], blockedChannels = [], onBlockChannel, onUnblockChannel, onEngineChange, extraSlot }) {
   const [val, setVal] = useState(initialQuery);
   const [showHistory, setShowHistory] = useState(false);
   const [activeHistoryIndex, setActiveHistoryIndex] = useState(-1);
@@ -681,7 +681,7 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
         </button>
       </form>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
         <button
           type="button"
           className="open-btn"
@@ -696,6 +696,8 @@ export default function SearchBar({ onSearch, initialQuery = '', isLoading, hist
           <Bookmark size={14} />
           <span>{searchInBookmarks ? 'Searching Bookmarks Only (Active)' : 'Search in Bookmarks Only'}</span>
         </button>
+
+        {extraSlot}
       </div>
     </div>
   );
