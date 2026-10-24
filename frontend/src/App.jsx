@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check, Ban, Database, RotateCw, Pin, ChevronDown } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -18,6 +18,8 @@ function App() {
   const [ratingFilter, setRatingFilter] = useState('all'); // 'all' | 'visited' | 'unvisited' | 'good' | 'bad' | 'primary'
   const [cacheNotification, setCacheNotification] = useState(null);
   const [activeCache, setActiveCache] = useState(null);
+  const [showCacheMenu, setShowCacheMenu] = useState(false);
+  const cacheMenuRef = useRef(null);
   const [isFromBookmarks, setIsFromBookmarks] = useState(false);
   const [activeEngine, setActiveEngine] = useState('google');
   const [lastOptions, setLastOptions] = useState({});
@@ -147,10 +149,90 @@ function App() {
     });
   };
 
+  const [notRelevantResults, setNotRelevantResults] = useState(() => {
+    try {
+      const stored = localStorage.getItem('notRelevantResults');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const map = {};
+          parsed.forEach(url => { map[url] = true; });
+          return map;
+        }
+        return parsed;
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  });
+
+  const [hideNotRelevant, setHideNotRelevant] = useState(false);
+
+  const handleToggleNotRelevant = (url) => {
+    if (!url) return;
+    const isCurrentlyNotRelevant = !!notRelevantResults[url];
+    const newStatus = !isCurrentlyNotRelevant;
+
+    // 1. Instant optimistic update in React state + localStorage (0ms)
+    setNotRelevantResults(prev => {
+      const next = { ...prev };
+      if (newStatus) {
+        next[url] = true;
+      } else {
+        delete next[url];
+      }
+      localStorage.setItem('notRelevantResults', JSON.stringify(next));
+      return next;
+    });
+
+    // 2. Background sync to server
+    api.setNotRelevant(url, newStatus).catch(err => {
+      console.warn('Failed to sync not relevant status to server:', err);
+    });
+  };
+
+  const visibleResults = useMemo(() => results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid'), [results, preferences]);
+  const hiddenResults = useMemo(() => results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid'), [results, preferences]);
+  
+  const visitedCount = useMemo(() => visibleResults.filter(r => isResultVisited(r.url)).length, [visibleResults, visitedResults, resourceRatings]);
+  const unvisitedCount = useMemo(() => visibleResults.filter(r => !isResultVisited(r.url) && !notRelevantResults[r.url]).length, [visibleResults, visitedResults, resourceRatings, notRelevantResults]);
+  const goodCount = useMemo(() => visibleResults.filter(r => resourceRatings[r.url] === 'good').length, [visibleResults, resourceRatings]);
+  const badCount = useMemo(() => visibleResults.filter(r => resourceRatings[r.url] === 'bad').length, [visibleResults, resourceRatings]);
+  const primaryCount = useMemo(() => visibleResults.filter(r => r.isPrimarySource).length, [visibleResults]);
+  const notRelevantCount = useMemo(() => visibleResults.filter(r => notRelevantResults[r.url]).length, [visibleResults, notRelevantResults]);
+
+  const displayedResults = useMemo(() => {
+    return visibleResults.filter(r => {
+      if (ratingFilter === 'visited') return isResultVisited(r.url);
+      if (ratingFilter === 'unvisited') return !isResultVisited(r.url) && !notRelevantResults[r.url];
+      if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
+      if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
+      if (ratingFilter === 'primary') return !!r.isPrimarySource;
+      if (ratingFilter === 'not_relevant') return !!notRelevantResults[r.url];
+      if (hideNotRelevant && notRelevantResults[r.url]) return false;
+      return true;
+    });
+  }, [visibleResults, ratingFilter, hideNotRelevant, visitedResults, resourceRatings, notRelevantResults]);
+
+  const hasFilterableResults = !isLoading && activePage === 'results' && !cacheNotification && results.length > 0;
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (cacheMenuRef.current && !cacheMenuRef.current.contains(event.target)) {
+        setShowCacheMenu(false);
+      }
+    }
+    if (showCacheMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showCacheMenu]);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -226,6 +308,21 @@ function App() {
       });
     }).catch(err => {
       console.warn('Could not fetch server visited, using local visited:', err);
+    });
+
+    // Initial not-relevant sync: fetch backend not-relevant and merge with local
+    api.getNotRelevant().then(serverNotRelevant => {
+      setNotRelevantResults(prev => {
+        const merged = { ...serverNotRelevant, ...prev };
+        localStorage.setItem('notRelevantResults', JSON.stringify(merged));
+        const needsSync = Object.keys(prev).some(url => !serverNotRelevant[url]);
+        if (needsSync) {
+          api.syncNotRelevant(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server not-relevant, using local:', err);
     });
   }, []);
 
@@ -450,6 +547,73 @@ function App() {
     return list;
   };
 
+  const cacheButtonSlot = activeCache ? (
+    <div className="cache-btn-container" ref={cacheMenuRef}>
+      <button
+        type="button"
+        className={`cache-pill-btn ${activeCache.permanent ? 'pinned' : ''} ${activeCache.isStale ? 'stale' : ''} ${showCacheMenu ? 'active' : ''}`}
+        onClick={() => setShowCacheMenu(prev => !prev)}
+        title="Viewing Cached Results — Click for cache actions"
+        aria-expanded={showCacheMenu}
+        aria-haspopup="true"
+      >
+        <Database size={13} className="cache-icon" />
+        <span className="cache-btn-title">Cached</span>
+        {activeCache.permanent && <span className="cache-mini-tag pinned">📌 Pinned</span>}
+        {activeCache.isStale && <span className="cache-mini-tag stale">⚠️ Stale</span>}
+        <ChevronDown size={12} className={`cache-chevron ${showCacheMenu ? 'open' : ''}`} />
+      </button>
+
+      {showCacheMenu && (
+        <div className="cache-popover-menu animate-slide-up" role="menu">
+          <div className="cache-popover-header">
+            <span className="cache-popover-title">Viewing Cached Results</span>
+            {activeCache.permanent ? (
+              <span className="cache-popover-tag pinned">Pinned</span>
+            ) : activeCache.isStale ? (
+              <span className="cache-popover-tag stale">Stale</span>
+            ) : (
+              <span className="cache-popover-tag fresh">Fresh</span>
+            )}
+          </div>
+          <div className="cache-popover-actions">
+            {!activeCache.permanent && (
+              <button
+                type="button"
+                className="cache-popover-item"
+                onClick={() => { handlePin(); setShowCacheMenu(false); }}
+                role="menuitem"
+              >
+                <Pin size={13} />
+                <span>Pin Cache Permanently</span>
+              </button>
+            )}
+            {activeCache.isStale && !activeCache.permanent && (
+              <button
+                type="button"
+                className="cache-popover-item"
+                onClick={() => { handleRenew(); setShowCacheMenu(false); }}
+                role="menuitem"
+              >
+                <RotateCw size={13} />
+                <span>Renew Results</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="cache-popover-item danger"
+              onClick={() => { handleDelete(); setShowCacheMenu(false); }}
+              role="menuitem"
+            >
+              <Trash2 size={13} />
+              <span>Delete Cache</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  ) : null;
+
   return (
     <div className="app-container">
       <nav className="navbar">
@@ -496,16 +660,139 @@ function App() {
 
       <main>
         {activePage !== 'settings' && activePage !== 'bookmarks' && (
-          <SearchBar
-            onSearch={handleSearch}
-            initialQuery={query}
-            isLoading={isLoading}
-            history={history}
-            blockedChannels={blockedChannels}
-            onBlockChannel={blockChannel}
-            onUnblockChannel={unblockChannel}
-            onEngineChange={setActiveEngine}
-          />
+          <div className={`search-header-layout ${hasFilterableResults ? 'has-filter-card' : ''}`}>
+            <div className="search-bar-col">
+              <SearchBar
+                onSearch={handleSearch}
+                initialQuery={query}
+                isLoading={isLoading}
+                history={history}
+                blockedChannels={blockedChannels}
+                onBlockChannel={blockChannel}
+                onUnblockChannel={unblockChannel}
+                onEngineChange={setActiveEngine}
+                extraSlot={cacheButtonSlot}
+              />
+            </div>
+
+            {hasFilterableResults && (
+              <aside className="top-right-filter-card animate-slide-up" aria-label="Filters">
+                <div className="top-filter-header">
+                  <span className="top-filter-title">Filters</span>
+                </div>
+
+                <nav className="top-filter-list" role="tablist" aria-label="Filter results">
+                  <button
+                    type="button"
+                    className={`v-filter-btn ${ratingFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter('all')}
+                    title="Show all results"
+                  >
+                    <span className="v-filter-name">All</span>
+                    <span className="v-filter-count">{visibleResults.length}</span>
+                  </button>
+
+                  {primaryCount > 0 && (
+                    <button
+                      type="button"
+                      className={`v-filter-btn primary ${ratingFilter === 'primary' ? 'active' : ''}`}
+                      onClick={() => setRatingFilter(prev => prev === 'primary' ? 'all' : 'primary')}
+                      title="Authoritative primary sources"
+                    >
+                      <span className="v-filter-left">
+                        <Award size={13} strokeWidth={ratingFilter === 'primary' ? 2.5 : 1.8} />
+                        <span className="v-filter-name">Primary</span>
+                      </span>
+                      <span className="v-filter-count">{primaryCount}</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className={`v-filter-btn visited ${ratingFilter === 'visited' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter(prev => prev === 'visited' ? 'all' : 'visited')}
+                    title="Show visited results"
+                  >
+                    <span className="v-filter-left">
+                      <Check size={13} strokeWidth={ratingFilter === 'visited' ? 2.5 : 1.8} />
+                      <span className="v-filter-name">Visited</span>
+                    </span>
+                    <span className="v-filter-count">{visitedCount}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`v-filter-btn unvisited ${ratingFilter === 'unvisited' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter(prev => prev === 'unvisited' ? 'all' : 'unvisited')}
+                    title="Show not visited results"
+                  >
+                    <span className="v-filter-left">
+                      <EyeOff size={13} />
+                      <span className="v-filter-name">Not Visited</span>
+                    </span>
+                    <span className="v-filter-count">{unvisitedCount}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`v-filter-btn good ${ratingFilter === 'good' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter(prev => prev === 'good' ? 'all' : 'good')}
+                    title="Show good results"
+                  >
+                    <span className="v-filter-left">
+                      <ThumbsUp size={13} strokeWidth={ratingFilter === 'good' ? 2.5 : 1.8} fill={ratingFilter === 'good' ? 'currentColor' : 'none'} />
+                      <span className="v-filter-name">Good</span>
+                    </span>
+                    <span className="v-filter-count">{goodCount}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`v-filter-btn bad ${ratingFilter === 'bad' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter(prev => prev === 'bad' ? 'all' : 'bad')}
+                    title="Show bad results"
+                  >
+                    <span className="v-filter-left">
+                      <ThumbsDown size={13} strokeWidth={ratingFilter === 'bad' ? 2.5 : 1.8} fill={ratingFilter === 'bad' ? 'currentColor' : 'none'} />
+                      <span className="v-filter-name">Bad</span>
+                    </span>
+                    <span className="v-filter-count">{badCount}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`v-filter-btn not-relevant ${ratingFilter === 'not_relevant' ? 'active' : ''}`}
+                    onClick={() => setRatingFilter(prev => prev === 'not_relevant' ? 'all' : 'not_relevant')}
+                    title="Show not-relevant results"
+                  >
+                    <span className="v-filter-left">
+                      <Ban size={13} strokeWidth={ratingFilter === 'not_relevant' ? 2.5 : 1.8} />
+                      <span className="v-filter-name">Not Relevant</span>
+                    </span>
+                    <span className="v-filter-count">{notRelevantCount}</span>
+                  </button>
+
+                  {notRelevantCount > 0 && ratingFilter !== 'not_relevant' && (
+                    <>
+                      <div className="v-filter-divider" />
+                      <button
+                        type="button"
+                        className={`v-filter-btn hide-toggle ${hideNotRelevant ? 'active' : ''}`}
+                        onClick={() => setHideNotRelevant(prev => !prev)}
+                        title={hideNotRelevant ? 'Show not-relevant results' : 'Hide not-relevant results'}
+                      >
+                        <span className="v-filter-left">
+                          <EyeOff size={13} />
+                          <span className="v-filter-name">{hideNotRelevant ? 'Hidden' : 'Hide Irrelevant'}</span>
+                        </span>
+                        <span className="v-filter-count">{notRelevantCount}</span>
+                      </button>
+                    </>
+                  )}
+                </nav>
+              </aside>
+            )}
+          </div>
         )}
 
         {errorMsg && (
@@ -571,126 +858,11 @@ function App() {
               </div>
             )}
 
-            {activeCache && (
-              <div className="cache-banner animate-slide-up">
-                <div>
-                  <strong>Viewing Cached Results</strong>
-                  {activeCache.isStale && <span style={{ marginLeft: '10px', color: '#f87171' }}>(Stale)</span>}
-                  {activeCache.permanent && <span style={{ marginLeft: '10px', color: '#4ade80' }}>(Pinned)</span>}
-                </div>
-                <div style={{ display: 'flex', gap: '0.4rem' }}>
-                  {!activeCache.permanent && <button className="secondary-btn" onClick={handlePin} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>📌 Pin</button>}
-                  {activeCache.isStale && !activeCache.permanent && <button className="secondary-btn" onClick={handleRenew} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>🔄 Renew</button>}
-                  <button className="secondary-btn" onClick={handleDelete} style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', color: '#f87171' }}>🗑 Delete</button>
-                </div>
-              </div>
-            )}
-
             {results.length === 0 ? (
               <p style={{ color: 'var(--text-secondary)' }}>No results found.</p>
             ) : (
-              (() => {
-                const visibleResults = results.filter(r => (preferences[r.domain] || 'neutral') !== 'avoid');
-                const hiddenResults = results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid');
-                
-                const visitedCount = visibleResults.filter(r => isResultVisited(r.url)).length;
-                const unvisitedCount = visibleResults.filter(r => !isResultVisited(r.url)).length;
-                const goodCount = visibleResults.filter(r => resourceRatings[r.url] === 'good').length;
-                const badCount = visibleResults.filter(r => resourceRatings[r.url] === 'bad').length;
-                const primaryCount = visibleResults.filter(r => r.isPrimarySource).length;
-
-                const displayedResults = visibleResults.filter(r => {
-                  if (ratingFilter === 'visited') return isResultVisited(r.url);
-                  if (ratingFilter === 'unvisited') return !isResultVisited(r.url);
-                  if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
-                  if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
-                  if (ratingFilter === 'primary') return !!r.isPrimarySource;
-                  return true;
-                });
-
-                return (
-                  <>
-                    <div className="results-header-bar">
-                      <div className="results-count-badge">
-                        Showing {displayedResults.length} of {visibleResults.length} results
-                        {ratingFilter !== 'all' && (
-                          <span className="active-filter-tag">
-                            Filtered by: {ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : 'Bad'}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="rating-filter-group" role="tablist" aria-label="Filter results by rating and visit status">
-                        <button
-                          type="button"
-                          className={`filter-pill ${ratingFilter === 'all' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter('all')}
-                          title="Show all results"
-                        >
-                          <span>All</span>
-                          <span className="pill-count">{visibleResults.length}</span>
-                        </button>
-
-                        {primaryCount > 0 && (
-                          <button
-                            type="button"
-                            className={`filter-pill primary ${ratingFilter === 'primary' ? 'active' : ''}`}
-                            onClick={() => setRatingFilter(prev => prev === 'primary' ? 'all' : 'primary')}
-                            title="Show only authoritative primary sources (Linux kernel docs, USENIX, arXiv preprints, hardware specs)"
-                          >
-                            <Award size={12} strokeWidth={ratingFilter === 'primary' ? 2.5 : 1.8} />
-                            <span>Primary</span>
-                            <span className="pill-count">{primaryCount}</span>
-                          </button>
-                        )}
-
-                        <button
-                          type="button"
-                          className={`filter-pill visited ${ratingFilter === 'visited' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter(prev => prev === 'visited' ? 'all' : 'visited')}
-                          title="Show only Visited results (visited or rated)"
-                        >
-                          <Check size={12} strokeWidth={ratingFilter === 'visited' ? 2.5 : 1.8} />
-                          <span>Visited</span>
-                          <span className="pill-count">{visitedCount}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`filter-pill unvisited ${ratingFilter === 'unvisited' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter(prev => prev === 'unvisited' ? 'all' : 'unvisited')}
-                          title="Show only resources not visited yet"
-                        >
-                          <EyeOff size={12} />
-                          <span>Not Visited</span>
-                          <span className="pill-count">{unvisitedCount}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`filter-pill good ${ratingFilter === 'good' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter(prev => prev === 'good' ? 'all' : 'good')}
-                          title="Show only Good results"
-                        >
-                          <ThumbsUp size={12} strokeWidth={ratingFilter === 'good' ? 2.5 : 1.8} fill={ratingFilter === 'good' ? 'currentColor' : 'none'} />
-                          <span>Good</span>
-                          <span className="pill-count">{goodCount}</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          className={`filter-pill bad ${ratingFilter === 'bad' ? 'active' : ''}`}
-                          onClick={() => setRatingFilter(prev => prev === 'bad' ? 'all' : 'bad')}
-                          title="Show only Bad results"
-                        >
-                          <ThumbsDown size={12} strokeWidth={ratingFilter === 'bad' ? 2.5 : 1.8} fill={ratingFilter === 'bad' ? 'currentColor' : 'none'} />
-                          <span>Bad</span>
-                          <span className="pill-count">{badCount}</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {hiddenResults.length > 0 && (
+              <>
+                {hiddenResults.length > 0 && (
                       <div className="hidden-results-container">
                         <button 
                           className="toggle-hidden-btn"
@@ -715,6 +887,8 @@ function App() {
                                 onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                                 isPaywalledByUser={!!userPaywalls[result.url]}
                                 onTogglePaywall={() => handleTogglePaywall(result.url)}
+                                isNotRelevant={!!notRelevantResults[result.url]}
+                                onToggleNotRelevant={() => handleToggleNotRelevant(result.url)}
                               />
                             ))}
                           </div>
@@ -725,7 +899,7 @@ function App() {
                     {displayedResults.length === 0 ? (
                       <div className="empty-filter-state animate-slide-up">
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                          No results found matching the <strong>"{ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter}"</strong> filter.
+                          No results found matching the <strong>"{ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : ratingFilter === 'bad' ? 'Bad' : 'Not Relevant'}"</strong> filter.
                         </p>
                         <button 
                           className="secondary-btn" 
@@ -751,6 +925,8 @@ function App() {
                             onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                             isPaywalledByUser={!!userPaywalls[result.url]}
                             onTogglePaywall={() => handleTogglePaywall(result.url)}
+                            isNotRelevant={!!notRelevantResults[result.url]}
+                            onToggleNotRelevant={() => handleToggleNotRelevant(result.url)}
                             onBlockChannel={result.isYouTube ? blockChannel : undefined}
                             blockedChannels={blockedChannels}
                           />
@@ -788,9 +964,7 @@ function App() {
                       </div>
                     )}
                   </>
-                );
-              })()
-            )}
+                )}
           </div>
         )}
 

@@ -10,6 +10,7 @@ const BOOKMARKS_FILE = path.join(__dirname, '../bookmarks.json');
 const RATINGS_FILE = path.join(__dirname, '../ratings.json');
 const PAYWALLS_FILE = path.join(__dirname, '../paywalls.json');
 const VISITED_FILE = path.join(__dirname, '../visited.json');
+const NOT_RELEVANT_FILE = path.join(__dirname, '../notRelevant.json');
 
 const readJsonFile = async (filePath, defaultData) => {
   try {
@@ -220,6 +221,38 @@ export const storageService = {
       await writeJsonFile(VISITED_FILE, visited);
     }
     return visited;
+  },
+
+  getNotRelevant: async () => readJsonFile(NOT_RELEVANT_FILE, {}),
+  setNotRelevant: async ({ url, isNotRelevant }) => {
+    if (!url) return await readJsonFile(NOT_RELEVANT_FILE, {});
+    const notRelevant = await readJsonFile(NOT_RELEVANT_FILE, {});
+    if (!isNotRelevant) {
+      delete notRelevant[url];
+    } else {
+      notRelevant[url] = true;
+    }
+    await writeJsonFile(NOT_RELEVANT_FILE, notRelevant);
+    return notRelevant;
+  },
+  syncNotRelevant: async (notRelevantMap) => {
+    if (!notRelevantMap || typeof notRelevantMap !== 'object') {
+      return await readJsonFile(NOT_RELEVANT_FILE, {});
+    }
+    const notRelevant = await readJsonFile(NOT_RELEVANT_FILE, {});
+    let modified = false;
+    for (const [url, val] of Object.entries(notRelevantMap)) {
+      if (url && val) {
+        if (!notRelevant[url]) {
+          notRelevant[url] = true;
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      await writeJsonFile(NOT_RELEVANT_FILE, notRelevant);
+    }
+    return notRelevant;
   }
 };
 

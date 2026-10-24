@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock, Award, FileText, Cpu, AlertTriangle, Layers, ChevronDown, Check } from 'lucide-react';
+import { ExternalLink, CheckCircle2, MinusCircle, XCircle, Bookmark, BookmarkCheck, Play, ThumbsUp, ThumbsDown, Lock, Award, FileText, Cpu, AlertTriangle, Layers, ChevronDown, Check, Ban } from 'lucide-react';
 
 export default function ResultCard({
   result,
@@ -9,6 +9,8 @@ export default function ResultCard({
   onBookmarkToggle,
   isVisited = false,
   onVisitedToggle,
+  isNotRelevant = false,
+  onToggleNotRelevant,
   rating,
   onRatingChange,
   isPaywalledByUser = false,
@@ -17,7 +19,10 @@ export default function ResultCard({
   blockedChannels = []
 }) {
   const [isClusterExpanded, setIsClusterExpanded] = useState(false);
-  const cardClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : isVisited ? ' is-visited' : '';
+  let cardClass = rating === 'good' ? ' is-good' : rating === 'bad' ? ' is-bad' : isVisited ? ' is-visited' : '';
+  if (isNotRelevant) {
+    cardClass += ' is-not-relevant';
+  }
 
   if (result.engine === 'hackernews' || result.isHackerNews) {
     const formattedDate = result.createdAt
@@ -77,6 +82,17 @@ export default function ResultCard({
                     <span>Bad</span>
                   </button>
                 </div>
+              )}
+              {onToggleNotRelevant && (
+                <button
+                  type="button"
+                  className={`action-btn not-relevant-btn ${isNotRelevant ? 'active' : ''}`}
+                  onClick={onToggleNotRelevant}
+                  title={isNotRelevant ? 'Marked as not relevant (click to unflag)' : 'Flag as not relevant'}
+                >
+                  <Ban size={12} strokeWidth={isNotRelevant ? 2.5 : 1.8} />
+                  <span>Not Relevant</span>
+                </button>
               )}
               {result.hnUrl && (
                 <a href={result.hnUrl} target="_blank" rel="noopener noreferrer" className="open-btn">
@@ -187,6 +203,17 @@ export default function ResultCard({
                     <span>Bad</span>
                   </button>
                 </div>
+              )}
+              {onToggleNotRelevant && (
+                <button
+                  type="button"
+                  className={`action-btn not-relevant-btn ${isNotRelevant ? 'active' : ''}`}
+                  onClick={onToggleNotRelevant}
+                  title={isNotRelevant ? 'Marked as not relevant (click to unflag)' : 'Flag as not relevant'}
+                >
+                  <Ban size={12} strokeWidth={isNotRelevant ? 2.5 : 1.8} />
+                  <span>Not Relevant</span>
+                </button>
               )}
             </div>
           </div>
@@ -315,6 +342,17 @@ export default function ResultCard({
                     <span>Bad</span>
                   </button>
                 </div>
+              )}
+              {onToggleNotRelevant && (
+                <button
+                  type="button"
+                  className={`action-btn not-relevant-btn ${isNotRelevant ? 'active' : ''}`}
+                  onClick={onToggleNotRelevant}
+                  title={isNotRelevant ? 'Marked as not relevant (click to unflag)' : 'Flag as not relevant'}
+                >
+                  <Ban size={12} strokeWidth={isNotRelevant ? 2.5 : 1.8} />
+                  <span>Not Relevant</span>
+                </button>
               )}
               {onBlockChannel && result.channelName && (() => {
                 const isBlocked = blockedChannels.includes(result.channelName);
@@ -461,6 +499,17 @@ export default function ResultCard({
                   <span>Bad</span>
                 </button>
               </div>
+            )}
+            {onToggleNotRelevant && (
+              <button
+                type="button"
+                className={`action-btn not-relevant-btn ${isNotRelevant ? 'active' : ''}`}
+                onClick={onToggleNotRelevant}
+                title={isNotRelevant ? 'Marked as not relevant (click to unflag)' : 'Flag as not relevant'}
+              >
+                <Ban size={12} strokeWidth={isNotRelevant ? 2.5 : 1.8} />
+                <span>Not Relevant</span>
+              </button>
             )}
           </div>
         </div>
