@@ -161,5 +161,28 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to sync visited status');
     return res.json();
+  },
+  getNotRelevant: async () => {
+    const res = await fetch(`${API_BASE}/not-relevant`);
+    if (!res.ok) throw new Error('Failed to get not relevant results');
+    return res.json();
+  },
+  setNotRelevant: async (url, isNotRelevant) => {
+    const res = await fetch(`${API_BASE}/not-relevant`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, isNotRelevant })
+    });
+    if (!res.ok) throw new Error('Failed to set not relevant status');
+    return res.json();
+  },
+  syncNotRelevant: async (notRelevant) => {
+    const res = await fetch(`${API_BASE}/not-relevant/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notRelevant })
+    });
+    if (!res.ok) throw new Error('Failed to sync not relevant status');
+    return res.json();
   }
 };

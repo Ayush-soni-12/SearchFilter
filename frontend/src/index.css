@@ -676,6 +676,62 @@ button {
   transform: scale(0.97);
 }
 
+/* Dedicated Not Relevant Action Button */
+.not-relevant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.76rem;
+  padding: 0.28rem 0.55rem;
+  background: var(--btn-secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.not-relevant-btn:hover {
+  border-color: rgba(124, 58, 237, 0.45);
+  color: #7c3aed;
+  background: var(--neutral-bg);
+}
+
+[data-theme="dark"] .not-relevant-btn:hover {
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #a78bfa;
+}
+
+.not-relevant-btn.active {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.45);
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .not-relevant-btn.active {
+  background: rgba(124, 58, 237, 0.22);
+  border-color: rgba(167, 139, 250, 0.55);
+  color: #a78bfa;
+}
+
+.not-relevant-btn.active:hover {
+  background: rgba(124, 58, 237, 0.18);
+  border-color: rgba(124, 58, 237, 0.6);
+}
+
+[data-theme="dark"] .not-relevant-btn.active:hover {
+  background: rgba(124, 58, 237, 0.28);
+  border-color: rgba(167, 139, 250, 0.7);
+}
+
+.not-relevant-btn:active {
+  transform: scale(0.97);
+}
+
 /* Rating (Good / Bad) Action Buttons */
 .rating-btn-group {
   display: flex;
@@ -768,6 +824,7 @@ button {
 .result-header-actions .bookmark-btn,
 .result-header-actions .visited-btn,
 .result-header-actions .rating-btn,
+.result-header-actions .not-relevant-btn,
 .result-header-actions .open-btn {
   justify-content: center;
   width: 100%;
@@ -786,6 +843,22 @@ button {
 
 .result-card.is-bad:hover {
   opacity: 1;
+}
+
+.result-card.is-not-relevant {
+  border-color: rgba(124, 58, 237, 0.35);
+  opacity: 0.55;
+  filter: grayscale(0.2);
+  transition: opacity 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+}
+
+[data-theme="dark"] .result-card.is-not-relevant {
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.result-card.is-not-relevant:hover {
+  opacity: 0.95;
+  filter: none;
 }
 
 /* Results Header & Rating Filter Bar */
@@ -949,6 +1022,38 @@ button {
   background: rgba(148, 163, 184, 0.14);
   border-color: rgba(148, 163, 184, 0.4);
   color: var(--text-primary);
+}
+
+.filter-pill.not-relevant:hover {
+  border-color: rgba(124, 58, 237, 0.45);
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .filter-pill.not-relevant:hover {
+  border-color: rgba(167, 139, 250, 0.45);
+  color: #a78bfa;
+}
+
+.filter-pill.not-relevant.active {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.45);
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .filter-pill.not-relevant.active {
+  background: rgba(124, 58, 237, 0.22);
+  border-color: rgba(167, 139, 250, 0.55);
+  color: #a78bfa;
+}
+
+.filter-pill.not-relevant.active .pill-count {
+  background: #7c3aed;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .filter-pill.not-relevant.active .pill-count {
+  background: #8b5cf6;
+  color: #ffffff;
 }
 
 /* Paywall Badge on Result Cards (User Flagged) */

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check } from 'lucide-react';
+import { Settings, Search as SearchIcon, Trash2, AlertCircle, Bookmark, Sun, Moon, ThumbsUp, ThumbsDown, EyeOff, ArrowDown, Lock, Award, Check, Ban } from 'lucide-react';
 import { api } from './api';
 import SearchBar from './components/SearchBar';
 import ResultCard from './components/ResultCard';
@@ -147,6 +147,49 @@ function App() {
     });
   };
 
+  const [notRelevantResults, setNotRelevantResults] = useState(() => {
+    try {
+      const stored = localStorage.getItem('notRelevantResults');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const map = {};
+          parsed.forEach(url => { map[url] = true; });
+          return map;
+        }
+        return parsed;
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  });
+
+  const [hideNotRelevant, setHideNotRelevant] = useState(false);
+
+  const handleToggleNotRelevant = (url) => {
+    if (!url) return;
+    const isCurrentlyNotRelevant = !!notRelevantResults[url];
+    const newStatus = !isCurrentlyNotRelevant;
+
+    // 1. Instant optimistic update in React state + localStorage (0ms)
+    setNotRelevantResults(prev => {
+      const next = { ...prev };
+      if (newStatus) {
+        next[url] = true;
+      } else {
+        delete next[url];
+      }
+      localStorage.setItem('notRelevantResults', JSON.stringify(next));
+      return next;
+    });
+
+    // 2. Background sync to server
+    api.setNotRelevant(url, newStatus).catch(err => {
+      console.warn('Failed to sync not relevant status to server:', err);
+    });
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
@@ -226,6 +269,21 @@ function App() {
       });
     }).catch(err => {
       console.warn('Could not fetch server visited, using local visited:', err);
+    });
+
+    // Initial not-relevant sync: fetch backend not-relevant and merge with local
+    api.getNotRelevant().then(serverNotRelevant => {
+      setNotRelevantResults(prev => {
+        const merged = { ...serverNotRelevant, ...prev };
+        localStorage.setItem('notRelevantResults', JSON.stringify(merged));
+        const needsSync = Object.keys(prev).some(url => !serverNotRelevant[url]);
+        if (needsSync) {
+          api.syncNotRelevant(merged).catch(console.error);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Could not fetch server not-relevant, using local:', err);
     });
   }, []);
 
@@ -594,17 +652,20 @@ function App() {
                 const hiddenResults = results.filter(r => (preferences[r.domain] || 'neutral') === 'avoid');
                 
                 const visitedCount = visibleResults.filter(r => isResultVisited(r.url)).length;
-                const unvisitedCount = visibleResults.filter(r => !isResultVisited(r.url)).length;
+                const unvisitedCount = visibleResults.filter(r => !isResultVisited(r.url) && !notRelevantResults[r.url]).length;
                 const goodCount = visibleResults.filter(r => resourceRatings[r.url] === 'good').length;
                 const badCount = visibleResults.filter(r => resourceRatings[r.url] === 'bad').length;
                 const primaryCount = visibleResults.filter(r => r.isPrimarySource).length;
+                const notRelevantCount = visibleResults.filter(r => notRelevantResults[r.url]).length;
 
                 const displayedResults = visibleResults.filter(r => {
                   if (ratingFilter === 'visited') return isResultVisited(r.url);
-                  if (ratingFilter === 'unvisited') return !isResultVisited(r.url);
+                  if (ratingFilter === 'unvisited') return !isResultVisited(r.url) && !notRelevantResults[r.url];
                   if (ratingFilter === 'good') return resourceRatings[r.url] === 'good';
                   if (ratingFilter === 'bad') return resourceRatings[r.url] === 'bad';
                   if (ratingFilter === 'primary') return !!r.isPrimarySource;
+                  if (ratingFilter === 'not_relevant') return !!notRelevantResults[r.url];
+                  if (hideNotRelevant && notRelevantResults[r.url]) return false;
                   return true;
                 });
 
@@ -615,7 +676,7 @@ function App() {
                         Showing {displayedResults.length} of {visibleResults.length} results
                         {ratingFilter !== 'all' && (
                           <span className="active-filter-tag">
-                            Filtered by: {ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : 'Bad'}
+                            Filtered by: {ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : ratingFilter === 'bad' ? 'Bad' : 'Not Relevant'}
                           </span>
                         )}
                       </div>
@@ -687,6 +748,30 @@ function App() {
                           <span>Bad</span>
                           <span className="pill-count">{badCount}</span>
                         </button>
+
+                        <button
+                          type="button"
+                          className={`filter-pill not-relevant ${ratingFilter === 'not_relevant' ? 'active' : ''}`}
+                          onClick={() => setRatingFilter(prev => prev === 'not_relevant' ? 'all' : 'not_relevant')}
+                          title="Show only results flagged as not relevant"
+                        >
+                          <Ban size={12} strokeWidth={ratingFilter === 'not_relevant' ? 2.5 : 1.8} />
+                          <span>Not Relevant</span>
+                          <span className="pill-count">{notRelevantCount}</span>
+                        </button>
+
+                        {notRelevantCount > 0 && ratingFilter !== 'not_relevant' && (
+                          <button
+                            type="button"
+                            className={`filter-pill ${hideNotRelevant ? 'active' : ''}`}
+                            onClick={() => setHideNotRelevant(prev => !prev)}
+                            title={hideNotRelevant ? 'Show flagged not-relevant results' : 'Hide flagged not-relevant results from view'}
+                            style={{ borderStyle: 'dashed' }}
+                          >
+                            <EyeOff size={12} />
+                            <span>{hideNotRelevant ? `Hidden (${notRelevantCount})` : `Hide Not Relevant (${notRelevantCount})`}</span>
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -715,6 +800,8 @@ function App() {
                                 onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                                 isPaywalledByUser={!!userPaywalls[result.url]}
                                 onTogglePaywall={() => handleTogglePaywall(result.url)}
+                                isNotRelevant={!!notRelevantResults[result.url]}
+                                onToggleNotRelevant={() => handleToggleNotRelevant(result.url)}
                               />
                             ))}
                           </div>
@@ -725,7 +812,7 @@ function App() {
                     {displayedResults.length === 0 ? (
                       <div className="empty-filter-state animate-slide-up">
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                          No results found matching the <strong>"{ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter}"</strong> filter.
+                          No results found matching the <strong>"{ratingFilter === 'visited' ? 'Visited' : ratingFilter === 'unvisited' ? 'Not Visited' : ratingFilter === 'primary' ? 'Primary Sources' : ratingFilter === 'good' ? 'Good' : ratingFilter === 'bad' ? 'Bad' : 'Not Relevant'}"</strong> filter.
                         </p>
                         <button 
                           className="secondary-btn" 
@@ -751,6 +838,8 @@ function App() {
                             onRatingChange={(rating) => handleRatingChange(result.url, rating)}
                             isPaywalledByUser={!!userPaywalls[result.url]}
                             onTogglePaywall={() => handleTogglePaywall(result.url)}
+                            isNotRelevant={!!notRelevantResults[result.url]}
+                            onToggleNotRelevant={() => handleToggleNotRelevant(result.url)}
                             onBlockChannel={result.isYouTube ? blockChannel : undefined}
                             blockedChannels={blockedChannels}
                           />
